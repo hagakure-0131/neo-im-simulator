@@ -272,7 +272,9 @@ button{
 .gogo-lamp .s3{right:8px;bottom:8px}
 .medal-panel{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#10141b}
 .medal-panel .balance{font-size:32px;font-weight:900;font-variant-numeric:tabular-nums}
-.medal-ledger{font-size:12px;color:var(--muted);line-height:1.7;margin-top:6px}
+.medal-ledger{font-size:clamp(10px,3vw,12px);color:var(--muted);line-height:1.7;margin-top:6px;white-space:pre;font-variant-numeric:tabular-nums}
+#bonusAfterG{display:flex;justify-content:center;align-items:baseline;gap:0}
+#bonusAfterG .bonus-count{display:inline-block;width:7ch;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -303,10 +305,11 @@ button{
     <div class="medal-panel">
       <div class="small">🪙 持ちメダル換算・累計差枚（0枚スタート）</div>
       <div id="medalBalance" class="balance">0枚</div>
-      <div id="medalLedger" class="medal-ledger">通常投入 0枚｜小役払出 0枚｜ボーナス純増 0枚</div>
+      <div id="medalLedger" class="medal-ledger">通常投入 0枚｜小役払出 0枚
+ボーナス純増 0枚</div>
     </div>
     <div class="result" style="margin-top:12px">
-      <div id="bonusAfterG" class="small" style="font-size:18px;font-weight:800;color:var(--accent);margin-bottom:6px">ボナ後G数：0G</div>
+      <div id="bonusAfterG" class="small" style="font-size:18px;font-weight:800;color:var(--accent);margin-bottom:6px"> <span>ボナ後G数：</span><span id="bonusAfterCount" class="bonus-count">0G</span></div>
       <div id="bonusSymbol" style="font-size:44px;font-weight:1000;letter-spacing:4px;min-height:54px;margin-bottom:4px">—</div>
       <div id="role" class="role">—</div>
       <div id="rng" class="rng">取得乱数：—</div>
@@ -524,7 +527,7 @@ function draw(render=true){
   if(render){
     const isBonus = out.type==='BIG' || out.type==='REG';
     $('gogoLamp').classList.toggle('on', isBonus);
-    $('bonusAfterG').textContent=`ボナ後G数：${bonusAfterG}G`;
+    $('bonusAfterCount').textContent=`${bonusAfterG}G`;
     $('bonusSymbol').textContent = out.type==='BIG' ? '７７７' : (out.type==='REG' ? '７７BAR' : '—');
     $('role').textContent=out.name;
     $('rng').textContent=`取得乱数：${r.toLocaleString()} / 65,535`;
@@ -538,7 +541,7 @@ function draw(render=true){
 function renderStats(){
   $('medalBalance').textContent=`${medals>0?'+':''}${medals.toLocaleString()}枚`;
   $('medalBalance').style.color=medals<0?'var(--red)':medals>0?'var(--green)':'var(--text)';
-  $('medalLedger').textContent=`通常投入 ${normalStake.toLocaleString()}枚｜小役払出 ${smallPayout.toLocaleString()}枚｜ボーナス純増 ${bonusNetTotal.toLocaleString()}枚`;
+  $('medalLedger').textContent=`通常投入 ${normalStake.toLocaleString()}枚｜小役払出 ${smallPayout.toLocaleString()}枚\nボーナス純増 ${bonusNetTotal.toLocaleString()}枚`;
 
   $('games').textContent=games.toLocaleString();
   $('bigs').textContent=bigs.toLocaleString();
@@ -571,7 +574,7 @@ document.querySelectorAll('.setbtn').forEach(btn=>{
     document.querySelectorAll('.setbtn').forEach(b=>b.classList.toggle('active',b===btn));
     updatePreset();
     $('gogoLamp').classList.remove('on');
-    $('bonusAfterG').textContent=`ボナ後G数：${games-lastBonusGame}G`;
+    $('bonusAfterCount').textContent=`${games-lastBonusGame}G`;
     $('bonusSymbol').textContent='—';
     $('role').textContent=`設定${currentSet}を適用`;
     $('rng').textContent='取得乱数：—';
@@ -601,7 +604,7 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
     if(hit){
       // 当選したGで停止。実機のようにペカらせ、図柄・成立フラグを表示する。
       $('gogoLamp').classList.add('on');
-      $('bonusAfterG').textContent=`ボナ後G数：${history[0].intervalG}G`;
+      $('bonusAfterCount').textContent=`${history[0].intervalG}G`;
       $('bonusSymbol').textContent = hit.type==='BIG' ? '７７７' : '７７BAR';
       $('role').textContent = hit.name;
       $('rng').textContent='取得乱数：自動試行';
@@ -609,7 +612,7 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
     } else {
       // ボーナス非当選なら指定G数ぶん進める。
       $('gogoLamp').classList.remove('on');
-      $('bonusAfterG').textContent=`ボナ後G数：${currentBonusAfterG}G`;
+      $('bonusAfterCount').textContent=`${currentBonusAfterG}G`;
       $('bonusSymbol').textContent='—';
       $('role').textContent=`${n}G進行`;
       $('rng').textContent='取得乱数：—';
@@ -624,7 +627,7 @@ $('reset').addEventListener('click',()=>{
   medals=0;normalStake=0;smallPayout=0;bonusNetTotal=0;replayNext=false;lastMedal=null;
   games=0;bigs=0;regs=0;history=[];lastBonusGame=0;smallHits=Object.fromEntries(smallKeys.map(k=>[k,0]));
   $('gogoLamp').classList.remove('on');
-  $('bonusAfterG').textContent='ボナ後G数：0G';
+  $('bonusAfterCount').textContent='0G';
   $('bonusSymbol').textContent='—';
   $('role').textContent='—';
   $('rng').textContent='取得乱数：—';
