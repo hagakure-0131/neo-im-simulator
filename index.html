@@ -303,8 +303,6 @@ button{
     <div class="medal-panel">
       <div class="small">🪙 持ちメダル換算・累計差枚（0枚スタート）</div>
       <div id="medalBalance" class="balance">0枚</div>
-      <div id="lastMedalChange" class="small">直近ゲーム：—</div>
-      <div id="replayState" class="small">次ゲーム：3枚投入</div>
       <div id="medalLedger" class="medal-ledger">通常投入 0枚｜小役払出 0枚｜ボーナス純増 0枚</div>
     </div>
     <div class="result" style="margin-top:12px">
@@ -540,8 +538,6 @@ function draw(render=true){
 function renderStats(){
   $('medalBalance').textContent=`${medals>0?'+':''}${medals.toLocaleString()}枚`;
   $('medalBalance').style.color=medals<0?'var(--red)':medals>0?'var(--green)':'var(--text)';
-  $('lastMedalChange').textContent=lastMedal?`直近ゲーム：投入 ${lastMedal.stake}枚 ／ 払出 ${lastMedal.payout}枚${lastMedal.bonusNet?' ／ ボーナス純増 +'+lastMedal.bonusNet+'枚':''} → ${lastMedal.change>=0?'+':''}${lastMedal.change}枚`:'直近ゲーム：—';
-  $('replayState').textContent=replayNext?'🔁 次ゲーム：リプレイで投入0枚':'次ゲーム：3枚投入';
   $('medalLedger').textContent=`通常投入 ${normalStake.toLocaleString()}枚｜小役払出 ${smallPayout.toLocaleString()}枚｜ボーナス純増 ${bonusNetTotal.toLocaleString()}枚`;
 
   $('games').textContent=games.toLocaleString();
