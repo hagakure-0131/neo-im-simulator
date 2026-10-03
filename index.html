@@ -779,7 +779,7 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
       renderReels(hit);
       $('role').textContent = hit.name;
       $('rng').textContent='取得乱数：自動試行';
-      $('detail').textContent=`${n}Gボタンで進行中、${advanced}G目にボーナス当選したため停止しました。`;
+      $('detail').textContent=`${advanced}G目にボーナス当選したため停止しました。`;
     } else {
       // ボーナス非当選なら指定G数ぶん進める。
       $('gogoLamp').classList.remove('on');
