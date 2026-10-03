@@ -314,8 +314,18 @@ button{
 .gogo-lamp.on .lamp-title{fill:#f000fc}
 .gogo-lamp.on .lamp-word{fill:#fff}
 .result .lamp-stats{text-align:center;margin:10px 0}
+.result-summary{display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0}
+.result-summary .lamp-stats{flex:0 1 auto;margin:0;min-width:0}
+.bonus-summary{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:0;font-variant-numeric:tabular-nums;text-align:left}
+.bonus-summary .metric{padding:8px;min-width:0}
+.bonus-summary .num{font-size:24px}
+.bonus-summary .inline-prob{font-size:12px}
+.bonus-summary .summary-combined{grid-column:1 / -1}
+button:disabled{opacity:.5;cursor:default}
+@media(max-width:480px){.result-summary{gap:8px}.bonus-summary{flex:1;gap:5px}.bonus-summary .metric{padding:7px 5px}.bonus-summary .num{font-size:20px}.bonus-summary .inline-prob{font-size:10px}.bonus-summary .label{font-size:11px}}
 .result #bonusAfterG{justify-content:center;font-size:18px}
 .result .lamp-total{font-size:12px}
+@media(max-width:480px){.result-summary #bonusAfterG{font-size:13px}.result-summary .lamp-total{font-size:10px}}
 .gogo-wrap>.role{flex:1;min-width:0;font-size:clamp(12px,3.5vw,17px);font-weight:900;line-height:1.4;text-align:left;overflow-wrap:anywhere}
 </style>
 </head>
@@ -417,9 +427,14 @@ button{
         <div class="reel"><span id="reelRight">—</span></div>
       </div>
       <div class="reel-note">当選役のイメージ表示（実機の停止目とは異なります）</div>
-      <div class="lamp-stats">
+      <div class="result-summary"><div class="lamp-stats">
         <div id="bonusAfterG"><span>ボナ後G数：</span><span id="bonusAfterCount" class="bonus-count">0G</span></div>
         <div class="lamp-total">総ゲーム数：<span id="lampTotalGames">0G</span></div>
+      </div><div class="bonus-summary" aria-label="実践集計">
+        <div class="metric"><div class="label">BIG</div><div class="num red"><span id="drawBigs">0</span> <span id="drawBigsProb" class="inline-prob">—</span></div></div>
+        <div class="metric"><div class="label">REG</div><div class="num yellow"><span id="drawRegs">0</span> <span id="drawRegsProb" class="inline-prob">—</span></div></div>
+        <div class="metric summary-combined"><div class="label">合算</div><div id="drawCombined" class="num green">—</div></div>
+      </div>
       </div>
       <div id="rng" class="rng">取得乱数：—</div>
       <div id="detail" class="small" style="margin-top:6px">レバーONで1/65,536の乱数を1つ取得します。</div>
@@ -636,7 +651,17 @@ function renderReels(out){
   $('bonusSymbol').setAttribute('aria-label',out?`当選役のイメージ表示：${out.name}`:'簡易リール表示');
 }
 
+let bonusLockUntil=0;
+function lockBonusButtons(){
+  bonusLockUntil=Date.now()+1500;
+  const buttons=document.querySelectorAll('#lever, .autobtn');
+  buttons.forEach(button=>button.disabled=true);
+  setTimeout(()=>{
+    if(Date.now()>=bonusLockUntil) buttons.forEach(button=>button.disabled=false);
+  },1500);
+}
 function draw(render=true){
+  if(Date.now()<bonusLockUntil) return null;
   const r=Math.floor(Math.random()*N);
   const out=roleFor(r);
   const stake=replayNext?0:3;
@@ -660,6 +685,7 @@ function draw(render=true){
     history.unshift({totalG:games, intervalG:interval, role:out.name, r});
     history=history.slice(0,40);
     lastBonusGame = games;
+    lockBonusButtons();
   }
 
   if(render){
@@ -690,6 +716,9 @@ function renderStats(){
   for(const key of smallKeys){$(key+'Hits').textContent=smallHits[key].toLocaleString();$(key+'Actual').textContent=smallHits[key]?`1/${(games/smallHits[key]).toFixed(1)}`:'—';}
   const hit=bigs+regs;
   $('combined').textContent=hit?`1/${(games/hit).toFixed(1)}`:'—';
+  for(const [target,source] of [['drawBigs','bigs'],['drawRegs','regs'],['drawBigsProb','bigsProb'],['drawRegsProb','regsProb'],['drawCombined','combined']]){
+    $(target).textContent=$(source).textContent;
+  }
 }
 
 function renderHistory(){
@@ -725,6 +754,7 @@ $('lever').addEventListener('click',()=>draw(true));
 document.querySelectorAll('.autobtn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const n=Number(btn.dataset.g);
+    if(Date.now()<bonusLockUntil) return;
     let advanced = 0;
     let hit = null;
     let lastOut = null;
