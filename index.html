@@ -275,7 +275,11 @@ button{
 .medal-panel{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#10141b}
 .medal-panel .balance{font-size:32px;font-weight:900;font-variant-numeric:tabular-nums}
 .medal-ledger{font-size:clamp(10px,3vw,12px);color:var(--muted);line-height:1.7;margin-top:6px;white-space:pre;font-variant-numeric:tabular-nums}
-#bonusAfterG{display:flex;justify-content:center;align-items:baseline;gap:0}
+.gogo-wrap{gap:12px;align-items:center}
+.gogo-lamp{flex-shrink:0}
+.lamp-stats{min-width:0;text-align:left}
+#bonusAfterG{display:flex;justify-content:flex-start;align-items:baseline;gap:0;font-size:clamp(13px,3.8vw,16px);font-weight:800;color:var(--accent);white-space:nowrap}
+.lamp-total{margin-top:5px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 #bonusAfterG .bonus-count{display:inline-block;width:7ch;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
 </style>
 </head>
@@ -311,7 +315,6 @@ button{
 ボーナス純増 0枚</div>
     </div>
     <div class="result" style="margin-top:12px">
-      <div id="bonusAfterG" class="small" style="font-size:18px;font-weight:800;color:var(--accent);margin-bottom:6px"> <span>ボナ後G数：</span><span id="bonusAfterCount" class="bonus-count">0G</span></div>
       <div id="bonusSymbol" style="font-size:44px;font-weight:1000;letter-spacing:4px;min-height:54px;margin-bottom:4px">—</div>
       <div id="role" class="role">—</div>
       <div id="rng" class="rng">取得乱数：—</div>
@@ -326,6 +329,10 @@ button{
         <div class="gogo-star" aria-hidden="true"></div>
         <div class="gogo-text">GOGO!</div>
         <div class="gogo-sub">CHANCE</div>
+      </div>
+      <div class="lamp-stats">
+        <div id="bonusAfterG"><span>ボナ後G数：</span><span id="bonusAfterCount" class="bonus-count">0G</span></div>
+        <div class="lamp-total">総ゲーム数：<span id="lampTotalGames">0G</span></div>
       </div>
 
     </div>
@@ -546,6 +553,7 @@ function renderStats(){
   $('medalLedger').textContent=`通常投入 ${normalStake.toLocaleString()}枚｜小役払出 ${smallPayout.toLocaleString()}枚\nボーナス純増 ${bonusNetTotal.toLocaleString()}枚`;
 
   $('games').textContent=games.toLocaleString();
+  $('lampTotalGames').textContent=`${games.toLocaleString()}G`;
   $('bigs').textContent=bigs.toLocaleString();
   $('regs').textContent=regs.toLocaleString();
   $('bigsProb').textContent=bigs?`1/${(games/bigs).toFixed(1)}`:'—';
