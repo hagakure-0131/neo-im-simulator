@@ -281,9 +281,105 @@ button{
 #bonusAfterG{display:flex;justify-content:flex-start;align-items:baseline;gap:0;font-size:clamp(13px,3.8vw,16px);font-weight:800;color:var(--accent);white-space:nowrap}
 .lamp-total{margin-top:5px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 #bonusAfterG .bonus-count{display:inline-block;width:7ch;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
+.reels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:4px 0 8px}
+.reel{height:84px;display:flex;align-items:center;justify-content:center;border:2px solid #596173;border-radius:9px;background:linear-gradient(#c3c8d2,#fff 35%,#fff 65%,#c3c8d2);color:#d42d46;font-size:38px;font-weight:900;letter-spacing:0;box-shadow:inset 0 6px 12px #0002,inset 0 -6px 12px #0002}
+.reel .bar-symbol{font-size:23px;background:#171a23;color:#fff;padding:3px 5px;border-radius:3px}
+.reel-note{font-size:10px;color:var(--muted);margin-bottom:6px}
+.reel-symbol{display:block;width:100%;height:70px}
+.reel>span{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.reel .bar-symbol{width:auto;height:auto}
+.lamp-reset{margin-left:auto;flex-shrink:0;padding:10px 7px;font-size:13px;line-height:1.4}
+.lamp-reset small{display:block;font-size:9px;font-weight:400;color:var(--muted);margin-top:4px;white-space:nowrap}
+@media(max-width:480px){
+.gogo-wrap{gap:6px}
+.gogo-lamp{width:90px;height:64px}
+.gogo-star{width:65px;height:40px}
+.gogo-text{font-size:17px}.gogo-sub{font-size:14px}
+.lamp-stats{flex:1}
+#bonusAfterG{font-size:12px}
+#bonusAfterG .bonus-count{width:6ch}
+.lamp-total{font-size:10px}
+.lamp-reset{padding:9px 5px;font-size:12px}
+.lamp-reset small{font-size:8px}
+}
+@media(max-width:360px){.gogo-lamp{width:78px}#bonusAfterG{font-size:11px}.lamp-total{font-size:9px}.lamp-reset small{font-size:7px}}
+.gogo-lamp,.gogo-lamp.on{background:#080947;border:1px solid #29264c;border-radius:3px;box-shadow:none;overflow:hidden}
+.gogo-lamp::before,.gogo-lamp::after{display:none}
+.lamp-art{display:block;width:100%;height:100%}
+.lamp-burst{fill:#201d69;transition:fill .14s ease}
+.lamp-title{fill:#43315e;transition:fill .14s ease}
+.lamp-word{fill:#777885;transition:fill .14s ease}
+.gogo-lamp.on{box-shadow:0 0 9px #5c4cff55}
+.gogo-lamp.on .lamp-burst{fill:#4035e8}
+.gogo-lamp.on .lamp-title{fill:#f000fc}
+.gogo-lamp.on .lamp-word{fill:#fff}
+.result .lamp-stats{text-align:center;margin:10px 0}
+.result #bonusAfterG{justify-content:center;font-size:18px}
+.result .lamp-total{font-size:12px}
+.gogo-wrap>.role{flex:1;min-width:0;font-size:clamp(12px,3.5vw,17px);font-weight:900;line-height:1.4;text-align:left;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true"><defs>
+<symbol id="symbol-seven" viewBox="0 0 120 80">
+<path d="M18 15 C48 7 76 20 108 11 L101 31 C80 40 56 43 35 61 L90 60 L88 72 L13 72 C28 54 49 42 69 35 L9 42Z" fill="#e60020" stroke="#241714" stroke-width="3" stroke-linejoin="round"/>
+<path d="M23 17 C49 11 79 22 104 15 L99 21 C74 28 42 16 19 26Z" fill="#fff"/>
+<path d="M14 42 C51 27 81 41 102 26 C86 46 50 38 22 60" fill="#fff" stroke="#241714" stroke-width="2"/>
+<path d="M24 57 L113 53 L113 56 L23 61Z" fill="#ffde27" stroke="#241714" stroke-width="1.5"/>
+<path d="M81 43 L85 53 L95 55 L85 59 L82 70 L78 59 L67 56 L77 53Z" fill="#ffe528" stroke="#241714" stroke-width="1.5"/>
+</symbol>
+<symbol id="symbol-grape" viewBox="0 0 120 80">
+<g stroke="#26351b" stroke-width="2" stroke-linejoin="round">
+<path d="M63 14 Q66 7 83 9 M69 14 L82 22" fill="none" stroke="#714322" stroke-width="5"/>
+<path d="M72 18 Q99 8 110 25 Q101 34 89 33 L107 48 L95 48 L105 66 Q89 63 83 51 Q87 72 77 74 Q70 52 70 34Z" fill="#087e40"/>
+<path d="M77 25 L96 28 M81 33 L99 48 M79 41 L84 62" fill="none" stroke="#044c2c"/>
+</g>
+<g fill="#80bd13" stroke="#29411b" stroke-width="1.8">
+<circle cx="58" cy="22" r="10"/><circle cx="45" cy="29" r="10"/><circle cx="70" cy="30" r="10"/>
+<circle cx="57" cy="37" r="10"/><circle cx="34" cy="41" r="10"/><circle cx="47" cy="46" r="10"/><circle cx="71" cy="45" r="10"/>
+<circle cx="59" cy="53" r="10"/><circle cx="36" cy="55" r="10"/><circle cx="47" cy="61" r="10"/><circle cx="25" cy="64" r="9"/>
+</g>
+<g fill="#f9ffdb"><ellipse cx="55" cy="18" rx="3" ry="2.5"/><ellipse cx="42" cy="25" rx="3" ry="2.5"/><ellipse cx="67" cy="26" rx="3" ry="2.5"/><ellipse cx="54" cy="33" rx="3" ry="2.5"/><ellipse cx="31" cy="37" rx="3" ry="2.5"/><ellipse cx="44" cy="42" rx="3" ry="2.5"/><ellipse cx="68" cy="41" rx="3" ry="2.5"/><ellipse cx="56" cy="49" rx="3" ry="2.5"/><ellipse cx="33" cy="51" rx="3" ry="2.5"/><ellipse cx="44" cy="57" rx="3" ry="2.5"/><ellipse cx="22" cy="60" rx="2.5" ry="2"/></g>
+</symbol>
+<symbol id="symbol-rhino" viewBox="0 0 120 80">
+<g stroke="#32221b" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+<path d="M48 26 Q88 15 101 38 L109 43 L103 45 L102 63 L96 66 L94 69 L84 69 L82 65 L75 66 L70 69 L58 69 L59 61 L45 59Z" fill="#ff8b04"/>
+<path d="M64 38 Q65 57 51 63 Q25 67 19 49 Q13 37 25 27 Q36 16 49 23 Q60 20 65 30" fill="#ff8b04"/>
+<path d="M24 31 Q13 19 16 45 Q6 41 9 31 Q2 49 16 55 Q31 61 35 46 Q27 47 24 31Z" fill="#fff9e8"/>
+<path d="M47 25 Q51 15 63 22 Q66 27 54 30" fill="#ff8b04"/>
+<path d="M49 49 Q52 57 39 60 M65 60 L65 68 M91 59 L90 67" fill="none"/>
+</g><ellipse cx="31" cy="34" rx="2.5" ry="4" fill="#24201a"/><ellipse cx="41" cy="34" rx="2.5" ry="4" fill="#24201a"/>
+<path d="M78 24 Q87 22 93 27" fill="none" stroke="#fff4ce" stroke-width="4" stroke-linecap="round"/>
+</symbol>
+<symbol id="symbol-bell" viewBox="0 0 120 80">
+<g stroke="#302013" stroke-width="2.5" stroke-linejoin="round">
+<ellipse cx="60" cy="14" rx="8" ry="6" fill="#ffe400"/>
+<path d="M23 57 Q32 48 33 34 Q33 18 60 18 Q87 18 87 34 Q88 48 98 57Z" fill="#ffbf00"/>
+<path d="M60 18 Q87 18 87 34 Q88 48 98 57 L75 55 Q77 35 69 20Z" fill="#ff8800" stroke-width="1.5"/>
+<path d="M33 43 Q60 39 88 44 L90 49 Q60 44 31 49Z" fill="#ffe62a" stroke-width="1.5"/>
+<path d="M23 56 Q59 49 98 57 L105 64 Q60 72 15 64Z" fill="#ffa000"/>
+<ellipse cx="44" cy="66" rx="9" ry="6" fill="#ffe600"/>
+</g><path d="M43 28 Q42 33 41 40" fill="none" stroke="#fffbd2" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="51" cy="25" rx="5" ry="2.5" fill="#fffbd2"/>
+</symbol>
+<symbol id="symbol-clown" viewBox="0 0 120 80">
+<g stroke="#30201c" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+<path d="M22 49 L12 43 Q8 41 8 45 L17 53 L6 50 Q2 50 4 54 L16 59 L7 59 Q3 61 7 64 L23 66 L30 57Z" fill="#fff9e7"/>
+<path d="M98 49 L108 43 Q112 41 112 45 L103 53 L114 50 Q118 50 116 54 L104 59 L113 59 Q117 61 113 64 L97 66 L90 57Z" fill="#fff9e7"/>
+<path d="M27 44 Q21 34 31 34 Q24 24 39 28 Q45 23 49 34 L42 53 L28 56Z" fill="#ffe333"/>
+<path d="M93 44 Q99 34 89 34 Q96 24 81 28 Q75 23 71 34 L78 53 L92 56Z" fill="#ffe333"/>
+<ellipse cx="60" cy="47" rx="23" ry="23" fill="#fff4d9"/>
+<path d="M40 52 Q60 65 80 52 Q76 73 60 73 Q44 73 40 52Z" fill="#eb062c"/>
+<path d="M45 56 Q60 63 75 56 L73 62 Q60 67 47 62Z" fill="#fff"/>
+<ellipse cx="60" cy="48" rx="9" ry="5" fill="#f00028"/>
+<path d="M45 41 Q49 36 53 41 M67 41 Q71 36 75 41" fill="none" stroke-width="2.5"/>
+<path d="M42 43 L39 49 L46 48Z M78 43 L81 49 L74 48Z" fill="#eb1938" stroke="none"/>
+<path d="M39 27 L31 8 Q60 2 89 8 L81 27Z" fill="#fff"/>
+<path d="M33 8 L40 27 L48 27 L45 6Z M56 5 L57 27 L65 27 L66 5Z M79 7 L72 27 L81 27 L87 8Z" fill="#ed052c" stroke-width="1"/>
+<ellipse cx="60" cy="28" rx="30" ry="5" fill="#156dad"/>
+</g>
+</symbol>
+</defs></svg>
 <div class="wrap">
   <div class="iphone-note">
     📱 iPhone向け表示。Safariのホーム画面から使うには、このファイルをWeb公開する必要があります。
@@ -315,25 +411,43 @@ button{
 ボーナス純増 0枚</div>
     </div>
     <div class="result" style="margin-top:12px">
-      <div id="bonusSymbol" style="font-size:44px;font-weight:1000;letter-spacing:4px;min-height:54px;margin-bottom:4px">—</div>
-      <div id="role" class="role">—</div>
+      <div id="bonusSymbol" class="reels" aria-label="簡易リール表示">
+        <div class="reel"><span id="reelLeft">—</span></div>
+        <div class="reel"><span id="reelCenter">—</span></div>
+        <div class="reel"><span id="reelRight">—</span></div>
+      </div>
+      <div class="reel-note">当選役のイメージ表示（実機の停止目とは異なります）</div>
+      <div class="lamp-stats">
+        <div id="bonusAfterG"><span>ボナ後G数：</span><span id="bonusAfterCount" class="bonus-count">0G</span></div>
+        <div class="lamp-total">総ゲーム数：<span id="lampTotalGames">0G</span></div>
+      </div>
       <div id="rng" class="rng">取得乱数：—</div>
       <div id="detail" class="small" style="margin-top:6px">レバーONで1/65,536の乱数を1つ取得します。</div>
     </div>
     <div class="gogo-wrap">
       
       <div id="gogoLamp" class="gogo-lamp" aria-label="GOGOランプ">
-        <div class="gogo-mini s1">★</div>
-        <div class="gogo-mini s2">★</div>
-        <div class="gogo-mini s3">★</div>
-        <div class="gogo-star" aria-hidden="true"></div>
-        <div class="gogo-text">GOGO!</div>
-        <div class="gogo-sub">CHANCE</div>
+        <svg class="lamp-art" viewBox="0 0 250 160" aria-hidden="true">
+          <rect width="250" height="160" fill="#080947"/>
+          <g stroke="#c69521" stroke-width="4" stroke-linejoin="miter">
+            <path d="M0 0H70L55 48Z" fill="#e30019"/>
+            <path d="M86 0L104 51L139 0Z" fill="#122077"/>
+            <path d="M192 0H250V44L160 78Z" fill="#280960"/>
+            <path d="M250 84L218 103L250 129Z" fill="#241175"/>
+            <path d="M250 138L205 118L172 150L250 160Z" fill="#ec071b"/>
+            <path d="M0 118L24 144L0 157Z" fill="#1c1964"/>
+          </g>
+          <path d="M25 7L28 17L39 17L30 23L34 34L25 27L16 34L20 23L11 17L22 17Z" fill="#ffe634"/>
+          <path d="M218 59L221 68L231 68L223 74L226 83L218 77L210 83L213 74L205 68L215 68Z" fill="#ffe634"/>
+          <path class="lamp-burst" d="M24 111L44 86L12 79L42 72L20 51L53 60L44 28L72 53L85 25L89 51L100 20L102 50L123 37L113 62L155 40L135 70L186 60L152 84L179 91L140 98L162 131L127 112L139 145L109 120L101 149L88 124L64 145L70 118L37 137L52 108Z" fill="#3531de" stroke="#030309" stroke-width="3"/>
+          <g transform="rotate(-18 100 83)">
+            <text class="lamp-title" x="100" y="91" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="34" font-weight="900" font-style="italic" letter-spacing="-1" stroke="#030309" stroke-width="4" paint-order="stroke fill">GOGO!</text>
+          </g>
+          <text class="lamp-word" x="116" y="143" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="39" font-weight="900" letter-spacing="-1.8" stroke="#030309" stroke-width="7" paint-order="stroke fill">CHANCE</text>
+        </svg>
       </div>
-      <div class="lamp-stats">
-        <div id="bonusAfterG"><span>ボナ後G数：</span><span id="bonusAfterCount" class="bonus-count">0G</span></div>
-        <div class="lamp-total">総ゲーム数：<span id="lampTotalGames">0G</span></div>
-      </div>
+      <div id="role" class="role">—</div>
+      <button id="reset" class="lamp-reset"><span>リセット</span><small>差枚・履歴・集計</small></button>
 
     </div>
     <div class="controls" style="margin-top:12px">
@@ -360,10 +474,8 @@ button{
       <div class="metric"><div class="label">BIG</div><div class="num red"><span id="bigs">0</span> <span id="bigsProb" class="inline-prob">—</span></div></div>
       <div class="metric"><div class="label">REG</div><div class="num yellow"><span id="regs">0</span> <span id="regsProb" class="inline-prob">—</span></div></div>
     </div>
-<div class="small" style="margin-top:12px">小役の成立回数・実戦確率</div><div class="role-grid"><div class="metric"><div class="label">🍇 ぶどう</div><div class="num"><span id="grapeHits">0</span> <span id="grapeActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🔁 リプレイ</div><div class="num"><span id="replayHits">0</span> <span id="replayActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🍒 非重複チェリー</div><div class="num"><span id="cherryHits">0</span> <span id="cherryActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🔔 ベル</div><div class="num"><span id="bellHits">0</span> <span id="bellActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🤡 ピエロ</div><div class="num"><span id="clownHits">0</span> <span id="clownActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">ハズレ</div><div class="num"><span id="missHits">0</span> <span id="missActual" class="inline-prob">—</span></div></div></div><p class="small">通常時の成立回数を集計します。小役は全獲得として、ぶどう8枚・チェリー2枚・ベル14枚・ピエロ10枚を払い出します。チェリー重複時も2枚を加算します。リプレイは払出0枚・次ゲームの投入0枚。BIGは純増252枚、REGは純増96枚を当選時に自動加算します。ボーナス消化ゲームは総G数に含めず、入賞までの追加投入・取りこぼしは省略します。差枚がマイナスでも続行でき、設定変更時も集計を継続します。</p>
-    <div style="margin-top:12px">
-      <button id="reset">差枚・履歴・集計をリセット</button>
-    </div>
+<div class="small" style="margin-top:12px">小役の成立回数・実戦確率</div><div class="role-grid"><div class="metric"><div class="label">🍇 ブドウ</div><div class="num"><span id="grapeHits">0</span> <span id="grapeActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🔁 リプレイ</div><div class="num"><span id="replayHits">0</span> <span id="replayActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🍒 （非重複）</div><div class="num"><span id="cherryHits">0</span> <span id="cherryActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🔔 ベル</div><div class="num"><span id="bellHits">0</span> <span id="bellActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🤡 ピエロ</div><div class="num"><span id="clownHits">0</span> <span id="clownActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">ハズレ</div><div class="num"><span id="missHits">0</span> <span id="missActual" class="inline-prob">—</span></div></div></div><p class="small">通常時の成立回数を集計します。小役は全獲得として、ブドウ8枚・チェリー2枚・ベル14枚・ピエロ10枚を払い出します。チェリー重複時も2枚を加算します。リプレイは払出0枚・次ゲームの投入0枚。BIGは純増252枚、REGは純増96枚を当選時に自動加算します。ボーナス消化ゲームは総G数に含めず、入賞までの追加投入・取りこぼしは省略します。差枚がマイナスでも続行でき、設定変更時も集計を継続します。</p>
+
   </div>
 
   <div class="card">
@@ -406,14 +518,14 @@ button{
       </div>
     </div>
 
-<div class="small" style="margin-top:12px">通常小役・ハズレ</div><div class="role-grid"><div class="metric"><div class="label">🍇 ぶどう</div><div id="grapeCount" class="num">0</div><div id="grapeProb" class="prob"></div></div><div class="metric"><div class="label">🔁 リプレイ</div><div id="replayCount" class="num">0</div><div id="replayProb" class="prob"></div></div><div class="metric"><div class="label">🍒 非重複チェリー</div><div id="cherryCount" class="num">0</div><div id="cherryProb" class="prob"></div></div><div class="metric"><div class="label">🔔 ベル</div><div id="bellCount" class="num">0</div><div id="bellProb" class="prob"></div></div><div class="metric"><div class="label">🤡 ピエロ</div><div id="clownCount" class="num">0</div><div id="clownProb" class="prob"></div></div><div class="metric"><div class="label">ハズレ</div><div id="missCount" class="num">0</div><div id="missProb" class="prob"></div></div></div>
+<div class="small" style="margin-top:12px">通常小役・ハズレ</div><div class="role-grid"><div class="metric"><div class="label">🍇 ブドウ</div><div id="grapeCount" class="num">0</div><div id="grapeProb" class="prob"></div></div><div class="metric"><div class="label">🔁 リプレイ</div><div id="replayCount" class="num">0</div><div id="replayProb" class="prob"></div></div><div class="metric"><div class="label">🍒 （非重複）</div><div id="cherryCount" class="num">0</div><div id="cherryProb" class="prob"></div></div><div class="metric"><div class="label">🔔 ベル</div><div id="bellCount" class="num">0</div><div id="bellProb" class="prob"></div></div><div class="metric"><div class="label">🤡 ピエロ</div><div id="clownCount" class="num">0</div><div id="clownProb" class="prob"></div></div><div class="metric"><div class="label">ハズレ</div><div id="missCount" class="num">0</div><div id="missProb" class="prob"></div></div></div>
     <div class="summary" style="margin-top:12px">
       <div class="metric"><div class="label">BIG系合計</div><div id="bigTotal" class="num red">240</div><div id="bigTotalProb" class="prob"></div></div>
       <div class="metric"><div class="label">REG系合計</div><div id="regTotal" class="num yellow">149</div><div id="regTotalProb" class="prob"></div></div>
       <div class="metric"><div class="label">ボーナス合計</div><div id="bonusTotal" class="num green">389</div><div id="bonusTotalProb" class="prob"></div></div>
       <div class="metric"><div class="label">小役＋ハズレ合計</div><div id="otherTotal" class="num blue">65147</div><div id="otherTotalProb" class="prob"></div></div>
     </div>
-    <p class="small source-note">小役は独自解析の予測値を整数換算したモデルです。ぶどう：設定1〜5 約1/6.02408、設定6 約1/5.80016。リプレイ 約1/7.298、非重複チェリー 約1/35.617、ベル・ピエロ 各約1/1092.267。表示確率は換算後の値です。<br>チェリー重複はボーナス欄に含むため、通常小役には重ねて足しません。<br><a href="https://kenslo65536.com/kaiseki/juggler-neo-im-ex.html" target="_blank" rel="noopener">小役予測値の参照元</a>（確認：2026/10/2）。BIG・REGの合計個数はメーカー公表確率を優先し、共通・レアチェリーの個数を維持して単独ボーナスの個数を調整しています。内訳はメーカー公表値ではなく、このモデルの仮定です。</p>
+    <p class="small source-note">小役は独自解析の予測値を整数換算したモデルです。ブドウ：設定1〜5 約1/6.02408、設定6 約1/5.80016。リプレイ 約1/7.298、非重複チェリー 約1/35.617、ベル・ピエロ 各約1/1092.267。表示確率は換算後の値です。<br>チェリー重複はボーナス欄に含むため、通常小役には重ねて足しません。<br><a href="https://kenslo65536.com/kaiseki/juggler-neo-im-ex.html" target="_blank" rel="noopener">小役予測値の参照元</a>（確認：2026/10/2）。BIG・REGの合計個数はメーカー公表確率を優先し、共通・レアチェリーの個数を維持して単独ボーナスの個数を調整しています。内訳はメーカー公表値ではなく、このモデルの仮定です。</p>
   </div>
 
   <div class="card">
@@ -502,9 +614,26 @@ function roleFor(r){
   x+=p.sr; if(r<x) return {name:'🟡 単独REG', type:'REG', count:p.sr};
   x+=p.cr; if(r<x) return {name:'🍒 共通チェリーREG', type:'REG', count:p.cr};
   const small=smallPreset();
-  const labels={grape:'🍇 ぶどう',replay:'🔁 リプレイ',cherry:'🍒 非重複チェリー',bell:'🔔 ベル',clown:'🤡 ピエロ'};
+  const labels={grape:'🍇 ブドウ',replay:'🔁 リプレイ',cherry:'🍒 （非重複）',bell:'🔔 ベル',clown:'🤡 ピエロ'};
   for(const [key,count] of Object.entries(small)){x+=count;if(r<x)return {name:labels[key],type:'SMALL',key,count};}
   return {name:'ハズレ', type:'MISS', key:'miss', count:N-x};
+}
+
+function renderReels(out){
+  let symbols=['—','—','—'];
+  if(out){
+    if(out.type==='BIG') symbols=['7','7','7'];
+    else if(out.type==='REG') symbols=['7','7','BAR'];
+    else symbols=({grape:['🍇','🍇','🍇'],replay:['Replay','Replay','Replay'],cherry:['🍒','🍇','🔔'],bell:['🔔','🔔','🔔'],clown:['🤡','🤡','🤡'],miss:['🍇','🔔','7']})[out.key]||symbols;
+  }
+  ['reelLeft','reelCenter','reelRight'].forEach((id,i)=>{
+    const graphic={'7':'seven','🍇':'grape','Replay':'rhino','🔔':'bell','🤡':'clown'}[symbols[i]];
+    if(graphic){
+      $(id).innerHTML=`<svg class="reel-symbol" viewBox="0 0 120 80" aria-hidden="true"><use href="#symbol-${graphic}"></use></svg>`;
+    }else $(id).textContent=symbols[i];
+    $(id).classList.toggle('bar-symbol',symbols[i]==='BAR');
+  });
+  $('bonusSymbol').setAttribute('aria-label',out?`当選役のイメージ表示：${out.name}`:'簡易リール表示');
 }
 
 function draw(render=true){
@@ -537,7 +666,7 @@ function draw(render=true){
     const isBonus = out.type==='BIG' || out.type==='REG';
     $('gogoLamp').classList.toggle('on', isBonus);
     $('bonusAfterCount').textContent=`${bonusAfterG}G`;
-    $('bonusSymbol').textContent = out.type==='BIG' ? '７７７' : (out.type==='REG' ? '７７BAR' : '—');
+    renderReels(out);
     $('role').textContent=out.name;
     $('rng').textContent=`取得乱数：${r.toLocaleString()} / 65,535`;
     $('detail').textContent=`設定${currentSet}｜このフラグは65,536個中 ${out.count}個（${prob(out.count)}）`;
@@ -585,7 +714,7 @@ document.querySelectorAll('.setbtn').forEach(btn=>{
     updatePreset();
     $('gogoLamp').classList.remove('on');
     $('bonusAfterCount').textContent=`${games-lastBonusGame}G`;
-    $('bonusSymbol').textContent='—';
+    renderReels(null);
     $('role').textContent=`設定${currentSet}を適用`;
     $('rng').textContent='取得乱数：—';
     $('detail').textContent='フラグ個数を切り替えました。';
@@ -598,10 +727,12 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
     const n=Number(btn.dataset.g);
     let advanced = 0;
     let hit = null;
+    let lastOut = null;
 
     // 選択G数まで進める。ただし途中でBIG/REGに当選したらそのGで停止する。
     for(let i=0;i<n;i++){
       const out = draw(false);
+      lastOut = out;
       advanced++;
       if(out.type==='BIG' || out.type==='REG'){
         hit = out;
@@ -615,7 +746,7 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
       // 当選したGで停止。実機のようにペカらせ、図柄・成立フラグを表示する。
       $('gogoLamp').classList.add('on');
       $('bonusAfterCount').textContent=`${history[0].intervalG}G`;
-      $('bonusSymbol').textContent = hit.type==='BIG' ? '７７７' : '７７BAR';
+      renderReels(hit);
       $('role').textContent = hit.name;
       $('rng').textContent='取得乱数：自動試行';
       $('detail').textContent=`${n}Gボタンで進行中、${advanced}G目にボーナス当選したため停止しました。`;
@@ -623,8 +754,8 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
       // ボーナス非当選なら指定G数ぶん進める。
       $('gogoLamp').classList.remove('on');
       $('bonusAfterCount').textContent=`${currentBonusAfterG}G`;
-      $('bonusSymbol').textContent='—';
-      $('role').textContent=`${n}G進行`;
+      renderReels(lastOut);
+      $('role').textContent=lastOut.name;
       $('rng').textContent='取得乱数：—';
       $('detail').textContent=`ボーナス非当選のまま${n}G進みました。`;
     }
@@ -638,7 +769,7 @@ $('reset').addEventListener('click',()=>{
   games=0;bigs=0;regs=0;history=[];lastBonusGame=0;smallHits=Object.fromEntries(smallKeys.map(k=>[k,0]));
   $('gogoLamp').classList.remove('on');
   $('bonusAfterCount').textContent='0G';
-  $('bonusSymbol').textContent='—';
+  renderReels(null);
   $('role').textContent='—';
   $('rng').textContent='取得乱数：—';
   $('detail').textContent='レバーONで1/65,536の乱数を1つ取得します。';
