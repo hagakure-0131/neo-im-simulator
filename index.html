@@ -56,6 +56,8 @@ button.active{background:var(--accent);color:#111;border-color:var(--accent)}
 .result .role{font-size:30px;font-weight:900;margin:6px 0}
 .result .rng{color:var(--muted);font-variant-numeric:tabular-nums}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Disabled buttons may be hit-tested as their parent on iPhone. */
+.controls,.target-controls{touch-action:manipulation}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:right}
 th:first-child,td:first-child{text-align:left}
@@ -477,6 +479,19 @@ button:disabled{opacity:.5;cursor:default}
   </div>
 
   <div class="card">
+    <b>指定の総G数まで一括試行</b>
+    <div class="small" style="margin:6px 0 10px">現在の集計を引き継ぎ、途中のボーナスで止まらず指定の総G数まで進めます。到達済みのボタンは無効になります。</div>
+    <div class="target-controls" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+      <button class="targetbtn" data-target="1000">総1000G</button>
+      <button class="targetbtn" data-target="2000">総2000G</button>
+      <button class="targetbtn" data-target="3000">総3000G</button>
+      <button class="targetbtn" data-target="4000">総4000G</button>
+      <button class="targetbtn" data-target="5000">総5000G</button>
+      <button class="targetbtn" data-target="6000">総6000G</button>
+    </div>
+  </div>
+
+  <div class="card">
     <b>③ 直近履歴</b><div class="small" style="margin-top:6px">一番上が最新（1回前）。左から「何回前」「当選G数」「成立フラグ」「総回転数」。</div>
     <div id="history" class="history small" style="margin-top:10px">まだ抽選されていません。</div>
   </div>
@@ -652,16 +667,20 @@ function renderReels(out){
 }
 
 let bonusLockUntil=0;
+function updateGameButtons(){
+  const locked=Date.now()<bonusLockUntil;
+  document.querySelectorAll('#lever, .autobtn').forEach(button=>button.disabled=locked);
+  document.querySelectorAll('.targetbtn').forEach(button=>button.disabled=locked||games>=Number(button.dataset.target));
+}
 function lockBonusButtons(){
   bonusLockUntil=Date.now()+1500;
-  const buttons=document.querySelectorAll('#lever, .autobtn');
-  buttons.forEach(button=>button.disabled=true);
+  updateGameButtons();
   setTimeout(()=>{
-    if(Date.now()>=bonusLockUntil) buttons.forEach(button=>button.disabled=false);
+    updateGameButtons();
   },1500);
 }
-function draw(render=true){
-  if(Date.now()<bonusLockUntil) return null;
+function draw(render=true, batch=false){
+  if(!batch&&Date.now()<bonusLockUntil) return null;
   const r=Math.floor(Math.random()*N);
   const out=roleFor(r);
   const stake=replayNext?0:3;
@@ -685,7 +704,7 @@ function draw(render=true){
     history.unshift({totalG:games, intervalG:interval, role:out.name, r});
     history=history.slice(0,40);
     lastBonusGame = games;
-    lockBonusButtons();
+    if(!batch) lockBonusButtons();
   }
 
   if(render){
@@ -703,6 +722,7 @@ function draw(render=true){
 }
 
 function renderStats(){
+  updateGameButtons();
   $('medalBalance').textContent=`${medals>0?'+':''}${medals.toLocaleString()}枚`;
   $('medalBalance').style.color=medals<0?'var(--red)':medals>0?'var(--green)':'var(--text)';
   $('medalLedger').textContent=`通常投入 ${normalStake.toLocaleString()}枚｜小役払出 ${smallPayout.toLocaleString()}枚\nボーナス純増 ${bonusNetTotal.toLocaleString()}枚`;
@@ -792,6 +812,24 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
 
     renderStats();
     renderHistory();
+  });
+});
+document.querySelectorAll('.targetbtn').forEach(button=>{
+  button.addEventListener('click',()=>{
+    const target=Number(button.dataset.target);
+    if(Date.now()<bonusLockUntil||games>=target) return;
+    const start=games, startBigs=bigs, startRegs=regs;
+    let lastOut;
+    while(games<target) lastOut=draw(false,true);
+    const finalBonus=lastOut.type==='BIG'||lastOut.type==='REG';
+    $('gogoLamp').classList.toggle('on',finalBonus);
+    $('bonusAfterCount').textContent=`${finalBonus?history[0].intervalG:games-lastBonusGame}G`;
+    renderReels(lastOut);
+    $('role').textContent=lastOut.name;
+    $('rng').textContent='取得乱数：一括試行';
+    $('detail').textContent=`総${target.toLocaleString()}Gまで${(target-start).toLocaleString()}G進みました。今回のBIG ${bigs-startBigs}回・REG ${regs-startRegs}回。`;
+    if(finalBonus) lockBonusButtons();
+    renderStats();renderHistory();
   });
 });
 $('reset').addEventListener('click',()=>{
