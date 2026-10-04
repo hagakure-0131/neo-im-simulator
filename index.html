@@ -334,6 +334,15 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 .gogo-wrap>.role{flex:1;min-width:0;font-size:clamp(12px,3.5vw,17px);font-weight:900;line-height:1.4;text-align:left;overflow-wrap:anywhere}
 .result .after-display{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;line-height:1.4}
 .result .after-display .bonus-count{width:6ch;text-align:center;font-size:clamp(28px,7vw,42px);font-weight:900;line-height:1.2}
+.learning[hidden],.batch-normal[hidden]{display:none}
+.learn-switch,.learn-fields{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.learn-fields label{flex:1 1 130px;font-size:12px;color:var(--muted)}
+.learn-fields select{display:block;width:100%;margin-top:5px;padding:10px;background:#141820;color:var(--text);border:1px solid var(--line);border-radius:8px;font-size:16px}
+.learn-card{padding:12px;margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow-wrap:anywhere}
+.learn-row{display:grid;grid-template-columns:55px 1fr;gap:8px;margin-top:9px;font-size:12px}
+.learn-track{height:7px;background:#252a35;border-radius:4px;margin:3px 0;overflow:hidden}
+.learn-fill{height:100%;background:var(--accent)}
+.learn-fill.theory{background:var(--blue)}
 </style>
 </head>
 <body>
@@ -485,6 +494,8 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 
   <div class="card">
     <b>指定の総G数まで一括試行</b>
+    <div class="learn-switch"><button id="normalTab" class="active">通常プレイ</button><button id="learningTab">🎓 体感学習</button></div>
+    <div id="batchNormal" class="batch-normal">
     <div class="small" style="margin:6px 0 10px">現在の集計を引き継ぎ、途中のボーナスで止まらず指定の総G数まで進めます。到達済みのボタンは無効になります。</div>
     <div class="result" style="margin-bottom:12px">
       <div class="result-summary">
@@ -508,6 +519,21 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
       <button class="targetbtn" data-target="6000">総6000G</button>
     </div>
     <button id="batchReset" class="lamp-reset" style="width:100%;margin-top:10px"><span>リセット</span><small>差枚・履歴・集計</small></button>
+    </div>
+    <div id="learningPanel" class="learning" hidden>
+      <p class="small">同じ条件を繰り返して、上振れ・下振れを体感します。通常プレイの記録は変わりません。</p>
+      <div class="learn-fields">
+        <label>学習用設定<select id="learnSet"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option></select></label>
+        <label>1試行のG数<select id="learnGames"><option>500</option><option>1000</option><option>2000</option><option selected>3000</option><option>5000</option><option>10000</option></select></label>
+        <label>試行回数<select id="learnTrials"><option>1</option><option>10</option><option>50</option><option selected>100</option><option>1000</option></select></label>
+        <label>比較する設定<select id="learnCompare"><option value="0">比較なし</option><option selected value="1">設定1</option><option value="2">設定2</option><option value="3">設定3</option><option value="4">設定4</option><option value="5">設定5</option><option value="6">設定6</option></select></label>
+      </div>
+      <div class="learn-switch"><button id="learnStart">学習スタート</button><button id="learnStop" disabled>中止</button><button id="learnReset">学習結果をリセット</button></div>
+      <div id="learnProgress" class="small" role="status" aria-live="polite">条件を選んでスタートしてください。</div>
+      <div class="learn-fields"><label>見る項目<select id="learnMetric"><option value="big">BIG全体</option><option value="reg" selected>REG全体</option><option value="bonus">ボーナス全体</option><option value="sb">単独BIG</option><option value="cb">共通チェリーBIG</option><option value="rb">レアチェリーBIG</option><option value="sr">単独REG</option><option value="cr">共通チェリーREG</option></select></label></div>
+      <div id="learnResults"></div>
+      <p class="small">理論値は現在の65,536フラグ個数から計算します。各ゲームの抽選は独立です。ハマりの後も次ゲームの当選確率は変わりません。学習のフラグ内訳は、通常のホールの台データだけでは分からない情報を含みます。</p>
+    </div>
   </div>
 
   <div class="card">
@@ -622,7 +648,7 @@ let currentSet=1, games=0, bigs=0, regs=0, history=[], lastBonusGame=0;
 const $=id=>document.getElementById(id);
 const prob=c=>c ? `約 1/${(N/c).toFixed(2)}` : '—';
 
-function smallPreset(){return {grape:Math.round(N/(currentSet===6?5.80016:6.02408)), replay:Math.round(N/7.298), cherry:Math.round(N/35.617), bell:Math.round(N/1092.267), clown:Math.round(N/1092.267)};}
+function smallPreset(set=currentSet){return {grape:Math.round(N/(set===6?5.80016:6.02408)), replay:Math.round(N/7.298), cherry:Math.round(N/35.617), bell:Math.round(N/1092.267), clown:Math.round(N/1092.267)};}
 function updatePreset(){
   document.querySelectorAll('[data-spec-set]').forEach(row=>row.classList.toggle('selected',Number(row.dataset.specSet)===currentSet));
   const p=presets[currentSet];
@@ -654,15 +680,20 @@ function updatePreset(){
   $('presetList').innerHTML=Object.entries(presets).map(([set,p])=>`<div class="metric small"><b>設定${set}</b><br>単独BIG ${p.sb}<br>共通🍒BIG ${p.cb}<br>レア🍒BIG ${p.rb}<br>単独REG ${p.sr}<br>共通🍒REG ${p.cr}</div>`).join('');
 }
 
-function roleFor(r){
-  const p=presets[currentSet];
+const bonusFlagIds=['sb','cb','rb','sr','cr'];
+const bonusFlagNames={sb:'🔴 単独BIG',cb:'🍒 共通チェリーBIG',rb:'🍒 レアチェリーBIG',sr:'🟡 単独REG',cr:'🍒 共通チェリーREG'};
+function bonusFlagFor(r,set){
+  let end=0;
+  for(const id of bonusFlagIds){end+=presets[set][id];if(r<end)return id;}
+  return null;
+}
+function roleFor(r,set=currentSet){
+  const p=presets[set];
+  const flag=bonusFlagFor(r,set);
+  if(flag)return {name:bonusFlagNames[flag],type:['sr','cr'].includes(flag)?'REG':'BIG',count:p[flag],flag};
   let x=0;
-  x+=p.sb; if(r<x) return {name:'🔴 単独BIG', type:'BIG', count:p.sb};
-  x+=p.cb; if(r<x) return {name:'🍒 共通チェリーBIG', type:'BIG', count:p.cb};
-  x+=p.rb; if(r<x) return {name:'🍒 レアチェリーBIG', type:'BIG', count:p.rb};
-  x+=p.sr; if(r<x) return {name:'🟡 単独REG', type:'REG', count:p.sr};
-  x+=p.cr; if(r<x) return {name:'🍒 共通チェリーREG', type:'REG', count:p.cr};
-  const small=smallPreset();
+  for(const id of bonusFlagIds)x+=p[id];
+  const small=smallPreset(set);
   const labels={grape:'🍇 ブドウ',replay:'🔁 リプレイ',cherry:'🍒 （非重複）',bell:'🔔 ベル',clown:'🤡 ピエロ'};
   for(const [key,count] of Object.entries(small)){x+=count;if(r<x)return {name:labels[key],type:'SMALL',key,count};}
   return {name:'ハズレ', type:'MISS', key:'miss', count:N-x};
@@ -875,6 +906,98 @@ function resetSimulation(){
 }
 $('reset').addEventListener('click',resetSimulation);
 $('batchReset').addEventListener('click',resetSimulation);
+
+const learnNames={...bonusFlagNames,big:'BIG全体',reg:'REG全体',bonus:'ボーナス全体'};
+let learnData=null,learnRunning=false,learnCancel=false,learnResetPending=false;
+function setLearningTab(learning){
+  $('batchNormal').hidden=learning;$('learningPanel').hidden=!learning;
+  $('normalTab').classList.toggle('active',!learning);$('learningTab').classList.toggle('active',learning);
+}
+$('normalTab').addEventListener('click',()=>setLearningTab(false));
+$('learningTab').addEventListener('click',()=>setLearningTab(true));
+function learnProbability(set,key){
+  const p=presets[set];
+  const counts={...p,big:p.sb+p.cb+p.rb,reg:p.sr+p.cr,bonus:p.sb+p.cb+p.rb+p.sr+p.cr};
+  return counts[key]/N;
+}
+function binomialDistribution(n,p){
+  const a=new Float64Array(n+1);a[0]=Math.exp(n*Math.log1p(-p));
+  for(let k=0;k<n;k++)a[k+1]=a[k]*(n-k)/(k+1)*p/(1-p);
+  return a;
+}
+function learnSample(n,lookup){
+  const counts={sb:0,cb:0,rb:0,sr:0,cr:0};
+  for(let g=0;g<n;g++){const index=lookup[Math.floor(Math.random()*N)];if(index)counts[bonusFlagIds[index-1]]++;}
+  counts.big=counts.sb+counts.cb+counts.rb;counts.reg=counts.sr+counts.cr;counts.bonus=counts.big+counts.reg;
+  return counts;
+}
+const learnPercent=p=>`${(100*p).toFixed(2)}%`;
+const learnFrequency=(n,k)=>k?`1/${(n/k).toFixed(1)}`:'—（0回）';
+function renderLearning(){
+  if(!learnData||!learnData.groups[0].samples.length){$('learnResults').textContent='';return;}
+  const {n,groups}=learnData,key=$('learnMetric').value;
+  const commonTheories=groups.map(g=>binomialDistribution(n,learnProbability(g.set,key)));
+  let commonEnd=0;
+  for(let i=0;i<groups.length;i++){
+    let cumulative=0,k=0;for(;k<n;k++){cumulative+=commonTheories[i][k];if(cumulative>=.9999)break;}
+    commonEnd=Math.max(commonEnd,k,...groups[i].samples.map(s=>s[key]));
+  }
+  const commonWidth=Math.max(1,Math.ceil((commonEnd+1)/18));
+  let commonScale=.001;
+  groups.forEach((g,i)=>{for(let start=0;start<=commonEnd;start+=commonWidth){let observed=0,expected=0;const last=Math.min(commonEnd,start+commonWidth-1);for(let k=start;k<=last;k++)expected+=commonTheories[i][k];for(const sample of g.samples)if(sample[key]>=start&&sample[key]<=last)observed++;commonScale=Math.max(commonScale,expected,g.samples.length?observed/g.samples.length:0);}});
+  let html='';
+  const theories=[];
+  for(const group of groups){
+    const samples=group.samples;if(!samples.length)continue;
+    const latest=samples[samples.length-1],p=learnProbability(group.set,key),theory=binomialDistribution(n,p);theories.push(theory);
+    const values=samples.map(s=>s[key]),freq=new Map();values.forEach(k=>freq.set(k,(freq.get(k)||0)+1));
+    const avg=values.reduce((a,b)=>a+b,0)/values.length;
+    let lower=0,upper=0;for(let k=0;k<theory.length;k++){if(k<=latest[key])lower+=theory[k];if(k>=latest[key])upper+=theory[k];}
+    const position=lower<=.05?'少ない側':upper<=.05?'多い側':'中央の範囲';
+    html+=`<div class="learn-card"><b>設定${group.set}｜${n.toLocaleString()}G × ${samples.length}回</b><p>${learnNames[key]}：実測平均 ${avg.toFixed(2)}回<br>理論平均 ${(n*p).toFixed(2)}回（1/${(1/p).toFixed(2)}）</p>`;
+    html+=`<div class="small">最後の試行：${latest[key]}回・${learnFrequency(n,latest[key])}<br>今回以下になる理論確率：${learnPercent(lower)}<br>今回以上になる理論確率：${learnPercent(upper)}<br>分布上の位置：${position}（同数を含む）</div>`;
+    html+=`<details ${samples.length===1?'open':''}><summary>最後の1試行のフラグ内訳</summary><p>BIG ${latest.big}回／REG ${latest.reg}回<br>合算 ${learnFrequency(n,latest.bonus)}</p>`;
+    for(const flag of bonusFlagIds){const fp=learnProbability(group.set,flag);html+=`<div class="learn-card"><b>${learnNames[flag]}</b><div class="small">今回 ${latest[flag]}回｜実測 ${learnFrequency(n,latest[flag])}<br>理論平均 ${(n*fp).toFixed(2)}回｜理論 1/${(1/fp).toFixed(2)}</div></div>`;}
+    html+='</details>';
+    // Include nearly all theoretical mass, and every observed result.
+    const end=commonEnd,width=commonWidth,bins=[];
+    for(let start=0;start<=end;start+=width){let observed=0,expected=0;const last=Math.min(end,start+width-1);for(let k=start;k<=last;k++){observed+=freq.get(k)||0;expected+=theory[k];}bins.push({label:start===last?`${start}回`:`${start}〜${last}回`,observed:observed/samples.length,expected});}
+    const tail=theory.slice(end+1).reduce((a,b)=>a+b,0);if(tail>0)bins.push({label:`${end+1}回以上`,observed:0,expected:tail});
+    const scale=commonScale;
+    html+='<p class="small">黄色：今回の実測分布／青：理論分布<br>理論上の中央付近でも、個々の結果は揺れます。</p>';
+    for(const b of bins)html+=`<div class="learn-row"><div>${b.label}</div><div>実測 ${learnPercent(b.observed)}<div class="learn-track"><div class="learn-fill" style="width:${100*b.observed/scale}%"></div></div>理論 ${learnPercent(b.expected)}<div class="learn-track"><div class="learn-fill theory" style="width:${100*b.expected/scale}%"></div></div></div></div>`;
+    html+='</div>';
+  }
+  if(theories.length===2){let overlap=0;for(let k=0;k<=n;k++)overlap+=Math.min(theories[0][k],theories[1][k]);html=`<div class="learn-card"><b>${learnNames[key]}｜設定${groups[0].set}と${groups[1].set}</b><p>理論分布の重なり：${learnPercent(overlap)}</p><div class="small">同じ回数になる範囲の重なりです。大きいほど、この項目だけでは区別しにくくなります。設定推測の正解率ではありません。両設定の回数区分と棒の長さの尺度は共通です。</div></div>`+html;}
+  $('learnResults').innerHTML=html;
+}
+function learningBusy(busy){
+  learnRunning=busy;['learnSet','learnGames','learnTrials','learnCompare','learnStart'].forEach(id=>$(id).disabled=busy);
+  $('learnStop').disabled=!busy;
+}
+async function startLearning(){
+  if(learnRunning)return;
+  const n=Number($('learnGames').value),trials=Number($('learnTrials').value),set=Number($('learnSet').value),compare=Number($('learnCompare').value);
+  const sets=compare&&compare!==set?[set,compare]:[set];
+  learnData={n,groups:sets.map(s=>({set:s,samples:[]}))};learnCancel=false;learnResetPending=false;learningBusy(true);
+  $('learnResults').textContent='';
+  try{
+    for(const group of learnData.groups){
+      const lookup=new Uint8Array(N);for(let r=0;r<N;r++){const id=bonusFlagFor(r,group.set);lookup[r]=id?bonusFlagIds.indexOf(id)+1:0;}
+      for(let t=0;t<trials&&!learnCancel;t++){
+        group.samples.push(learnSample(n,lookup));
+        if(t%5===0||t===trials-1){$('learnProgress').textContent=`設定${group.set}：${t+1} / ${trials}回完了`;await new Promise(resolve=>setTimeout(resolve,0));}
+      }
+      if(learnCancel)break;
+    }
+    $('learnProgress').textContent=(learnCancel?'中断しました。':'完了しました。')+learnData.groups.map(g=>`設定${g.set} ${g.samples.length}回`).join('／');
+    renderLearning();
+  }finally{learningBusy(false);if(learnResetPending){learnData=null;$('learnResults').textContent='';$('learnProgress').textContent='条件を選んでスタートしてください。';}}
+}
+$('learnStart').addEventListener('click',startLearning);
+$('learnStop').addEventListener('click',()=>{learnCancel=true;});
+$('learnReset').addEventListener('click',()=>{if(learnRunning){learnCancel=true;learnResetPending=true;return;}learnData=null;$('learnResults').textContent='';$('learnProgress').textContent='条件を選んでスタートしてください。';});
+$('learnMetric').addEventListener('change',renderLearning);
 
 updatePreset(); renderStats(); renderHistory();
 </script>
