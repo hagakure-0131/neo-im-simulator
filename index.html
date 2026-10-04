@@ -505,6 +505,7 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
       <button class="targetbtn" data-target="5000">総5000G</button>
       <button class="targetbtn" data-target="6000">総6000G</button>
     </div>
+    <button id="batchReset" class="lamp-reset" style="width:100%;margin-top:10px"><span>リセット</span><small>差枚・履歴・集計</small></button>
   </div>
 
   <div class="card">
@@ -858,7 +859,7 @@ document.querySelectorAll('.targetbtn').forEach(button=>{
     renderStats();renderHistory();
   });
 });
-$('reset').addEventListener('click',()=>{
+function resetSimulation(){
   medals=0;normalStake=0;smallPayout=0;bonusNetTotal=0;replayNext=false;lastMedal=null;
   games=0;bigs=0;regs=0;history=[];lastBonusGame=0;smallHits=Object.fromEntries(smallKeys.map(k=>[k,0]));
   $('gogoLamp').classList.remove('on');
@@ -868,7 +869,9 @@ $('reset').addEventListener('click',()=>{
   $('rng').textContent='取得乱数：—';
   $('detail').textContent='レバーONで1/65,536の乱数を1つ取得します。';
   renderStats();renderHistory();
-});
+}
+$('reset').addEventListener('click',resetSimulation);
+$('batchReset').addEventListener('click',resetSimulation);
 
 updatePreset(); renderStats(); renderHistory();
 </script>
