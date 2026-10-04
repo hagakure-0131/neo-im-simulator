@@ -343,6 +343,13 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 .learn-track{height:7px;background:#252a35;border-radius:4px;margin:3px 0;overflow:hidden}
 .learn-fill{height:100%;background:var(--accent)}
 .learn-fill.theory{background:var(--blue)}
+.learn-overview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.learn-overview>div{background:#141820;padding:12px 8px;border:1px solid var(--line);border-radius:10px;min-width:0}
+.learn-overview strong{display:block;font-size:25px;color:var(--accent);margin:5px 0}
+.learn-compare-line{display:grid;grid-template-columns:38px 1fr 48px;align-items:center;gap:6px;font-size:11px}
+.learn-compare-line .learn-track{height:9px}
+.learn-chart-bin{display:grid;grid-template-columns:48px 1fr;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:7px 0;font-size:12px}
+.learn-card details{margin-top:10px}.learn-card summary{cursor:pointer;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -946,7 +953,7 @@ function renderLearning(){
   let commonScale=.001;
   groups.forEach((g,i)=>{for(let start=0;start<=commonEnd;start+=commonWidth){let observed=0,expected=0;const last=Math.min(commonEnd,start+commonWidth-1);for(let k=start;k<=last;k++)expected+=commonTheories[i][k];for(const sample of g.samples)if(sample[key]>=start&&sample[key]<=last)observed++;commonScale=Math.max(commonScale,expected,g.samples.length?observed/g.samples.length:0);}});
   let html='';
-  const theories=[];
+  const theories=[],groupBins=[];
   for(const group of groups){
     const samples=group.samples;if(!samples.length)continue;
     const latest=samples[samples.length-1],p=learnProbability(group.set,key),theory=binomialDistribution(n,p);theories.push(theory);
@@ -954,21 +961,32 @@ function renderLearning(){
     const avg=values.reduce((a,b)=>a+b,0)/values.length;
     let lower=0,upper=0;for(let k=0;k<theory.length;k++){if(k<=latest[key])lower+=theory[k];if(k>=latest[key])upper+=theory[k];}
     const position=lower<=.05?'少ない側':upper<=.05?'多い側':'中央の範囲';
-    html+=`<div class="learn-card"><b>設定${group.set}｜${n.toLocaleString()}G × ${samples.length}回</b><p>${learnNames[key]}：実測平均 ${avg.toFixed(2)}回<br>理論平均 ${(n*p).toFixed(2)}回（1/${(1/p).toFixed(2)}）</p>`;
-    html+=`<div class="small">最後の試行：${latest[key]}回・${learnFrequency(n,latest[key])}<br>今回以下になる理論確率：${learnPercent(lower)}<br>今回以上になる理論確率：${learnPercent(upper)}<br>分布上の位置：${position}（同数を含む）</div>`;
-    html+=`<details ${samples.length===1?'open':''}><summary>最後の1試行のフラグ内訳</summary><p>BIG ${latest.big}回／REG ${latest.reg}回<br>合算 ${learnFrequency(n,latest.bonus)}</p>`;
+    let cumulative=0,low=0,high=0,foundLow=false;for(let k=0;k<=n;k++){cumulative+=theory[k];if(!foundLow&&cumulative>=.05){low=k;foundLow=true;}if(cumulative>=.95){high=k;break;}}
+    const rangeMass=theory.slice(low,high+1).reduce((a,b)=>a+b,0);
+    html+=`<div class="learn-card"><b>設定${group.set}｜${samples.length}試行</b><div class="learn-overview"><div><span class="small">今回の平均</span><strong>${avg.toFixed(1)}回</strong><span class="small">理論 ${(n*p).toFixed(1)}回</span></div><div><span class="small">理論上の主な範囲</span><strong>${low}〜${high}回</strong><span class="small">約${(100*rangeMass).toFixed(1)}%がこの範囲</span></div></div>`;
+    html+=`<details ${samples.length===1?'open':''}><summary>最後の試行：${latest[key]}回｜${position} ▾</summary><div class="small" style="margin-top:10px">実測 ${learnFrequency(n,latest[key])}<br>この回数以下：${learnPercent(lower)}<br>この回数以上：${learnPercent(upper)}<br>選んだ設定での理論確率。同数を含みます。</div>`;
+    html+=`<details><summary>BIG・REGとフラグ内訳 ▾</summary><p>BIG ${latest.big}回／REG ${latest.reg}回<br>合算 ${learnFrequency(n,latest.bonus)}</p>`;
     for(const flag of bonusFlagIds){const fp=learnProbability(group.set,flag);html+=`<div class="learn-card"><b>${learnNames[flag]}</b><div class="small">今回 ${latest[flag]}回｜実測 ${learnFrequency(n,latest[flag])}<br>理論平均 ${(n*fp).toFixed(2)}回｜理論 1/${(1/fp).toFixed(2)}</div></div>`;}
-    html+='</details>';
+    html+='</details></details>';
     // Include nearly all theoretical mass, and every observed result.
     const end=commonEnd,width=commonWidth,bins=[];
     for(let start=0;start<=end;start+=width){let observed=0,expected=0;const last=Math.min(end,start+width-1);for(let k=start;k<=last;k++){observed+=freq.get(k)||0;expected+=theory[k];}bins.push({label:start===last?`${start}回`:`${start}〜${last}回`,observed:observed/samples.length,expected});}
-    const tail=theory.slice(end+1).reduce((a,b)=>a+b,0);if(tail>0)bins.push({label:`${end+1}回以上`,observed:0,expected:tail});
-    const scale=commonScale;
-    html+='<p class="small">黄色：今回の実測分布／青：理論分布<br>理論上の中央付近でも、個々の結果は揺れます。</p>';
-    for(const b of bins)html+=`<div class="learn-row"><div>${b.label}</div><div>実測 ${learnPercent(b.observed)}<div class="learn-track"><div class="learn-fill" style="width:${100*b.observed/scale}%"></div></div>理論 ${learnPercent(b.expected)}<div class="learn-track"><div class="learn-fill theory" style="width:${100*b.expected/scale}%"></div></div></div></div>`;
+    const tail=theory.slice(end+1).reduce((a,b)=>a+b,0);if(end<n)bins.push({label:`${end+1}回以上`,observed:0,expected:tail});
+    groupBins.push({set:group.set,bins});
     html+='</div>';
   }
-  if(theories.length===2){let overlap=0;for(let k=0;k<=n;k++)overlap+=Math.min(theories[0][k],theories[1][k]);html=`<div class="learn-card"><b>${learnNames[key]}｜設定${groups[0].set}と${groups[1].set}</b><p>理論分布の重なり：${learnPercent(overlap)}</p><div class="small">同じ回数になる範囲の重なりです。大きいほど、この項目だけでは区別しにくくなります。設定推測の正解率ではありません。両設定の回数区分と棒の長さの尺度は共通です。</div></div>`+html;}
+  let chart=`<div class="learn-card"><b>${learnNames[key]}｜回数のばらつき</b><div class="small" style="margin:6px 0">${n.toLocaleString()}Gずつ試行。棒は今回の実測割合です。</div>`;
+  const colors=['var(--accent)','var(--blue)'];
+  groupBins[0].bins.forEach((bin,index)=>{
+    chart+=`<div class="learn-chart-bin"><b>${bin.label}</b><div>`;
+    groupBins.forEach((g,i)=>{const b=g.bins[index];if(b)chart+=`<div class="learn-compare-line"><span style="color:${colors[i]}">設定${g.set}</span><div class="learn-track"><div class="learn-fill" style="background:${colors[i]};width:${100*b.observed/commonScale}%"></div></div><span>${(100*b.observed).toFixed(1)}%</span></div>`;});
+    chart+='</div></div>';
+  });
+  chart+='<details><summary>理論分布と比べる ▾</summary>';
+  groupBins[0].bins.forEach((bin,index)=>{chart+=`<div class="learn-chart-bin"><b>${bin.label}</b><div>`;groupBins.forEach((g,i)=>{const b=g.bins[index];if(b)chart+=`<div class="learn-compare-line"><span style="color:${colors[i]}">設定${g.set}</span><div class="learn-track"><div class="learn-fill" style="background:${colors[i]};width:${100*b.expected/commonScale}%"></div></div><span>${(100*b.expected).toFixed(1)}%</span></div>`;});chart+='</div></div>';});
+  chart+='</details><p class="small">試行回数が少ないと、この割合自体も大きく揺れます。</p></div>';
+  html+=chart;
+  if(theories.length===2){let overlap=0;for(let k=0;k<=n;k++)overlap+=Math.min(theories[0][k],theories[1][k]);html=`<div class="learn-card"><b>${learnNames[key]}｜設定${groups[0].set} vs 設定${groups[1].set}</b><p style="margin:8px 0">理論分布の重なり <strong style="font-size:27px;color:var(--accent)">${(100*overlap).toFixed(1)}%</strong></p><div class="small">${n.toLocaleString()}Gでも、両設定で似た回数が出る範囲があります。</div><details><summary>重なりの意味 ▾</summary><p class="small">各回数の理論確率の小さい方を合計した値です。大きいほど、この項目だけで区別しにくくなります。設定推測の正解率ではありません。</p></details></div>`+html;}
   $('learnResults').innerHTML=html;
 }
 function learningBusy(busy){
