@@ -323,7 +323,7 @@ button{
 .bonus-summary .num{font-size:24px}
 .bonus-summary .inline-prob{font-size:12px}
 .bonus-summary .summary-combined{grid-column:1 / -1}
-button:disabled{opacity:.5;cursor:default}
+button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 @media(max-width:480px){.result-summary{gap:8px}.bonus-summary{flex:1;gap:5px}.bonus-summary .metric{padding:7px 5px}.bonus-summary .num{font-size:20px}.bonus-summary .inline-prob{font-size:10px}.bonus-summary .label{font-size:11px}}
 .result #bonusAfterG{justify-content:center;font-size:18px}
 .result .lamp-total{font-size:12px}
@@ -669,8 +669,15 @@ function renderReels(out){
 let bonusLockUntil=0;
 function updateGameButtons(){
   const locked=Date.now()<bonusLockUntil;
-  document.querySelectorAll('#lever, .autobtn').forEach(button=>button.disabled=locked);
-  document.querySelectorAll('.targetbtn').forEach(button=>button.disabled=locked||games>=Number(button.dataset.target));
+  // Keep touch handling active while click handlers block game advancement.
+  document.querySelectorAll('#lever, .autobtn').forEach(button=>{
+    button.disabled=false;
+    button.setAttribute('aria-disabled',String(locked));
+  });
+  document.querySelectorAll('.targetbtn').forEach(button=>{
+    button.disabled=false;
+    button.setAttribute('aria-disabled',String(locked||games>=Number(button.dataset.target)));
+  });
 }
 function lockBonusButtons(){
   bonusLockUntil=Date.now()+1500;
