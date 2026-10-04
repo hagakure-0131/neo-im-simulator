@@ -332,6 +332,8 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 @media(max-width:480px){.batch-bonus-count{font-size:13px}.batch-bonus-count .bonus-count{width:6ch}}
 @media(max-width:480px){.result-summary #bonusAfterG{font-size:13px}.result-summary .lamp-total{font-size:10px}}
 .gogo-wrap>.role{flex:1;min-width:0;font-size:clamp(12px,3.5vw,17px);font-weight:900;line-height:1.4;text-align:left;overflow-wrap:anywhere}
+.result .after-display{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;line-height:1.4}
+.result .after-display .bonus-count{width:6ch;text-align:center;font-size:clamp(28px,7vw,42px);font-weight:900;line-height:1.2}
 </style>
 </head>
 <body>
@@ -433,7 +435,7 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
       </div>
       <div class="reel-note">当選役のイメージ表示（実機の停止目とは異なります）</div>
       <div class="result-summary"><div class="lamp-stats">
-        <div id="bonusAfterG"><span>ボナ後G数：</span><span id="bonusAfterCount" class="bonus-count">0G</span></div>
+        <div id="bonusAfterG" class="after-display"><span>ボーナス終了後</span><span id="bonusAfterCount" class="bonus-count">0 G</span></div>
         <div class="lamp-total">総ゲーム数：<span id="lampTotalGames">0G</span></div>
       </div><div class="bonus-summary" aria-label="実践集計">
         <div class="metric"><div class="label">BIG</div><div class="num red"><span id="drawBigs">0</span> <span id="drawBigsProb" class="inline-prob">—</span></div></div>
@@ -487,7 +489,7 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
     <div class="result" style="margin-bottom:12px">
       <div class="result-summary">
         <div class="lamp-stats">
-          <div class="batch-bonus-count"><span>ボナ後G数：</span><span id="batchAfterCount" class="bonus-count">0G</span></div>
+          <div class="batch-bonus-count after-display"><span>ボーナス終了後</span><span id="batchAfterCount" class="bonus-count">0 G</span></div>
           <div class="lamp-total">総ゲーム数：<span id="batchTotalGames">0G</span></div>
         </div>
         <div class="bonus-summary" aria-label="一括試行の実践集計">
@@ -746,6 +748,7 @@ function draw(render=true, batch=false){
 }
 
 function renderStats(){
+  $('bonusAfterCount').textContent=$('bonusAfterCount').textContent.replace(/(\d)\s*G$/,'$1 G');
   updateGameButtons();
   $('medalBalance').textContent=`${medals>0?'+':''}${medals.toLocaleString()}枚`;
   $('medalBalance').style.color=medals<0?'var(--red)':medals>0?'var(--green)':'var(--text)';
