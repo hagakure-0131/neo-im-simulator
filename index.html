@@ -64,11 +64,14 @@ th:first-child,td:first-child{text-align:left}
 .small{font-size:12px;color:var(--muted);line-height:1.6}
 .history{max-height:320px;overflow:auto}
 .flag-seven{color:var(--red);font-weight:900;font-style:italic}
+.flag-big{color:#fff;font-weight:900}
 .flag-bar{display:inline-block;background:#171a23;color:#fff;padding:2px 5px;border-radius:3px;font-weight:900;line-height:1.2}
 .bonus-history-chart{margin-top:12px;padding:12px 8px;background:#10141b;border:1px solid var(--line);border-radius:12px}
 .bonus-history-chart svg{display:block;width:100%;height:120px}
-#slumpChart svg{height:140px}
-#historyChartPanel{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.slump-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;text-align:left}
+.slump-balance{font-size:clamp(18px,5vw,26px);font-weight:900;font-variant-numeric:tabular-nums;max-width:100%;overflow-wrap:anywhere}
+#slumpChart svg,#batchSlumpChart svg{height:140px}
+#historyChartPanel,.history-chart-panel{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .chart-tabs{display:flex;gap:6px;margin-bottom:8px}
 .chart-tabs button{flex:1;padding:7px 5px;font-size:12px}
 .bonus-history-chart [hidden]{display:none}
@@ -367,6 +370,15 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 .learn-compare-line .learn-track{height:9px}
 .learn-chart-bin{display:grid;grid-template-columns:48px 1fr;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:7px 0;font-size:12px}
 .learn-card details{margin-top:10px}.learn-card summary{cursor:pointer;font-size:13px;color:var(--muted)}
+.fold-card>summary{cursor:pointer;touch-action:manipulation}
+.fold-card>summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+.menu-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.menu-links a{display:flex;align-items:center;min-height:44px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#222833;color:var(--text);text-decoration:none;font-size:13px;font-weight:700;touch-action:manipulation;overflow-wrap:anywhere}
+.menu-links a:hover{border-color:var(--accent)}
+[id^="section-"]{scroll-margin-top:12px}
+[hidden]{display:none!important}
+.content-nav{position:sticky;top:0;z-index:10;padding:8px 0;background:var(--bg)}
+.content-nav button{min-height:44px;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -431,17 +443,19 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 </symbol>
 </defs></svg>
 <div class="wrap">
+  <h1>🎰 ジャグポケ</h1>
+  <nav class="card menu-panel" id="appMenu" aria-label="メニュー">
+    <b>📋 メニュー</b>
+    <div class="menu-links"><a href="#section-play">ジャグプレイ</a><a href="#section-lab">ジャグラボ</a><a href="#section-spec">スペック確認</a><a href="#section-presets">プリセット一覧</a></div>
+  </nav>
+  <div id="contentNav" class="content-nav" hidden><button id="backToMenu">← メニューに戻る</button></div>
   <div class="iphone-note">
     📱 iPhone向け表示。Safariのホーム画面から使うには、このファイルをWeb公開する必要があります。
   </div>
-  <h1>🎰 ジャグポケ</h1>
-  <div class="sub">
-    設定1〜6のプリセットを選ぶと、各フラグの個数を65,536個中に自動配置します。<br>
-    ネオアイム｜この版は「フラグ個数を整数として65,536個の抽選空間に配置する」モデルです。
-  </div>
 
-  <div class="card">
-    <b>① 設定を選択</b>
+  <div class="card" id="section-play" hidden>
+    <b>① 🕹️ ジャグプレイ</b>
+    <div class="small" style="margin-top:12px">設定を選択</div>
     <div class="settings" style="margin-top:12px">
       <button class="setbtn active" data-set="1">設定1</button>
       <button class="setbtn" data-set="2">設定2</button>
@@ -450,10 +464,6 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
       <button class="setbtn" data-set="5">設定5</button>
       <button class="setbtn" data-set="6">設定6</button>
     </div>
-  </div>
-
-  <div class="card">
-    <b>② 抽選</b>
     <div class="medal-panel">
       <div class="small">🪙 持ちメダル換算・累計差枚（0枚スタート）</div>
       <div id="medalBalance" class="balance">0枚</div>
@@ -462,7 +472,7 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
     </div>
     <div class="result" style="margin-top:12px">
       <div class="bonus-history-chart">
-        <div id="slumpChartPanel"><div class="small">スランプグラフ・累計差枚</div><div id="slumpChart"></div></div>
+        <div id="slumpChartPanel"><div class="slump-heading"><span class="small">スランプグラフ・累計差枚</span><span id="slumpBalance" class="slump-balance">0枚</span></div><div id="slumpChart"></div></div>
         <div id="historyChartPanel"><div class="small"><span class="red">■ BIG</span>　<span class="yellow">■ REG</span>　直近10回・左が最新</div><div id="bonusHistoryChart"></div></div>
       </div>
       <div class="result-summary"><div class="lamp-stats">
@@ -477,10 +487,6 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
         <div class="metric"><div class="label">ブドウ確率</div><div id="drawGrapeProb" class="num cyan summary-prob">—</div></div>
       </div>
       </div>
-      <details style="margin-top:8px"><summary class="small" style="cursor:pointer">抽選の詳細を見る</summary>
-        <div id="rng" class="rng">取得乱数：—</div>
-        <div id="detail" class="small" style="margin-top:6px">レバーONで1/65,536の乱数を1つ取得します。</div>
-      </details>
     </div>
     <div class="gogo-wrap">
       
@@ -521,61 +527,17 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
         <button class="autobtn" data-g="1000">1000G</button>
       </div>
     </div>
-  </div>
-
-  <div class="card">
-    <b>指定の総G数まで一括試行</b>
-    <div class="learn-switch"><button id="normalTab" class="active">通常プレイ</button><button id="learningTab">🎓 体感学習</button></div>
-    <div id="batchNormal" class="batch-normal">
-    <div class="small" style="margin:6px 0 10px">現在の集計を引き継ぎ、途中のボーナスで止まらず指定の総G数まで進めます。到達済みのボタンは無効になります。</div>
-    <div class="result" style="margin-bottom:12px">
-      <div class="result-summary">
-        <div class="lamp-stats">
-          <div id="batchSetting" class="summary-setting">設定1</div>
-          <div class="after-display total-display"><span>総ゲーム数</span><span id="batchTotalGames" class="total-count">0 G</span></div>
-          <div class="lamp-total">ボーナス終了後：<span id="batchAfterCount">0 G</span></div>
-        </div>
-        <div class="bonus-summary" aria-label="一括試行の実践集計">
-          <div class="metric"><div class="label">BIG</div><div class="num red"><span id="batchBigs">0</span> <span id="batchBigsProb" class="inline-prob">—</span></div></div>
-          <div class="metric"><div class="label">REG</div><div class="num yellow"><span id="batchRegs">0</span> <span id="batchRegsProb" class="inline-prob">—</span></div></div>
-          <div class="metric summary-combined"><div class="label">合算</div><div id="batchCombined" class="num green summary-prob">—</div></div>
-          <div class="metric"><div class="label">ブドウ確率</div><div id="batchGrapeProb" class="num cyan summary-prob">—</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="target-controls" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
-      <button class="targetbtn" data-target="1000">総1000G</button>
-      <button class="targetbtn" data-target="2000">総2000G</button>
-      <button class="targetbtn" data-target="3000">総3000G</button>
-      <button class="targetbtn" data-target="4000">総4000G</button>
-      <button class="targetbtn" data-target="5000">総5000G</button>
-      <button class="targetbtn" data-target="6000">総6000G</button>
-    </div>
-    <button id="batchReset" class="lamp-reset" style="width:100%;margin-top:10px"><span>リセット</span><small>差枚・履歴・集計</small></button>
-    </div>
-    <div id="learningPanel" class="learning" hidden>
-      <p class="small">同じ条件を繰り返して、上振れ・下振れを体感します。通常プレイの記録は変わりません。</p>
-      <div class="learn-fields">
-        <label>学習用設定<select id="learnSet"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option></select></label>
-        <label>1試行のG数<select id="learnGames"><option>500</option><option>1000</option><option>2000</option><option selected>3000</option><option>5000</option><option>10000</option></select></label>
-        <label>試行回数<select id="learnTrials"><option>1</option><option>10</option><option>50</option><option selected>100</option><option>1000</option></select></label>
-        <label>比較する設定<select id="learnCompare"><option value="0">比較なし</option><option selected value="1">設定1</option><option value="2">設定2</option><option value="3">設定3</option><option value="4">設定4</option><option value="5">設定5</option><option value="6">設定6</option></select></label>
-      </div>
-      <div class="learn-switch"><button id="learnStart">学習スタート</button><button id="learnStop" disabled>中止</button><button id="learnReset">学習結果をリセット</button></div>
-      <div id="learnProgress" class="small" role="status" aria-live="polite">条件を選んでスタートしてください。</div>
-      <div class="learn-fields"><label>見る項目<select id="learnMetric"><option value="big">BIG全体</option><option value="reg" selected>REG全体</option><option value="bonus">ボーナス全体</option><option value="sb">単独BIG</option><option value="cb">共通チェリーBIG</option><option value="rb">レアチェリーBIG</option><option value="sr">単独REG</option><option value="cr">共通チェリーREG</option></select></label></div>
-      <div id="learnResults"></div>
-      <p class="small">理論値は現在の65,536フラグ個数から計算します。各ゲームの抽選は独立です。ハマりの後も次ゲームの当選確率は変わりません。学習のフラグ内訳は、通常のホールの台データだけでは分からない情報を含みます。</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <b>③ 直近履歴</b><div class="small" style="margin-top:6px">一番上が最新（1回前）。左から「何回前」「当選G数」「成立フラグ」「総回転数」。</div>
+    <details style="margin-top:12px"><summary class="small" style="cursor:pointer">抽選の詳細を見る</summary>
+      <div id="rng" class="rng">取得乱数：—</div>
+      <div id="detail" class="small" style="margin-top:6px">レバーONで1/65,536の乱数を1つ取得します。</div>
+    </details>
+  <details class="card fold-card" id="playHistory">
+    <summary><b>直近履歴</b></summary><div class="small" style="margin-top:6px">一番上が最新（1回前）。左から「何回前」「当選G数」「成立フラグ」「総回転数」。</div>
     <div id="history" class="history small" style="margin-top:10px">まだ抽選されていません。</div>
-  </div>
+  </details>
 
-  <div class="card">
-    <b>④ 実戦集計</b>
+  <details class="card fold-card" id="playStats">
+    <summary><b>実戦集計</b></summary>
     <div class="summary" style="margin-top:12px">
       <div class="metric"><div class="label">総G数</div><div id="games" class="num">0</div></div>
       <div class="metric"><div class="label">合算</div><div id="combined" class="num green">—</div></div>
@@ -584,24 +546,15 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
     </div>
 <div class="small" style="margin-top:12px">小役の成立回数・実戦確率</div><div class="role-grid"><div class="metric"><div class="label">🍇 ブドウ</div><div class="num"><span id="grapeHits">0</span> <span id="grapeActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🔁 リプレイ</div><div class="num"><span id="replayHits">0</span> <span id="replayActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🍒 （非重複）</div><div class="num"><span id="cherryHits">0</span> <span id="cherryActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🔔 ベル</div><div class="num"><span id="bellHits">0</span> <span id="bellActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">🤡 ピエロ</div><div class="num"><span id="clownHits">0</span> <span id="clownActual" class="inline-prob">—</span></div></div><div class="metric"><div class="label">ハズレ</div><div class="num"><span id="missHits">0</span> <span id="missActual" class="inline-prob">—</span></div></div></div><p class="small">通常時の成立回数を集計します。小役は全獲得として、ブドウ8枚・チェリー2枚・ベル14枚・ピエロ10枚を払い出します。チェリー重複時も2枚を加算します。リプレイは払出0枚・次ゲームの投入0枚。BIGは純増252枚、REGは純増96枚を当選時に自動加算します。ボーナス消化ゲームは総G数に含めず、入賞までの追加投入・取りこぼしは省略します。差枚がマイナスでも続行でき、設定変更時も集計を継続します。</p>
 
-  </div>
+  </details>
 
-  <div class="card">
-    <b>⑤ ネオアイム スペック一覧</b>
-    <div class="small" style="margin-top:6px">ネオアイムジャグラーEX｜北電子公表値</div>
-    <table class="spec-table" style="margin-top:10px" aria-label="ネオアイム設定別スペック">
-      <thead><tr><th scope="col">設定</th><th scope="col">BIG</th><th scope="col">REG</th><th scope="col">合算</th><th scope="col">出玉率</th></tr></thead>
-      <tbody><tr data-spec-set="1"><th scope="row">1</th><td>1/273.1</td><td>1/439.8</td><td>1/168.5</td><td>97.0%</td></tr><tr data-spec-set="2"><th scope="row">2</th><td>1/269.7</td><td>1/399.6</td><td>1/161.0</td><td>98.0%</td></tr><tr data-spec-set="3"><th scope="row">3</th><td>1/269.7</td><td>1/331.0</td><td>1/148.6</td><td>99.5%</td></tr><tr data-spec-set="4"><th scope="row">4</th><td>1/259.0</td><td>1/315.1</td><td>1/142.2</td><td>101.1%</td></tr><tr data-spec-set="5"><th scope="row">5</th><td>1/259.0</td><td>1/255.0</td><td>1/128.5</td><td>103.3%</td></tr><tr data-spec-set="6"><th scope="row">6</th><td>1/255.0</td><td>1/255.0</td><td>1/127.5</td><td>105.5%</td></tr></tbody>
-    </table>
-    <p class="small source-note">選択中の設定を色付きで表示します。<br>※メーカーによる工場データから算出した予測値です。BIG・REGの合計個数は公表確率に最も近い整数に合わせています。フラグ構成欄は小数2桁、公表値は小数1桁で表示します。出玉率はメーカー公表の参照値です。このモデルは小役全獲得・ボーナス入賞までの追加投入省略のため、同じ出玉率を再現するものではありません。<br><a href="https://www.kitadenshi.co.jp/slot/neoimjugglerex/" target="_blank" rel="noopener">北電子 公式スペック</a>（確認：2026/10/2）</p>
-  </div>
-
-  <div class="card">
-    <b>⑥ 現在のフラグ構成</b>
+  <details class="card fold-card" id="playFlags">
+    <summary><b>現在のフラグ構成</b></summary>
     <div class="metric" style="margin-top:12px">
       <b>設定別ブドウ確率（モデル参考値）</b>
       <p class="small">北電子公式では未公表のため、推定値を使用しています。下記はジャグポケの65,536個の抽選配分から計算した確率です。実機の確定値ではありません。</p>
       <table class="spec-table" aria-label="設定別ブドウ確率のモデル参考値"><thead><tr><th>設定</th><th>ブドウ確率</th></tr></thead><tbody id="grapePresetRows"></tbody></table>
+      <p class="small source-note"><a href="https://kenslo65536.com/kaiseki/juggler-neo-im-ex.html" target="_blank" rel="noopener">参考：けんのスロットシミュレーション｜ネオアイムジャグラーEX 解析情報 ↗</a><br>参照箇所：小役確率（予測値）</p>
     </div>
     <div class="grid5" style="margin-top:12px">
       <div class="metric">
@@ -639,12 +592,86 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
       <div class="metric"><div class="label">小役＋ハズレ合計</div><div id="otherTotal" class="num blue">65147</div><div id="otherTotalProb" class="prob"></div></div>
     </div>
     <p class="small source-note">小役は独自解析の予測値を整数換算したモデルです。ブドウ：設定1〜5 約1/6.02408、設定6 約1/5.80016。リプレイ 約1/7.298、非重複チェリー 約1/35.617、ベル・ピエロ 各約1/1092.267。表示確率は換算後の値です。<br>チェリー重複はボーナス欄に含むため、通常小役には重ねて足しません。<br><a href="https://kenslo65536.com/kaiseki/juggler-neo-im-ex.html" target="_blank" rel="noopener">小役予測値の参照元</a>（確認：2026/10/2）。BIG・REGの合計個数はメーカー公表確率を優先し、共通・レアチェリーの個数を維持して単独ボーナスの個数を調整しています。内訳はメーカー公表値ではなく、このモデルの仮定です。</p>
+  </details>
+
   </div>
 
-  <div class="card">
-    <b>⑦ プリセット一覧</b>
-    <div id="presetList" class="preset-list"></div>
+  <div class="card" id="section-lab" hidden>
+    <b>② 🧪 ジャグラボ</b>
+    <div class="learn-switch"><button id="normalTab" class="active">通常プレイ</button><button id="learningTab">🎓 体感学習</button></div>
+    <div id="batchNormal" class="batch-normal">
+    <div class="small" style="margin:6px 0 10px">現在の集計を引き継ぎ、途中のボーナスで止まらず指定の総G数まで進めます。到達済みのボタンは無効になります。</div>
+    <div class="settings" style="margin-bottom:12px" aria-label="通常プレイの設定変更">
+      <button class="setbtn active" data-set="1">設定1</button>
+      <button class="setbtn" data-set="2">設定2</button>
+      <button class="setbtn" data-set="3">設定3</button>
+      <button class="setbtn" data-set="4">設定4</button>
+      <button class="setbtn" data-set="5">設定5</button>
+      <button class="setbtn" data-set="6">設定6</button>
+    </div>
+    <div class="result" style="margin-bottom:12px">
+      <div class="bonus-history-chart">
+        <div><div class="slump-heading"><span class="small">スランプグラフ・累計差枚</span><span id="batchSlumpBalance" class="slump-balance">0枚</span></div><div id="batchSlumpChart"></div></div>
+        <div class="history-chart-panel"><div class="small"><span class="red">■ BIG</span>　<span class="yellow">■ REG</span>　直近10回・左が最新</div><div id="batchBonusHistoryChart"></div></div>
+      </div>
+      <div class="result-summary">
+        <div class="lamp-stats">
+          <div id="batchSetting" class="summary-setting">設定1</div>
+          <div class="after-display total-display"><span>総ゲーム数</span><span id="batchTotalGames" class="total-count">0 G</span></div>
+          <div class="lamp-total">ボーナス終了後：<span id="batchAfterCount">0 G</span></div>
+        </div>
+        <div class="bonus-summary" aria-label="一括試行の実践集計">
+          <div class="metric"><div class="label">BIG</div><div class="num red"><span id="batchBigs">0</span> <span id="batchBigsProb" class="inline-prob">—</span></div></div>
+          <div class="metric"><div class="label">REG</div><div class="num yellow"><span id="batchRegs">0</span> <span id="batchRegsProb" class="inline-prob">—</span></div></div>
+          <div class="metric summary-combined"><div class="label">合算</div><div id="batchCombined" class="num green summary-prob">—</div></div>
+          <div class="metric"><div class="label">ブドウ確率</div><div id="batchGrapeProb" class="num cyan summary-prob">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="target-controls" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+      <button class="targetbtn" data-target="1000">総1000G</button>
+      <button class="targetbtn" data-target="2000">総2000G</button>
+      <button class="targetbtn" data-target="3000">総3000G</button>
+      <button class="targetbtn" data-target="4000">総4000G</button>
+      <button class="targetbtn" data-target="5000">総5000G</button>
+      <button class="targetbtn" data-target="6000">総6000G</button>
+    </div>
+    <button id="advance1000" style="width:100%;margin-top:10px;touch-action:manipulation">＋1000G進める</button>
+    <button id="batchReset" class="lamp-reset" style="width:100%;margin-top:10px"><span>リセット</span><small>差枚・履歴・集計</small></button>
+    <details class="card fold-card" id="labHistory"><summary><b>直近履歴</b></summary></details>
+    <details class="card fold-card" id="labStats"><summary><b>実戦集計</b></summary></details>
+    <details class="card fold-card" id="labFlags"><summary><b>現在のフラグ構成</b></summary></details>
+    </div>
+    <div id="learningPanel" class="learning" hidden>
+      <p class="small">同じ条件を繰り返して、上振れ・下振れを体感します。通常プレイの記録は変わりません。</p>
+      <div class="learn-fields">
+        <label>学習用設定<select id="learnSet"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option></select></label>
+        <label>1試行のG数<select id="learnGames"><option>500</option><option>1000</option><option>2000</option><option selected>3000</option><option>5000</option><option>10000</option></select></label>
+        <label>試行回数<select id="learnTrials"><option>1</option><option>10</option><option>50</option><option selected>100</option><option>1000</option></select></label>
+        <label>比較する設定<select id="learnCompare"><option value="0">比較なし</option><option selected value="1">設定1</option><option value="2">設定2</option><option value="3">設定3</option><option value="4">設定4</option><option value="5">設定5</option><option value="6">設定6</option></select></label>
+      </div>
+      <div class="learn-switch"><button id="learnStart">学習スタート</button><button id="learnStop" disabled>中止</button><button id="learnReset">学習結果をリセット</button></div>
+      <div id="learnProgress" class="small" role="status" aria-live="polite">条件を選んでスタートしてください。</div>
+      <div class="learn-fields"><label>見る項目<select id="learnMetric"><option value="big">BIG全体</option><option value="reg" selected>REG全体</option><option value="bonus">ボーナス全体</option><option value="sb">単独BIG</option><option value="cb">共通チェリーBIG</option><option value="rb">レアチェリーBIG</option><option value="sr">単独REG</option><option value="cr">共通チェリーREG</option></select></label></div>
+      <div id="learnResults"></div>
+      <p class="small">理論値は現在の65,536フラグ個数から計算します。各ゲームの抽選は独立です。ハマりの後も次ゲームの当選確率は変わりません。学習のフラグ内訳は、通常のホールの台データだけでは分からない情報を含みます。</p>
+    </div>
   </div>
+
+  <div class="card" id="section-spec" hidden>
+    <b>③ スペック確認</b>
+    <div class="small" style="margin-top:6px">ネオアイムジャグラーEX｜北電子公表値</div>
+    <table class="spec-table" style="margin-top:10px" aria-label="ネオアイム設定別スペック">
+      <thead><tr><th scope="col">設定</th><th scope="col">BIG</th><th scope="col">REG</th><th scope="col">合算</th><th scope="col">出玉率</th></tr></thead>
+      <tbody><tr data-spec-set="1"><th scope="row">1</th><td>1/273.1</td><td>1/439.8</td><td>1/168.5</td><td>97.0%</td></tr><tr data-spec-set="2"><th scope="row">2</th><td>1/269.7</td><td>1/399.6</td><td>1/161.0</td><td>98.0%</td></tr><tr data-spec-set="3"><th scope="row">3</th><td>1/269.7</td><td>1/331.0</td><td>1/148.6</td><td>99.5%</td></tr><tr data-spec-set="4"><th scope="row">4</th><td>1/259.0</td><td>1/315.1</td><td>1/142.2</td><td>101.1%</td></tr><tr data-spec-set="5"><th scope="row">5</th><td>1/259.0</td><td>1/255.0</td><td>1/128.5</td><td>103.3%</td></tr><tr data-spec-set="6"><th scope="row">6</th><td>1/255.0</td><td>1/255.0</td><td>1/127.5</td><td>105.5%</td></tr></tbody>
+    </table>
+    <p class="small source-note">選択中の設定を色付きで表示します。<br>※メーカーによる工場データから算出した予測値です。BIG・REGの合計個数は公表確率に最も近い整数に合わせています。フラグ構成欄は小数2桁、公表値は小数1桁で表示します。出玉率はメーカー公表の参照値です。このモデルは小役全獲得・ボーナス入賞までの追加投入省略のため、同じ出玉率を再現するものではありません。<br><a href="https://www.kitadenshi.co.jp/slot/neoimjugglerex/" target="_blank" rel="noopener">北電子 公式スペック</a>（確認：2026/10/2）</p>
+  </div>
+
+  <details class="card fold-card" id="section-presets" hidden>
+    <summary><b>④ プリセット一覧</b></summary>
+    <div id="presetList" class="preset-list"></div>
+  </details>
 
   <p class="small">
     ※これは抽選構造を理解・実験するためのシミュレーターです。
@@ -720,13 +747,14 @@ function updatePreset(){
   small.miss=N-total-Object.values(small).reduce((a,b)=>a+b,0);
   for(const key of smallKeys){$(key+'Count').textContent=small[key].toLocaleString();$(key+'Prob').textContent=prob(small[key]);}
   $('presetList').innerHTML=Object.entries(presets).map(([set,p])=>`<div class="metric small"><b>設定${set}</b><br>単独BIG ${p.sb}<br>共通🍒BIG ${p.cb}<br>レア🍒BIG ${p.rb}<br>単独REG ${p.sr}<br>共通🍒REG ${p.cr}</div>`).join('');
+  mirrorPanel('playFlags','labFlags');
 }
 
 const bonusFlagIds=['sb','cb','rb','sr','cr'];
 const bonusFlagNames={sb:'🔴 単独BIG',cb:'🍒 共通チェリーBIG',rb:'🍒 レアチェリーBIG',sr:'🟡 単独REG',cr:'🍒 共通チェリーREG'};
 function displayRole(name){
-  const seven='<span class="flag-seven">７</span>',bar='<span class="flag-bar">BAR</span>';
-  return ({'🔴 単独BIG':`${seven}BIG（単独）`,'🍒 共通チェリーBIG':`${seven}BIG 🍒（共通）`,'🍒 レアチェリーBIG':`${seven}BIG 🍒（レア）`,'🟡 単独REG':`${bar}（単独）`,'🍒 共通チェリーREG':`${bar} 🍒（共通）`,'🍒 （非重複）':'🍒（非重複）'})[name]||name;
+  const seven='<span class="flag-seven">７</span>',big='<span class="flag-big">BIG</span>',bar='<span class="flag-bar">BAR</span>';
+  return ({'🔴 単独BIG':`${seven}${big}（単独）`,'🍒 共通チェリーBIG':`${seven}${big} 🍒（共通）`,'🍒 レアチェリーBIG':`${seven}${big} 🍒（レア）`,'🟡 単独REG':`${bar}（単独）`,'🍒 共通チェリーREG':`${bar} 🍒（共通）`,'🍒 （非重複）':'🍒（非重複）'})[name]||name;
 }
 function bonusFlagFor(r,set){
   let end=0;
@@ -765,6 +793,7 @@ function renderReels(out){
 let bonusLockUntil=0;
 function updateGameButtons(){
   const locked=Date.now()<bonusLockUntil;
+  $('advance1000').setAttribute('aria-disabled',String(locked));
   // Keep touch handling active while click handlers block game advancement.
   document.querySelectorAll('#lever, .autobtn').forEach(button=>{
     button.disabled=false;
@@ -825,6 +854,9 @@ function draw(render=true, batch=false){
   return out;
 }
 
+function mirrorPanel(source,target){
+  $(target).innerHTML=$(source).innerHTML.replace(/\s+id="[^"]*"/g,'');
+}
 function renderStats(){
   renderSlumpChart();
   $('bonusAfterCount').textContent=$('bonusAfterCount').textContent.replace(/(\d)\s*G$/,'$1 G');
@@ -848,9 +880,14 @@ function renderStats(){
   for(const [target,source] of [['batchAfterCount','bonusAfterCount'],['batchTotalGames','lampTotalGames'],['batchBigs','bigs'],['batchRegs','regs'],['batchBigsProb','bigsProb'],['batchRegsProb','regsProb'],['batchCombined','combined'],['batchGrapeProb','grapeActual']]){
     $(target).textContent=$(source).textContent;
   }
+  mirrorPanel('playStats','labStats');
 }
 
 function renderSlumpChart(){
+  for(const id of ['slumpBalance','batchSlumpBalance']){
+    $(id).textContent=`${medals>0?'+':''}${medals.toLocaleString()}枚`;
+    $(id).style.color=medals<0?'var(--red)':medals>0?'var(--green)':'var(--text)';
+  }
   const width=360,left=48,right=352,top=16,bottom=132;
   let low=0,high=0;
   for(const p of slumpPoints){low=Math.min(low,p.medals);high=Math.max(high,p.medals);}
@@ -868,20 +905,23 @@ function renderSlumpChart(){
   for(let i=0;i<=4;i++){const g=Math.round(games*i/4);svg+=`<text x="${left+(right-left)*i/4}" y="151" text-anchor="${i===0?'start':i===4?'end':'middle'}" fill="#a9aeb8" font-size="9">${g.toLocaleString()}G</text>`;}
   if(!games)svg+='<text x="200" y="78" text-anchor="middle" fill="#a9aeb8" font-size="12">プレイすると差枚の推移を表示します</text>';
   $('slumpChart').innerHTML=svg+'</svg>';
+  $('batchSlumpChart').innerHTML=$('slumpChart').innerHTML;
 }
 function renderBonusHistoryChart(){
   const entries=history.slice(0,10);
-  const ceiling=Math.max(500,Math.ceil(Math.max(0,...entries.map(h=>h.intervalG))/100)*100);
+  const ceiling=500;
   let svg=`<svg viewBox="0 0 360 160" preserveAspectRatio="none" role="img" aria-label="直近10回のボーナス当選ゲーム数。左が最新"><title>ボーナス当選履歴</title>`;
   for(let i=0;i<=5;i++){const y=123-i*20;svg+=`<line x1="40" y1="${y}" x2="356" y2="${y}" stroke="#343a46"/><text x="35" y="${y+4}" text-anchor="end" fill="#a9aeb8" font-size="10">${Math.round(ceiling*i/5)}</text>`;}
   if(!entries.length)svg+='<text x="198" y="77" text-anchor="middle" fill="#a9aeb8" font-size="12">ボーナス当選後に表示されます</text>';
-  entries.forEach((h,i)=>{const x=43+i*31.2,height=Math.max(1,h.intervalG/ceiling*100),y=123-height,type=h.role.includes('BIG')?'BIG':'REG',color=type==='BIG'?'#ff6268':'#ffdc68';svg+=`<g><title>${i+1}回前：${type} ${h.intervalG}G、総${h.totalG}G</title><rect x="${x}" y="${y}" width="23" height="${height}" rx="2" fill="${color}"/><text x="${x+11.5}" y="${y-5}" text-anchor="middle" fill="#f2f3f5" font-size="9">${h.intervalG}</text><text x="${x+11.5}" y="138" text-anchor="middle" fill="${color}" font-size="9">${type==='BIG'?'B':'R'}</text><text x="${x+11.5}" y="153" text-anchor="middle" fill="#a9aeb8" font-size="9">${i+1}</text></g>`;});
+  entries.forEach((h,i)=>{const x=43+i*31.2,height=Math.max(1,Math.min(h.intervalG,ceiling)/ceiling*100),y=123-height,type=h.role.includes('BIG')?'BIG':'REG',color=type==='BIG'?'#ff6268':'#ffdc68';svg+=`<g><title>${i+1}回前：${type} ${h.intervalG}G、総${h.totalG}G${h.intervalG>ceiling?'（棒は500Gで上限表示）':''}</title><rect x="${x}" y="${y}" width="23" height="${height}" rx="2" fill="${color}"/>${h.intervalG>ceiling?`<path d="M${x+7.5},29 L${x+11.5},24 L${x+15.5},29 Z" fill="#10141b"/>`:''}<text x="${x+11.5}" y="${y-5}" text-anchor="middle" fill="#f2f3f5" font-size="9">${h.intervalG}</text><text x="${x+11.5}" y="138" text-anchor="middle" fill="${color}" font-size="9">${type==='BIG'?'B':'R'}</text><text x="${x+11.5}" y="153" text-anchor="middle" fill="#a9aeb8" font-size="9">${i+1}</text></g>`;});
   $('bonusHistoryChart').innerHTML=svg+'</svg>';
+  $('batchBonusHistoryChart').innerHTML=$('bonusHistoryChart').innerHTML;
 }
 function renderHistory(){
   renderBonusHistoryChart();
   if(!history.length){
     $('history').textContent='まだボーナス当選履歴がありません。';
+    mirrorPanel('playHistory','labHistory');
     return;
   }
   $('history').innerHTML='<div class="histrow history-head"><div>何回前</div><div>当選G</div><div>成立フラグ</div><div>総G</div></div>'+history.map((h,i)=>`
@@ -892,12 +932,13 @@ function renderHistory(){
       <div>総${h.totalG}G</div>
     </div>
   `).join('');
+  mirrorPanel('playHistory','labHistory');
 }
 
 document.querySelectorAll('.setbtn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     currentSet=Number(btn.dataset.set);
-    document.querySelectorAll('.setbtn').forEach(b=>b.classList.toggle('active',b===btn));
+    document.querySelectorAll('.setbtn').forEach(b=>b.classList.toggle('active',Number(b.dataset.set)===currentSet));
     updatePreset();
     $('gogoLamp').classList.remove('on');
     $('bonusAfterCount').textContent=`${games-lastBonusGame}G`;
@@ -952,9 +993,7 @@ document.querySelectorAll('.autobtn').forEach(btn=>{
     renderHistory();
   });
 });
-document.querySelectorAll('.targetbtn').forEach(button=>{
-  button.addEventListener('click',()=>{
-    const target=Number(button.dataset.target);
+function advanceToTotal(target){
     if(Date.now()<bonusLockUntil||games>=target) return;
     const start=games, startBigs=bigs, startRegs=regs;
     let lastOut;
@@ -968,8 +1007,11 @@ document.querySelectorAll('.targetbtn').forEach(button=>{
     $('detail').textContent=`総${target.toLocaleString()}Gまで${(target-start).toLocaleString()}G進みました。今回のBIG ${bigs-startBigs}回・REG ${regs-startRegs}回。`;
     if(finalBonus) lockBonusButtons();
     renderStats();renderHistory();
-  });
+}
+document.querySelectorAll('.targetbtn').forEach(button=>{
+  button.addEventListener('click',()=>advanceToTotal(Number(button.dataset.target)));
 });
+$('advance1000').addEventListener('click',()=>advanceToTotal(games+1000));
 function resetSimulation(){
   medals=0;normalStake=0;smallPayout=0;bonusNetTotal=0;replayNext=false;lastMedal=null;
   games=0;bigs=0;regs=0;history=[];lastBonusGame=0;smallHits=Object.fromEntries(smallKeys.map(k=>[k,0]));
@@ -1088,6 +1130,29 @@ $('learnStop').addEventListener('click',()=>{learnCancel=true;});
 $('learnReset').addEventListener('click',()=>{if(learnRunning){learnCancel=true;learnResetPending=true;return;}learnData=null;$('learnResults').textContent='';$('learnProgress').textContent='条件を選んでスタートしてください。';});
 $('learnMetric').addEventListener('change',renderLearning);
 
+const appSections=Array.from(document.querySelectorAll('[id^="section-"]'));
+function showAppSection(id){
+  const target=document.getElementById(id);
+  if(!target||!appSections.includes(target))return;
+  appSections.forEach(section=>{section.hidden=section!==target;});
+  $('appMenu').hidden=true;
+  $('contentNav').hidden=false;
+  if(target.tagName==='DETAILS')target.open=true;
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function returnToMenu(){
+  appSections.forEach(section=>{section.hidden=true;});
+  $('appMenu').hidden=false;
+  $('contentNav').hidden=true;
+  window.scrollTo({top:0,behavior:'instant'});
+}
+document.querySelectorAll('.menu-links a').forEach(link=>{
+  link.addEventListener('click',event=>{
+    event.preventDefault();
+    showAppSection(link.getAttribute('href').slice(1));
+  });
+});
+$('backToMenu').addEventListener('click',returnToMenu);
 updatePreset(); renderStats(); renderHistory();
 </script>
 
