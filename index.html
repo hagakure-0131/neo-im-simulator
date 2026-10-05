@@ -419,6 +419,7 @@ button{text-align:left}
 .machine-preview-caption a{color:var(--muted);font-size:11px}
 .machine-copyright{color:var(--muted);font-size:9px}
 @media(max-width:480px){.machine-card,.menu-card{padding:12px}.machine-preview{padding:10px;gap:12px}.machine-preview img{width:94px;height:160px}}
+.machine-preview-caption .machine-spec-button{display:flex;align-items:center;min-height:44px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#222833;color:var(--text);font-size:13px;font-weight:700;line-height:1.5;text-align:left;text-decoration:none;touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -488,10 +489,10 @@ button{text-align:left}
     <section class="card machine-card" aria-label="機種選択">
     <b>🎰 機種選択</b>
     <div class="machine-select"><button class="active" data-machine="neo">ネオアイムジャグラーEX</button><button data-machine="girls">ジャグラーガールズSS</button><button data-machine="happy">ハッピージャグラーV Ⅲ</button><button data-machine="gogo">ゴーゴージャグラー3</button></div>
-    <div class="machine-preview" aria-live="polite"><img id="machineImage" width="106" height="180" alt=""><div class="machine-preview-caption"><span class="small">選択中</span><strong id="selectedMachine">ネオアイムジャグラーEX</strong><a id="machineImageSource" class="small" target="_blank" rel="noopener">北電子 製品ページ ↗</a><span class="machine-copyright">©KITA DENSHI</span></div></div>
+    <div class="machine-preview" aria-live="polite"><img id="machineImage" width="106" height="180" alt=""><div class="machine-preview-caption"><span class="small">選択中</span><strong id="selectedMachine">ネオアイムジャグラーEX</strong><a id="machineImageSource" class="small" target="_blank" rel="noopener">北電子 製品ページ ↗</a><span class="machine-copyright">©KITA DENSHI</span><a class="machine-spec-button" href="#section-spec">スペック確認</a></div></div>
     </section>
     <section class="card menu-card" aria-label="メニュー項目"><b>📋 メニュー</b>
-    <div class="menu-links"><a href="#section-play">ジャグプレイ</a><a href="#section-lab">ジャグラボ</a><a href="#section-spec">スペック確認</a><a href="#section-presets">プリセット一覧</a></div>
+    <div class="menu-links"><a href="#section-play">ジャグプレイ</a><a href="#section-lab">ジャグラボ</a><a href="#section-presets">プリセット一覧</a></div>
     </section>
   </nav>
   <div id="contentNav" class="content-nav" hidden><button id="backToMenu">← メニューに戻る</button></div>
@@ -1265,7 +1266,7 @@ function returnToMenu(){
   $('contentNav').hidden=true;
   window.scrollTo({top:0,behavior:'instant'});
 }
-document.querySelectorAll('.menu-links a').forEach(link=>{
+document.querySelectorAll('.menu-links a,.machine-spec-button').forEach(link=>{
   link.addEventListener('click',event=>{
     event.preventDefault();
     showAppSection(link.getAttribute('href').slice(1));
