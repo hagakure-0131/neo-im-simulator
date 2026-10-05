@@ -379,6 +379,27 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 [hidden]{display:none!important}
 .content-nav{position:sticky;top:0;z-index:10;padding:8px 0;background:var(--bg)}
 .content-nav button{min-height:44px;color:var(--accent)}
+@media(max-width:480px){
+  .content-nav{padding:4px 0}
+  .content-nav button{padding:8px 12px;font-size:13px}
+  #section-play,#section-lab{padding:10px}
+  #section-play>.result,#batchNormal>.result{padding:10px}
+  .bonus-history-chart{margin-top:4px;padding:8px 5px}
+  #slumpChart svg,#batchSlumpChart svg{height:112px}
+  #bonusHistoryChart svg,#batchBonusHistoryChart svg{height:90px}
+  #historyChartPanel,.history-chart-panel{margin-top:5px;padding-top:5px}
+  .result-summary{margin:7px 0;gap:7px}
+  .bonus-summary .metric{padding:6px 5px}
+  .result .after-display{gap:2px}
+  .result .summary-setting{margin-bottom:3px}
+  .result .lamp-total{margin-top:3px}
+  .gogo-wrap{margin:9px 0 7px}
+  .controls{gap:7px}
+  .controls .big{min-height:48px;padding:11px 10px;font-size:19px}
+  .controls .autobtn,.target-controls .targetbtn{min-height:44px;padding:9px 5px}
+  .target-controls{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+  #advance1000,#batchReset{min-height:44px;padding:10px;margin-top:7px!important}
+}
 </style>
 </head>
 <body>
@@ -449,9 +470,6 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
     <div class="menu-links"><a href="#section-play">ジャグプレイ</a><a href="#section-lab">ジャグラボ</a><a href="#section-spec">スペック確認</a><a href="#section-presets">プリセット一覧</a></div>
   </nav>
   <div id="contentNav" class="content-nav" hidden><button id="backToMenu">← メニューに戻る</button></div>
-  <div class="iphone-note">
-    📱 iPhone向け表示。Safariのホーム画面から使うには、このファイルをWeb公開する必要があります。
-  </div>
 
   <div class="card" id="section-play" hidden>
     <b>① 🕹️ ジャグプレイ</b>
