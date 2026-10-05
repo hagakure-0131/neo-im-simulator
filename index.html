@@ -334,6 +334,13 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 .gogo-wrap>.role{flex:1;min-width:0;font-size:clamp(12px,3.5vw,17px);font-weight:900;line-height:1.4;text-align:left;overflow-wrap:anywhere}
 .result .after-display{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;line-height:1.4}
 .result .after-display .bonus-count{width:6ch;text-align:center;font-size:clamp(28px,7vw,42px);font-weight:900;line-height:1.2}
+.result .summary-setting{font-size:13px;font-weight:800;margin-bottom:6px;color:var(--text)}
+.result .total-display{color:var(--accent);font-weight:800}
+.result .total-display .total-count{font-size:clamp(28px,7vw,42px);font-weight:900;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
+.result #bonusAfterG{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:6px;white-space:normal}
+.result #bonusAfterG .bonus-count{width:auto;font-size:inherit;font-weight:inherit;text-align:inherit}
+.result .lamp-total{margin-top:6px}
+@media(max-width:480px){.result #bonusAfterG{font-size:10px}}
 .learning[hidden],.batch-normal[hidden]{display:none}
 .learn-switch,.learn-fields{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .learn-fields label{flex:1 1 130px;font-size:12px;color:var(--muted)}
@@ -451,8 +458,9 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
       </div>
       <div class="reel-note">当選役のイメージ表示（実機の停止目とは異なります）</div>
       <div class="result-summary"><div class="lamp-stats">
-        <div id="bonusAfterG" class="after-display"><span>ボーナス終了後</span><span id="bonusAfterCount" class="bonus-count">0 G</span></div>
-        <div class="lamp-total">総ゲーム数：<span id="lampTotalGames">0G</span></div>
+        <div id="drawSetting" class="summary-setting">設定1</div>
+        <div class="after-display total-display"><span>総ゲーム数</span><span id="lampTotalGames" class="total-count">0 G</span></div>
+        <div id="bonusAfterG">ボーナス終了後：<span id="bonusAfterCount" class="bonus-count">0 G</span></div>
       </div><div class="bonus-summary" aria-label="実践集計">
         <div class="metric"><div class="label">BIG</div><div class="num red"><span id="drawBigs">0</span> <span id="drawBigsProb" class="inline-prob">—</span></div></div>
         <div class="metric"><div class="label">REG</div><div class="num yellow"><span id="drawRegs">0</span> <span id="drawRegsProb" class="inline-prob">—</span></div></div>
@@ -507,8 +515,9 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
     <div class="result" style="margin-bottom:12px">
       <div class="result-summary">
         <div class="lamp-stats">
-          <div class="batch-bonus-count after-display"><span>ボーナス終了後</span><span id="batchAfterCount" class="bonus-count">0 G</span></div>
-          <div class="lamp-total">総ゲーム数：<span id="batchTotalGames">0G</span></div>
+          <div id="batchSetting" class="summary-setting">設定1</div>
+          <div class="after-display total-display"><span>総ゲーム数</span><span id="batchTotalGames" class="total-count">0 G</span></div>
+          <div class="lamp-total">ボーナス終了後：<span id="batchAfterCount">0 G</span></div>
         </div>
         <div class="bonus-summary" aria-label="一括試行の実践集計">
           <div class="metric"><div class="label">BIG</div><div class="num red"><span id="batchBigs">0</span> <span id="batchBigsProb" class="inline-prob">—</span></div></div>
@@ -657,6 +666,8 @@ const prob=c=>c ? `約 1/${(N/c).toFixed(2)}` : '—';
 
 function smallPreset(set=currentSet){return {grape:Math.round(N/(set===6?5.80016:6.02408)), replay:Math.round(N/7.298), cherry:Math.round(N/35.617), bell:Math.round(N/1092.267), clown:Math.round(N/1092.267)};}
 function updatePreset(){
+  $('drawSetting').textContent=`設定${currentSet}`;
+  $('batchSetting').textContent=`設定${currentSet}`;
   document.querySelectorAll('[data-spec-set]').forEach(row=>row.classList.toggle('selected',Number(row.dataset.specSet)===currentSet));
   const p=presets[currentSet];
   $('singleBigCount').textContent=p.sb;
@@ -793,7 +804,7 @@ function renderStats(){
   $('medalLedger').textContent=`通常投入 ${normalStake.toLocaleString()}枚｜小役払出 ${smallPayout.toLocaleString()}枚\nボーナス純増 ${bonusNetTotal.toLocaleString()}枚`;
 
   $('games').textContent=games.toLocaleString();
-  $('lampTotalGames').textContent=`${games.toLocaleString()}G`;
+  $('lampTotalGames').textContent=`${games.toLocaleString()} G`;
   $('bigs').textContent=bigs.toLocaleString();
   $('regs').textContent=regs.toLocaleString();
   $('bigsProb').textContent=bigs?`1/${(games/bigs).toFixed(1)}`:'—';
