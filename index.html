@@ -1096,7 +1096,7 @@ async function animateCabinetReel(i,rows,startPosition,endPosition){
  el.classList.add('is-spinning');
  try{
   // ON時は毎フレーム位置を更新し、端末側のアニメーション省略に依存しない。
-  const duration=700+i*220;
+  const duration=250+i*220;
   strip.style.transform=`translate3d(0,${-21*h}px,0)`;
   await new Promise(resolve=>{
    let started=null;
