@@ -17,6 +17,8 @@
   --green:#6bd089; --blue:#6ca8ff; --purple:#c48cff;
 }
 *{box-sizing:border-box}
+/* Prevent double-tap zoom on every page surface while retaining scrolling. */
+html,body,body *{touch-action:manipulation}
 body{
   margin:0;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
@@ -472,6 +474,22 @@ button{text-align:left}
 #section-play.girls-cabinet-mode #reset{margin-left:0}
 #section-play.girls-cabinet-mode .reel-animation-option{flex:1;min-width:0;margin:0;padding:0;justify-content:flex-start;gap:10px;font-size:13px;white-space:nowrap}
 @media(max-width:360px){#section-play.girls-cabinet-mode .gogo-wrap{gap:8px}#section-play.girls-cabinet-mode .reel-animation-option{gap:7px;font-size:12px}}
+
+/* Compact the play summary on iPhone while keeping the four metrics readable. */
+@media(max-width:480px){
+ #section-play .result-summary{margin:5px 0 3px;gap:7px}
+ #section-play .result-summary .summary-setting{font-size:12px;line-height:1.2;margin-bottom:2px}
+ #section-play .result-summary #bonusAfterG{font-size:12px;line-height:1.2;gap:1px}
+ #section-play .result-summary .after-display .bonus-count{font-size:clamp(24px,6.6vw,30px);line-height:1.05}
+ #section-play .result-summary .lamp-total{font-size:10px;line-height:1.2;margin-top:2px}
+ #section-play .result-summary .lamp-stats .role{font-size:12px;line-height:1.2;margin:3px 0 0}
+ #section-play .result-summary .bonus-summary{gap:4px}
+ #section-play .result-summary .bonus-summary .metric{padding:4px 5px}
+ #section-play .result-summary .bonus-summary .label{font-size:11px;line-height:1.15}
+ #section-play .result-summary .bonus-summary .num{font-size:20px;line-height:1.1;margin-top:2px}
+ #section-play .result-summary .bonus-summary .inline-prob{font-size:10px}
+ #section-play .result-summary .bonus-summary .summary-prob{font-size:20px}
+}
 </style>
 </head>
 <body>
@@ -1449,6 +1467,14 @@ document.querySelectorAll('.menu-links a,.machine-spec-button').forEach(link=>{
   });
 });
 $('backToMenu').addEventListener('click',returnToMenu);
+
+// CSS is the primary double-tap policy; retain both individual button clicks.
+document.addEventListener('dblclick',event=>{
+ if(event.sourceCapabilities?.firesTouchEvents||window.matchMedia('(pointer: coarse)').matches){
+  event.preventDefault();
+ }
+},{capture:true});
+
 updatePreset(); renderStats(); renderHistory();
 </script>
 
