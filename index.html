@@ -353,6 +353,9 @@ button:disabled,button[aria-disabled="true"]{opacity:.5;cursor:default}
 .result .after-display .bonus-count{width:100%;text-align:center;font-size:clamp(28px,7vw,42px);font-weight:900;line-height:1.2;font-variant-numeric:tabular-nums}
 .result-summary .lamp-stats{text-align:center;min-width:0}
 .result-summary #bonusAfterG{align-items:center;justify-content:center;text-align:center;width:100%;color:var(--text)}
+.result-summary #bonusAfterG .bonus-count{width:100%;text-align:center}
+.result-summary .lamp-stats{display:flex;flex-direction:column;align-items:center}
+.result-summary .lamp-stats .summary-setting,.result-summary .lamp-stats .lamp-total,.result-summary .lamp-stats .role{width:100%;text-align:center}
 .result .summary-setting{font-size:13px;font-weight:800;margin-bottom:6px;color:var(--text)}
 .result .summary-setting[data-tier="low"]{color:#8bd5e8}
 .result .summary-setting[data-tier="middle"]{color:#ffb86b}
@@ -1044,8 +1047,10 @@ const girlsChanceLines=new Set([
 ]);
 function cabinetHasConfirmedChance(rows){
  if(rows[0][1]==='cherry')return true;
- // 角チェリー＋中リールのチェリー否定（右リール不問）。
- if((rows[0][0]==='cherry'||rows[0][2]==='cherry')&&!rows[1].includes('cherry'))return true;
+ // 順押しの単チェリー：左上段からは中上段・中段、左下段からは中中段・下段に連なる。
+ // 中リールにチェリーがあっても、反対側の段だけなら連チェリーではない（2確）。
+ if(rows[0][0]==='cherry'&&rows[1][0]!=='cherry'&&rows[1][1]!=='cherry')return true;
+ if(rows[0][2]==='cherry'&&rows[1][1]!=='cherry'&&rows[1][2]!=='cherry')return true;
  return cabinetLines(rows).some(line=>girlsChanceLines.has(line.join('|')));
 }
 function cabinetStopIndex(length){
