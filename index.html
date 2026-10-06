@@ -1048,10 +1048,20 @@ async function animateCabinetReel(i,rows,startPosition,endPosition){
  const {el,strip,h}=paintCabinetReel(i,sequence);
  el.classList.add('is-spinning');
  try{
-  if(typeof strip.animate==='function'){
-   const animation=strip.animate([{transform:`translateY(${-travel*h}px)`},{transform:'translateY(0)'}],{duration:700+i*220,easing:'cubic-bezier(.25,.05,.25,1)',fill:'forwards'});
-   await animation.finished;animation.cancel();
-  }
+  // ON時は毎フレーム位置を更新し、端末側のアニメーション省略に依存しない。
+  const distance=travel*h,duration=700+i*220;
+  strip.style.transform=`translate3d(0,${-distance}px,0)`;
+  await new Promise(resolve=>{
+   let started=null;
+   function frame(now){
+    if(started===null)started=now;
+    const progress=Math.min(1,(now-started)/duration);
+    const eased=1-Math.pow(1-progress,2);
+    strip.style.transform=`translate3d(0,${-distance*(1-eased)}px,0)`;
+    if(progress<1)requestAnimationFrame(frame);else resolve();
+   }
+   requestAnimationFrame(frame);
+  });
  }finally{el.classList.remove('is-spinning');cabinetShown[i]=rows;paintCabinetReel(i,rows);}
 }
 // 回転演出の設定だけを保存。抽選・差枚・履歴には影響しない。
