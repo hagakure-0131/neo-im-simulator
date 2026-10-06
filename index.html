@@ -451,7 +451,7 @@ button{text-align:left}
 .cabinet-lamp{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .12s ease}
 .cabinet-lamp-art{display:block;width:100%;height:100%;overflow:visible}
 /* 点灯中だけ周囲を落とし、確定済みのランプ発光はそのまま保つ。 */
-.girls-cabinet-base,.cabinet-reels{filter:brightness(1);transition:filter .18s ease}
+.girls-cabinet-base,.cabinet-reels{filter:none;transition:filter .18s ease}
 .girls-cabinet.is-lit .girls-cabinet-base,.girls-cabinet.is-lit .cabinet-reels{filter:brightness(.7)}
 /* 消灯時は元画像のランプ部分だけを暗くし、発光画像には触れない。 */
 .cabinet-lamp-off{position:absolute;inset:0;pointer-events:none;opacity:1;transition:opacity .12s ease;filter:brightness(.6)}
@@ -1060,7 +1060,32 @@ function cabinetLayout(centers){
 }
 const girlsSymbolViewBoxes={"bell":"70 4.5 158 58","seven":"70 62.5 158 58","rhino":"70 121.5 158 58","grape":"70 179.5 158 58","bar":"70 354.5 158 58","cherry":"70 413 158 58","clown":"70 705 158 58"};
 function cabinetMarkup(name){const box=girlsSymbolViewBoxes[name];if(!box)throw new Error("Unknown Girls reel symbol: "+name);return `<svg class="girls-source-symbol" viewBox="${box}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><use href="#girls-reel-source" clip-path="url(#girls-symbol-crop-${name})"></use></svg>`;}
-function paintCabinetReel(i,rows){const el=$('girlsReel'+i),h=el.clientHeight/3;el.innerHTML='<div class="cabinet-strip">'+rows.map(name=>`<div class="cabinet-symbol" style="height:${h}px">${cabinetMarkup(name)}</div>`).join('')+'</div>';return {el,strip:el.firstElementChild,h};}
+// 元の配列画像を一度だけ読み込み、リールを単一のCanvasへ描画する。
+const girlsReelBitmap=new Image();
+let girlsReelBitmapLoaded=false;
+const girlsReelBitmapReady=new Promise(resolve=>{
+ girlsReelBitmap.onload=()=>{girlsReelBitmapLoaded=true;resolve();syncGirlsCabinet();};
+ girlsReelBitmap.onerror=()=>resolve();
+});
+girlsReelBitmap.src=$('girls-reel-source').getAttribute('href');
+function paintCabinetReel(i,rows){
+ const el=$('girlsReel'+i),h=el.clientHeight/3,w=el.clientWidth;
+ if(!girlsReelBitmapLoaded||!h||!w){
+  el.innerHTML='<div class="cabinet-strip">'+rows.map(name=>`<div class="cabinet-symbol" style="height:${h}px">${cabinetMarkup(name)}</div>`).join('')+'</div>';
+  return {el,strip:el.firstElementChild,h};
+ }
+ const scale=Math.min(window.devicePixelRatio||1,2);
+ const strip=document.createElement('canvas');strip.className='cabinet-strip';
+ strip.width=Math.max(1,Math.round(w*scale));strip.height=Math.max(1,Math.round(h*rows.length*scale));
+ strip.style.width=w+'px';strip.style.height=(h*rows.length)+'px';
+ const ctx=strip.getContext('2d');ctx.scale(scale,scale);ctx.fillStyle='#f8f8f5';ctx.fillRect(0,0,w,h*rows.length);
+ rows.forEach((name,j)=>{
+  const [sx,sy,sw,sh]=girlsSymbolViewBoxes[name].split(' ').map(Number);
+  const fit=Math.min((w-2)/sw,h/sh),dw=sw*fit,dh=sh*fit;
+  ctx.drawImage(girlsReelBitmap,sx,sy,sw,sh,(w-dw)/2,j*h+(h-dh)/2,dw,dh);
+ });
+ el.replaceChildren(strip);return {el,strip,h};
+}
 function syncGirlsCabinet(){if(currentMachine!=='girls'||cabinetBusy)return;cabinetShown=cabinetLayout(cabinetCenters());cabinetShown.forEach((rows,i)=>paintCabinetReel(i,rows));$('girlsCabinet').classList.toggle('is-lit',$('gogoLamp').classList.contains('on'));}
 async function animateCabinetReel(i,rows,startPosition,endPosition){
  // 21図柄の環を下方向へ送る。開始・停止の上下図柄も連続させる。
@@ -1100,6 +1125,7 @@ $('reelAnimation').addEventListener('change',()=>{
 async function playGirlsCabinet(){
  if(currentMachine!=='girls'||cabinetBusy||Date.now()<bonusLockUntil)return;
  if(!reelAnimationEnabled){draw(true);return;}
+ if(!girlsReelBitmapLoaded){await girlsReelBitmapReady;if(currentMachine!=='girls'||cabinetBusy||Date.now()<bonusLockUntil)return;}
  cabinetBeforeSpin=cabinetShown.map(rows=>[...rows]);
  const startPositions=[...cabinetPositions];
  const out=draw(false);if(!out)return;
