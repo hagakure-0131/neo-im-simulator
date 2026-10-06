@@ -517,6 +517,9 @@ button{text-align:left}
 .play-utilities .reel-animation-option{flex:1;min-width:0;margin:0;padding:0;justify-content:flex-start;gap:10px;font-size:13px;white-space:nowrap}
 .play-utilities .lamp-reset{margin-left:auto;padding:7px 10px}
 @media(max-width:360px){.play-utilities{gap:8px}.play-utilities .reel-animation-option{gap:7px;font-size:12px}}
+/* 長押しによる文字選択・画像保存メニューを抑え、タップ操作は維持する。 */
+html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+img,svg,canvas{-webkit-user-drag:none}
 </style>
 </head>
 <body>
@@ -1592,6 +1595,10 @@ document.addEventListener('dblclick',event=>{
 },{capture:true});
 
 updatePreset(); renderStats(); renderHistory();
+// 表示内容の選択・コピー・右クリックメニュー・画像ドラッグを抑制。
+['copy','cut','contextmenu','dragstart'].forEach(type=>{
+ document.addEventListener(type,event=>event.preventDefault());
+});
 </script>
 
 </body>
