@@ -278,7 +278,6 @@ button{
 .spec-table{table-layout:fixed;font-size:12px;font-variant-numeric:tabular-nums}
 .spec-table th,.spec-table td{padding:10px 3px;white-space:nowrap}
 .spec-table th:first-child{width:12%}
-.spec-table tr.selected{background:#353020;color:var(--accent)}
 @media(max-width:360px){.spec-table{font-size:11px}}
 
 .gogo-wrap{justify-content:flex-start;margin:14px 0 10px}
@@ -930,7 +929,7 @@ function renderMachineInfo(){
  const select=$('learnMetric');for(const option of select.options||[])if(bonusFlagIds.includes(option.value))option.textContent=activeFlagName(option.value);
 }
 function renderSpecReferences(){
-  const makeTable=(columns,getCount,label)=>`<table class="spec-table flag-spec-table" aria-label="${label}"><thead><tr><th scope="col">設定</th>${columns.map(([,name])=>`<th scope="col">${name}</th>`).join('')}</tr></thead><tbody>${Object.keys(presets).map(set=>`<tr class="${Number(set)===currentSet?'selected':''}"><th scope="row">${set}</th>${columns.map(([key])=>`<td>${getCount(Number(set),key)?'1/'+(N/getCount(Number(set),key)).toFixed(1):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const makeTable=(columns,getCount,label)=>`<table class="spec-table flag-spec-table" aria-label="${label}"><thead><tr><th scope="col">設定</th>${columns.map(([,name])=>`<th scope="col">${name}</th>`).join('')}</tr></thead><tbody>${Object.keys(presets).map(set=>`<tr ><th scope="row">${set}</th>${columns.map(([key])=>`<td>${getCount(Number(set),key)?'1/'+(N/getCount(Number(set),key)).toFixed(1):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   $('specBonusFlags').innerHTML=makeTable([['sb','単独<br>BIG'],['cb',currentMachine==='girls'?'🍒<br>BIG':'共通🍒<br>BIG'],['rb',currentMachine==='neo'?'レア🍒<br>BIG':'レア重複<br>BIG'],['sr','単独<br>REG'],['cr',currentMachine==='girls'?'🍒<br>REG':'共通🍒<br>REG']],(set,key)=>presets[set][key],'各ボーナスフラグの設定別モデル確率');
   $('specSmallRoles').innerHTML=makeTable([['grape','ブドウ'],['replay','リプレイ'],['cherry','🍒<br>非重複'],['bell','ベル'],['clown','ピエロ']],(set,key)=>smallPreset(set)[key],'小役の設定別モデル確率');
 }
@@ -939,7 +938,6 @@ function updatePreset(){
   renderSpecReferences();
   $('drawSetting').textContent=`設定${currentSet}`;
   $('batchSetting').textContent=`設定${currentSet}`;
-  document.querySelectorAll('[data-spec-set]').forEach(row=>row.classList.toggle('selected',Number(row.dataset.specSet)===currentSet));
   const p=presets[currentSet];
   $('singleBigCount').textContent=p.sb;
   $('cherryBigCount').textContent=p.cb;
@@ -964,7 +962,7 @@ function updatePreset(){
   $('bonusTotalProb').textContent=prob(total);
   $('otherTotalProb').textContent=`${prob(N-total)}（${(100*(N-total)/N).toFixed(3)}%）`;
   const small=smallPreset();
-  $('grapePresetRows').innerHTML=Object.keys(presets).map(set=>`<tr class="${Number(set)===currentSet?'selected':''}"><td>${set}</td><td class="cyan">1/${(N/smallPreset(Number(set)).grape).toFixed(3)}</td></tr>`).join('');
+  $('grapePresetRows').innerHTML=Object.keys(presets).map(set=>`<tr ><td>${set}</td><td class="cyan">1/${(N/smallPreset(Number(set)).grape).toFixed(3)}</td></tr>`).join('');
   small.miss=N-total-Object.values(small).reduce((a,b)=>a+b,0);
   for(const key of smallKeys){$(key+'Count').textContent=small[key].toLocaleString();$(key+'Prob').textContent=prob(small[key]);}
   $('presetList').innerHTML=Object.entries(presets).map(([set,p])=>`<div class="metric small"><b>設定${set}</b><br>単独BIG ${p.sb}<br>${currentMachine==='girls'?'🍒BIG':'共通🍒BIG'} ${p.cb}<br>${currentMachine==='neo'?'レア🍒BIG':'レア重複BIG'} ${p.rb}<br>単独REG ${p.sr}<br>${currentMachine==='girls'?'🍒REG':'共通🍒REG'} ${p.cr}</div>`).join('');
@@ -1028,11 +1026,29 @@ const girlsReelStrips=[
  ['clown','cherry','grape','bar','rhino','cherry','grape','bell','rhino','cherry','grape','bar','rhino','cherry','grape','bell','rhino','cherry','grape','seven','rhino'],
  ['rhino','bell','clown','grape','rhino','bell','clown','grape','rhino','bell','clown','grape','rhino','bell','clown','grape','rhino','bell','bar','seven','grape']
 ];
-let cabinetPositions=[9,19,19];
+let cabinetPositions=[9,19,19],cabinetStopSeed=0;
 const cabinetStopCache=new Map();
 function actualCabinetRows(reel,pos){const strip=girlsReelStrips[reel];return [strip[(pos+1)%21],strip[pos],strip[(pos+20)%21]];}
 function cabinetWinningLine(line){return line.every(v=>v===line[0])||(line[0]==='seven'&&line[1]==='seven'&&line[2]==='bar');}
 function cabinetLines(rows){return [[rows[0][0],rows[1][0],rows[2][0]],[rows[0][1],rows[1][1],rows[2][1]],[rows[0][2],rows[1][2],rows[2][2]],[rows[0][0],rows[1][1],rows[2][2]],[rows[0][2],rows[1][1],rows[2][0]]];}
+// 北電子公式「3枚投入・順押しのみ有効」のチャンス目。
+// https://www.kitadenshi.co.jp/cms/wp-content/uploads/2024/02/jgss_chance01.png
+const girlsChanceLines=new Set([
+ 'bar|bar|bar','bar|bar|seven','seven|bar|seven','seven|bar|bar',
+ 'bar|seven|seven','bar|seven|bar','clown|seven|clown','clown|bar|clown'
+]);
+function cabinetHasConfirmedChance(rows){
+ if(rows[0][1]==='cherry')return true;
+ // 角チェリー＋中リールのチェリー否定（右リール不問）。
+ if((rows[0][0]==='cherry'||rows[0][2]==='cherry')&&!rows[1].includes('cherry'))return true;
+ return cabinetLines(rows).some(line=>girlsChanceLines.has(line.join('|')));
+}
+function cabinetStopIndex(length){
+ // 抽選済みの乱数を表示選択にも利用。追加抽選や描画ごとの再選択はしない。
+ let hash=(Math.imul(games+1,0x9e3779b1)^Math.imul(cabinetStopSeed+1,0x85ebca6b))>>>0;
+ hash=Math.imul(hash^(hash>>>16),0x7feb352d)>>>0;
+ return ((hash^(hash>>>15))>>>0)%length;
+}
 function cabinetCenters(){return ['reelLeft','reelCenter','reelRight'].map((id,i)=>{
  const use=$(id).querySelector('use');
  if(use)return (use.getAttribute('href')||'').replace('#symbol-','');
@@ -1053,6 +1069,7 @@ function cabinetLayout(centers){
    if(cherry){if(!leftCherry||rows[0][1]==='cherry')continue;}
    else if(leftCherry)continue;
    const lines=cabinetLines(rows);
+   if(!bonus&&cabinetHasConfirmedChance(rows))continue;
    if(bonus){
     // 5本のラインから一つだけボーナス図柄が揃う停止形を採用する。
     const hits=lines.map((line,i)=>line.every((symbol,j)=>symbol===centers[j])?i:-1).filter(i=>i>=0);
@@ -1066,7 +1083,7 @@ function cabinetLayout(centers){
   cabinetStopCache.set(kind,stops);
  }
  const stops=cabinetStopCache.get(kind);
- cabinetPositions=[...stops[games%stops.length]];
+ cabinetPositions=[...stops[cabinetStopIndex(stops.length)]];
  return cabinetPositions.map((pos,i)=>actualCabinetRows(i,pos));
 }
 const girlsSymbolViewBoxes={"bell":"70 4.5 158 58","seven":"70 62.5 158 58","rhino":"70 121.5 158 58","grape":"70 179.5 158 58","bar":"70 354.5 158 58","cherry":"70 413 158 58","clown":"70 705 158 58"};
@@ -1190,6 +1207,7 @@ function draw(render=true, batch=false){
   const r=Math.floor(Math.random()*N);
   const out=roleFor(r);
   out.r=r;
+  cabinetStopSeed=r;
   const stake=replayNext?0:3;
   replayNext=out.key==='replay';
   const isBonus=out.type==='BIG'||out.type==='REG';
@@ -1398,7 +1416,7 @@ $('advance1000').addEventListener('click',()=>advanceToTotal(games+1000));
 function resetSimulation(){
   if(cabinetBusy)return;
   medals=0;normalStake=0;smallPayout=0;bonusNetTotal=0;replayNext=false;lastMedal=null;
-  cabinetCredit=50;cabinetPayout=0;
+  cabinetCredit=50;cabinetPayout=0;cabinetStopSeed=0;
   games=0;bigs=0;regs=0;history=[];lastBonusGame=0;smallHits=Object.fromEntries(smallKeys.map(k=>[k,0]));
   slumpPoints=[{g:0,medals:0}];
   $('gogoLamp').classList.remove('on');
@@ -1516,14 +1534,14 @@ $('learnStop').addEventListener('click',()=>{learnCancel=true;});
 $('learnReset').addEventListener('click',()=>{if(learnRunning){learnCancel=true;learnResetPending=true;return;}learnData=null;$('learnResults').textContent='';$('learnProgress').textContent='条件を選んでスタートしてください。';});
 $('learnMetric').addEventListener('change',renderLearning);
 
-function captureMachineRecord(){return {currentSet,games,bigs,regs,history,lastBonusGame,slumpPoints,medals,normalStake,smallPayout,bonusNetTotal,replayNext,lastMedal,cabinetCredit,cabinetPayout,smallHits,bonusLockUntil,learnData,learnMetric:$('learnMetric').value,learnSet:$('learnSet').value,learnGames:$('learnGames').value,learnTrials:$('learnTrials').value,learnCompare:$('learnCompare').value,after:$('bonusAfterCount').textContent,role:$('role').innerHTML,rng:$('rng').textContent,detail:$('detail').textContent,reels:['reelLeft','reelCenter','reelRight'].map(id=>({html:$(id).innerHTML,bar:$(id).classList.contains('bar-symbol')})),reelLabel:$('bonusSymbol').getAttribute('aria-label'),lamp:$('gogoLamp').classList.contains('on')};}
+function captureMachineRecord(){return {currentSet,games,bigs,regs,history,lastBonusGame,slumpPoints,medals,normalStake,smallPayout,bonusNetTotal,replayNext,lastMedal,cabinetCredit,cabinetPayout,cabinetStopSeed,smallHits,bonusLockUntil,learnData,learnMetric:$('learnMetric').value,learnSet:$('learnSet').value,learnGames:$('learnGames').value,learnTrials:$('learnTrials').value,learnCompare:$('learnCompare').value,after:$('bonusAfterCount').textContent,role:$('role').innerHTML,rng:$('rng').textContent,detail:$('detail').textContent,reels:['reelLeft','reelCenter','reelRight'].map(id=>({html:$(id).innerHTML,bar:$(id).classList.contains('bar-symbol')})),reelLabel:$('bonusSymbol').getAttribute('aria-label'),lamp:$('gogoLamp').classList.contains('on')};}
 function switchMachine(id){
  if(!machines[id]||id===currentMachine||learnRunning||cabinetBusy)return;
  machineRecords[currentMachine]=captureMachineRecord();
  currentMachine=id;const m=machines[id];officialSpecs=m.spec;presets=m.flags;PAYOUT={grape:8,cherry:m.cherryPay,bell:14,clown:10,replay:0,miss:0};BONUS_NET={BIG:m.bigNet,REG:96};
  learnNames={...Object.fromEntries(bonusFlagIds.map(key=>[key,activeFlagName(key)])),big:'BIG全体',reg:'REG全体',bonus:'ボーナス全体'};
  const r=machineRecords[id];
- if(r){({currentSet,games,bigs,regs,history,lastBonusGame,slumpPoints,medals,normalStake,smallPayout,bonusNetTotal,replayNext,lastMedal,cabinetCredit,cabinetPayout,smallHits,bonusLockUntil,learnData}=r);
+ if(r){({currentSet,games,bigs,regs,history,lastBonusGame,slumpPoints,medals,normalStake,smallPayout,bonusNetTotal,replayNext,lastMedal,cabinetCredit,cabinetPayout,cabinetStopSeed,smallHits,bonusLockUntil,learnData}=r);
    $('bonusAfterCount').textContent=r.after;$('role').innerHTML=r.role;$('rng').textContent=r.rng;$('detail').textContent=r.detail;$('gogoLamp').classList.toggle('on',r.lamp);
    for(const key of ['learnSet','learnGames','learnTrials','learnCompare','learnMetric'])$(key).value=r[key];
  }else{currentSet=1;bonusLockUntil=0;learnData=null;resetSimulation();$('learnMetric').value='reg';$('learnSet').value='6';$('learnGames').value='3000';$('learnTrials').value='100';$('learnCompare').value='1';}
