@@ -543,11 +543,10 @@ img,svg,canvas{-webkit-user-drag:none}
 #pageMachineSelection .machine-preview-caption .machine-spec-button{margin-top:4px;min-height:44px;padding:10px 12px;color:var(--text)}
 #appMenu .menu-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
 #appMenu .menu-links a{display:flex;align-items:center;padding:12px;min-height:48px;line-height:1.4;font-size:13px;white-space:nowrap}
-#appMenu .menu-links .home-play-button{grid-column:1/-1;min-height:58px;font-size:18px;font-weight:800;background:var(--accent);color:#111;border-color:var(--accent);padding:14px 16px}
 .home-about{margin:14px 0 22px;color:var(--muted);font-size:12px}
 .home-about summary{min-height:44px;display:list-item;padding:12px 4px;cursor:pointer}
 .home-about p{margin:5px 4px 0;font-size:11px;line-height:1.8}
-@media(max-width:360px){#pageMachineSelection .machine-select button{padding:9px;font-size:12px}#pageMachineSelection .machine-preview{gap:10px;padding:10px}#pageMachineSelection .machine-preview img{width:84px;height:143px}#appMenu .menu-links a{padding:10px;font-size:12px}#appMenu .menu-links .home-play-button{font-size:18px}}
+@media(max-width:360px){#pageMachineSelection .machine-select button{padding:9px;font-size:12px}#pageMachineSelection .machine-preview{gap:10px;padding:10px}#pageMachineSelection .machine-preview img{width:84px;height:143px}#appMenu .menu-links a{padding:10px;font-size:12px}}
 #girlsCabinet[data-cabinet="happy"] .cabinet-reels{left:18.343195%;top:18.000000%;width:63.313609%;height:46.666667%;gap:5.6%}
 #girlsCabinet[data-cabinet="happy"] > .happy-art{display:block}
 
@@ -612,10 +611,9 @@ body.start-active{overflow:hidden}
 #appMenu .menu-card{border-color:#3c4166;background:linear-gradient(145deg,#1d2236,#141823);box-shadow:0 6px 20px #0003}
 #appMenu .menu-links{grid-template-columns:1fr;gap:12px}
 #appMenu .menu-links a{display:flex;align-items:center;gap:14px;min-height:76px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#303952,#232a40);border:1px solid #5b6480;color:#f6f7fc;white-space:normal;box-shadow:inset 0 1px 0 #ffffff12,0 3px 0 #0d1020;transition:transform .12s,box-shadow .12s}
-#appMenu .menu-links .home-play-button{min-height:84px;background:linear-gradient(135deg,#ffeb8a,#e9be4e);border-color:#ffe7a1;color:#241c13;font-size:16px}
 #appMenu .menu-links a:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffffff12}
 #appMenu .menu-links a:focus-visible{outline:3px solid #fff0a1;outline-offset:3px}
-.menu-icon{font-size:28px;flex-shrink:0}.menu-copy{display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}.menu-copy strong{font-size:17px;line-height:1.35}.menu-copy small{font-size:11px;font-weight:400;opacity:.75}.menu-arrow{font-size:13px;flex-shrink:0;color:#ffe48b}.home-play-button .menu-arrow{color:#57401b}
+.menu-icon{font-size:28px;flex-shrink:0}.menu-copy{display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}.menu-copy strong{font-size:17px;line-height:1.35}.menu-copy small{font-size:11px;font-weight:400;opacity:.75}.menu-arrow{font-size:13px;flex-shrink:0;color:#ffe48b}
 @media(max-width:360px){.menu-copy strong{font-size:15px}#appMenu .menu-links a{padding:12px;gap:10px}}
 @media(prefers-reduced-motion:reduce){#appMenu .menu-links a{transition:none}}
 
@@ -627,6 +625,9 @@ body.start-active{overflow:hidden}
 @media(hover:hover){#pageMachineSelection.play-picker .machine-picker:hover{border-color:#ffe48a;background:#353e52}}
 @media(max-width:360px){#pageMachineSelection.play-picker .machine-picker{padding:9px;gap:6px}#pageMachineSelection.play-picker .machine-picker strong{font-size:13px}}
 @media(prefers-reduced-motion:reduce){#pageMachineSelection.play-picker .machine-picker{transition:none}}
+
+#appMenu .menu-links .menu-hall-button{grid-column:1/-1;min-height:76px;font-size:16px;font-weight:800;background:linear-gradient(135deg,#303952,#232a40);border:1px solid #5b6480;color:#f6f7fc;padding:14px 16px}
+#appMenu .menu-hall-button .menu-arrow{color:#f6f7fc}
 </style>
 </head>
 <body class="start-active">
@@ -696,7 +697,7 @@ body.start-active{overflow:hidden}
   <nav class="menu-panel" id="appMenu" aria-label="メインメニュー">
 
     <section class="card menu-card" aria-label="プレイメニュー"><b>🎮 メインメニュー</b>
-    <div class="menu-links"><a class="home-play-button" href="#section-play"><span class="menu-icon">🎰</span><span class="menu-copy"><strong>ジャグラーホール</strong><small>好きな機種で遊ぶ</small></span><span class="menu-arrow">▶</span></a><a href="#section-lab"><span class="menu-icon">🧪</span><span class="menu-copy"><strong>ジャグラー研究所</strong><small>出方の揺れを体感する</small></span><span class="menu-arrow">▶</span></a></div>
+    <div class="menu-links"><a class="menu-hall-button" href="#section-play"><span class="menu-icon">🎰</span><span class="menu-copy"><strong>ジャグラーホール</strong><small>好きな機種で遊ぶ</small></span><span class="menu-arrow">▶</span></a><a href="#section-lab"><span class="menu-icon">🧪</span><span class="menu-copy"><strong>ジャグラー研究所</strong><small>出方の揺れを体感する</small></span><span class="menu-arrow">▶</span></a></div>
     </section>
     <section class="card menu-card" aria-label="スペック図鑑"><b>📖 スペック</b><div class="menu-links spec-menu-links"><a href="#section-spec"><span class="menu-icon">📖</span><span class="menu-copy"><strong>スペック図鑑</strong><small>機種の数値を調べる</small></span><span class="menu-arrow">▶</span></a></div></section>
     <section class="card menu-card"><div class="menu-links spec-menu-links"><a href="#section-options"><span class="menu-icon">⚙️</span><span class="menu-copy"><strong>オプション</strong><small>表示・演出を設定する</small></span><span class="menu-arrow">▶</span></a></div></section>
