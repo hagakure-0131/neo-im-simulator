@@ -798,6 +798,153 @@ body.menu-active .home-about summary{font-size:10px}
 @media(min-width:600px){.pocket-brand{padding-top:32px}.pocket-hall-art{width:270px}#appMenu .pocket-hall{padding-top:20px}.pocket-destination svg{width:90px;height:90px}#appMenu .pocket-destination strong{font-size:15px}}
 @media(max-width:360px){.pocket-brand{padding-top:12px}.pocket-hall-art{width:200px}.pocket-main-label{font-size:19px}.pocket-destination svg{width:68px;height:68px}#appMenu .pocket-destination strong{font-size:12px}.pocket-footer{margin-top:18px}}
 @media(prefers-reduced-motion:reduce){#appMenu .menu-links a,.pocket-hall-art{transition:none}}
+
+/* The three game rooms share the open, softly lit pocket-menu atmosphere. */
+body.pocket-room{
+ --card:#252740;--line:#494660;--text:#eeedf7;--muted:#b2b2ca;
+ --accent:#f2d99f;--red:#f4839c;--yellow:#f2d99f;--green:#a8dec6;--blue:#b0c8f0;--purple:#c4b5ee;
+ background:radial-gradient(ellipse at 50% 15%,#34305b 0%,#20233e 40%,#131a30 85%);background-attachment:fixed;
+}
+body.pocket-room>.wrap{max-width:820px}
+body.pocket-room>.wrap>h1{display:none}
+body.pocket-room .content-nav{background:#1d2039ed;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:8px 0 10px;margin-bottom:12px}
+body.pocket-room .content-nav button{border:0;box-shadow:none;background:transparent;color:#bebed3;padding-left:0;font-size:12px}
+body.pocket-room .content-nav button::before{content:'‹';font-size:23px;margin-right:7px;font-weight:400}
+body.pocket-room .content-nav .screen-title{font-size:16px;letter-spacing:.06em;color:#e5ddf2}
+body.pocket-room .card{background:transparent;border:0;box-shadow:none;border-radius:0;padding:14px 0;margin:12px 0}
+body.pocket-room #pageMachineSelection{padding:0;margin:8px 0 22px}
+body.pocket-room .machine-preview{background:transparent;border:0;border-radius:0;padding:8px 2px;gap:24px;max-width:550px;margin:0 auto}
+body.pocket-room .machine-preview img{width:105px;height:174px;filter:drop-shadow(0 10px 12px #070b224d)}
+body.pocket-room .machine-preview-caption{gap:7px}
+body.pocket-room .machine-preview-caption>.small{font-size:9px;letter-spacing:.15em;color:#a5a6c2}
+body.pocket-room #pageMachineSelection.play-picker .machine-picker{background:transparent;border:0;border-radius:0;box-shadow:none;padding:9px 0;min-height:52px;gap:12px;color:#f2e5c6}
+body.pocket-room #pageMachineSelection.play-picker .machine-picker strong{font-size:18px;line-height:1.5}
+body.pocket-room #pageMachineSelection.play-picker .machine-picker:active{background:transparent;box-shadow:none;transform:translateY(2px)}
+body.pocket-room .machine-picker-chevron{background:transparent;color:#c4b5ee;width:28px;flex-basis:28px}
+body.pocket-room .machine-picker-chevron svg{width:16px;height:16px}
+body.pocket-room #machineImageSource{font-size:10px;color:#a3a6c1}
+body.pocket-room .machine-copyright{font-size:8px;color:#838aa6}
+body.pocket-room #section-play> b,body.pocket-room #section-lab> b,body.pocket-room #section-spec> b{font-size:12px;letter-spacing:.1em;color:#c4b5ee}
+body.pocket-room .machine-heading,body.pocket-room #specMachine{color:#b2b2ca;font-size:11px;margin-top:7px}
+body.pocket-room button{border-color:transparent;box-shadow:none;background:#c4b5ee0c;transition:transform .12s,background .12s,color .12s}
+body.pocket-room button:active{transform:translateY(2px)}
+body.pocket-room button:focus-visible,body.pocket-room a:focus-visible{outline:2px dashed #f2d99f;outline-offset:3px}
+body.pocket-room button.active{background:#c4b5ee19;color:#f2d99f;border-color:transparent}
+body.pocket-room .settings{gap:5px}
+body.pocket-room .settings button{background:transparent;border:0;border-radius:0;min-height:48px;text-align:center;padding:10px 3px;font-size:13px;color:#b2b2ca;position:relative}
+body.pocket-room .settings button.active{color:#f2d99f;background:transparent}
+body.pocket-room .settings button.active::after{content:'◆';position:absolute;left:0;right:0;bottom:0;font-size:6px;color:#c4b5ee}
+body.pocket-room .medal-panel{border:0;background:transparent;padding:14px 0;margin-top:12px}
+body.pocket-room .medal-panel .balance{font-size:30px;letter-spacing:.03em}
+body.pocket-room .medal-panel .small{font-size:10px}
+body.pocket-room .result{border:0;border-radius:0;padding:0;background:transparent}
+body.pocket-room .bonus-history-chart{border:0;border-radius:0;background:transparent;padding:9px 0}
+body.pocket-room #historyChartPanel,body.pocket-room .history-chart-panel{border-color:#b6acce20}
+body.pocket-room .metric{border:0;box-shadow:none;background:transparent;padding:10px 6px;border-radius:0}
+body.pocket-room .metric .label{color:#b2b2ca}
+body.pocket-room .bonus-summary{column-gap:12px;row-gap:8px}
+body.pocket-room .bonus-summary .metric{background:transparent;border:0;border-radius:0}
+body.pocket-room .bonus-summary .num{font-weight:800}
+body.pocket-room .girls-cabinet{box-shadow:0 14px 24px #070b2240;border-radius:9px;margin-top:18px;margin-bottom:18px}
+body.pocket-room .controls .big{background:linear-gradient(110deg,#e6d1a1,#ccb8e8);color:#27233d;border:0;border-radius:24px;text-align:center;font-size:18px;min-height:50px;box-shadow:0 5px 14px #0b0e252d}
+body.pocket-room .controls .autobtn,body.pocket-room .target-controls .targetbtn{background:transparent;border:0;border-radius:0;color:#e2dbf1;text-align:center;min-height:46px;font-size:14px}
+body.pocket-room .controls .autobtn::after,body.pocket-room .target-controls .targetbtn::after{content:' ›';color:#aa9bcb}
+body.pocket-room #advance1000{background:#c4b5ee17;color:#ede4f8;border:0;border-radius:24px;text-align:center;min-height:48px}
+body.pocket-room .play-utilities{margin-top:14px;gap:15px}
+body.pocket-room .lamp-reset{background:transparent;color:#a7aac2;border:0;font-size:12px}
+body.pocket-room .lamp-reset small{color:#8289a3;font-size:8px}
+body.pocket-room #batchReset{text-align:right;background:transparent}
+body.pocket-room .reel-animation-option{font-size:12px;color:#b2b2ca}
+body.pocket-room .reel-animation-switch input{background:#45415c}
+body.pocket-room .reel-animation-switch input:checked{background:#8977ad}
+body.pocket-room .reel-animation-switch input:before{background:#ece5f3}
+body.pocket-room .fold-card{border:0;border-top:1px solid #b6acce20;margin-top:18px;padding-top:12px}
+body.pocket-room .fold-card>summary{min-height:44px;padding:10px 0;color:#cbc1e3;font-size:12px}
+body.pocket-room .history-head{background:#21233e}
+body.pocket-room th,body.pocket-room td,body.pocket-room .histrow{border-bottom-color:#b6acce20}
+body.pocket-room .learn-switch{gap:20px}
+body.pocket-room .learn-switch button{background:transparent;border:0;border-radius:0;padding:10px 0;color:#a7aac2;font-size:13px}
+body.pocket-room .learn-switch button.active{color:#f2d99f;box-shadow:0 2px 0 #c4b5ee}
+body.pocket-room #learnStart{color:#f2d99f}
+body.pocket-room .learn-fields label{color:#b2b2ca}
+body.pocket-room .learn-fields select{background:#292841;border:0;border-radius:8px;color:#eee9f7}
+body.pocket-room .learn-card{background:transparent;border:0;border-top:1px solid #b6acce20;border-radius:0;padding:16px 0;margin-top:14px}
+body.pocket-room .learn-overview>div{background:transparent;border:0;border-radius:0;padding:12px 0}
+body.pocket-room .learn-track{background:#c4b5ee17}
+body.pocket-room .learn-chart-bin{border-bottom-color:#b6acce20}
+body.pocket-room .spec-tabs{background:transparent;border:0;border-radius:0;padding:0;gap:24px;margin:20px 0}
+body.pocket-room .spec-tabs button{background:transparent;border:0;border-radius:0;box-shadow:none;color:#a7aac2;text-align:center}
+body.pocket-room .spec-tabs button[aria-selected="true"]{color:#f2d99f;box-shadow:0 2px 0 #c4b5ee}
+body.pocket-room .spec-table thead{color:#c4b5ee}
+body.pocket-room .spec-table td{color:#eeedf7}
+body.pocket-room .spec-reference-group{border-color:#b6acce20}
+body.pocket-room .spec-reference-group>b{font-size:13px;color:#dfd5ee}
+body.pocket-room .history-intro,body.pocket-room .history-entry{background:transparent;border:0;border-radius:0;padding:10px 0}
+body.pocket-room .history-intro p,body.pocket-room .history-feature p{color:#b2b2ca;font-size:13px}
+body.pocket-room .history-intro h3{color:#eee4f8;font-size:18px}
+body.pocket-room .history-timeline{border-color:#655a80}
+body.pocket-room .history-timeline li:before{border-color:#25243e;background:#a99bc8}
+body.pocket-room .history-image-button{background:transparent;border:0;border-radius:0;padding:5px;filter:drop-shadow(0 7px 8px #070b2245)}
+body.pocket-room .history-image-button:active{background:transparent}
+body.pocket-room .history-feature,body.pocket-room .history-sources{border-color:#b6acce20}
+body.pocket-room .history-feature strong{color:#dfd5ee;font-size:14px}
+body.pocket-room .source-note a,body.pocket-room .history-sources a{color:#bdb1db}
+body.pocket-room .machine-sheet{background:linear-gradient(150deg,#302b4b,#1d233b);border:0;box-shadow:0 -12px 50px #06091a66;border-radius:24px 24px 0 0}
+body.pocket-room .machine-sheet-head h2{color:#e7ddf3;font-size:16px}
+body.pocket-room .machine-sheet-head button{background:transparent;color:#c4b5ee;border:0}
+body.pocket-room .machine-sheet .machine-select{gap:4px}
+body.pocket-room .machine-sheet .machine-select button{background:transparent;border:0;border-radius:0;padding:16px 8px;color:#bdbcd2}
+body.pocket-room .machine-sheet .machine-select button.active{background:transparent;color:#f2d99f}
+body.pocket-room .machine-sheet .machine-select button.active::before{content:'▶';font-size:10px;margin-right:6px;color:#c4b5ee}
+body.pocket-room .history-image-dialog{background:#25243e;border:0;box-shadow:0 14px 60px #06091a88}
+body.pocket-room .history-image-close{background:transparent;color:#c4b5ee}
+body.pocket-room .home-about{color:#848aa5;margin-top:24px}
+body.pocket-room .home-about summary{font-size:10px}
+@media(max-width:480px){
+ body.pocket-room #section-play,body.pocket-room #section-lab,body.pocket-room #section-spec{padding:10px 0}
+ body.pocket-room #section-play>.result,body.pocket-room #batchNormal>.result{padding:0}
+ body.pocket-room .machine-preview{gap:20px;padding:5px 3px}
+ body.pocket-room .machine-preview img{width:87px;height:145px}
+ body.pocket-room #pageMachineSelection.play-picker .machine-picker strong{font-size:16px}
+ body.pocket-room .content-nav .screen-title{font-size:14px}
+ body.pocket-room .settings{grid-template-columns:repeat(6,minmax(0,1fr))}
+ body.pocket-room .settings button{font-size:12px}
+ body.pocket-room .bonus-summary{gap:8px}
+ body.pocket-room .girls-cabinet{margin:14px auto}
+}
+@media(prefers-reduced-motion:reduce){body.pocket-room button{transition:none}}
+
+/* Tactile hall controls, with no surrounding card. */
+body.pocket-room #section-play .controls{gap:18px;align-items:center;margin-top:18px!important}
+body.pocket-room #section-play #lever{
+ position:relative;display:flex;align-items:center;justify-content:center;gap:17px;
+ min-height:68px;padding:12px 22px;border:0;border-radius:35px;
+ background:linear-gradient(180deg,#ded0ef 0%,#baa6d3 52%,#9d86bd 100%);
+ color:#2d2344;font-size:18px;font-weight:800;letter-spacing:.06em;
+ box-shadow:inset 0 2px 1px #fff8,inset 0 -2px 1px #6b56804d,0 5px 0 #5d496f,0 10px 16px #070b2245;
+ transition:transform .1s,box-shadow .1s,filter .1s;
+}
+.lever-grip{display:block;position:relative;width:34px;height:40px;flex:0 0 34px}
+.lever-grip::before{content:'';position:absolute;width:19px;height:7px;left:8px;bottom:0;border-radius:50%;background:#54475f;box-shadow:inset 0 1px 2px #17102166}
+.lever-grip::after{content:'';position:absolute;width:7px;height:20px;left:14px;bottom:3px;border-radius:3px;background:linear-gradient(90deg,#736c84,#f4eafa 45%,#9890ab);transform:rotate(-10deg);transform-origin:center bottom}
+.lever-grip i{position:absolute;z-index:1;left:1px;top:0;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 32% 25%,#ffd5df 0%,#f27d9f 22%,#bd416d 65%,#813457 100%);box-shadow:inset 0 1px 1px #fff6,0 3px 4px #36203855}
+body.pocket-room #section-play #lever:active:not([aria-disabled="true"]){transform:translateY(4px);box-shadow:inset 0 2px 4px #6b568033,0 1px 0 #5d496f,0 4px 8px #070b2230}
+body.pocket-room #section-play #lever:active:not([aria-disabled="true"]) .lever-grip{transform:rotate(-12deg);transform-origin:50% 100%}
+body.pocket-room #section-play .controls>.advance-keys{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;padding:3px 2px 6px}
+body.pocket-room #section-play .controls .autobtn{
+ display:flex;align-items:center;justify-content:center;min-height:48px;padding:12px 3px;
+ border:0;border-radius:25px;text-align:center;color:#e9e2f5;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;
+ background:linear-gradient(180deg,#625478,#4b405f 55%,#3d3452);
+ box-shadow:inset 0 2px 1px #c8b7dd44,inset 0 -1px 1px #21183177,0 4px 0 #211d34,0 7px 10px #070b2238;
+ transition:transform .1s,box-shadow .1s,filter .1s;
+}
+body.pocket-room #section-play .controls .autobtn::after{content:none}
+body.pocket-room #section-play .controls .autobtn:active:not([aria-disabled="true"]){transform:translateY(3px);box-shadow:inset 0 2px 4px #21183155,0 1px 0 #211d34,0 3px 5px #070b2228}
+body.pocket-room #section-play .play-utilities{margin-top:16px;padding:4px 2px;align-items:center}
+body.pocket-room #section-play #reset{padding:9px 5px;color:#a8a5bd;min-height:44px;text-align:right}
+body.pocket-room #section-play #reset>span::before{content:'↺ ';color:#c4b5ee;font-size:17px}
+@media(max-width:480px){body.pocket-room #section-play .controls{gap:16px}body.pocket-room #section-play #lever{min-height:62px;font-size:17px}body.pocket-room #section-play .controls>.advance-keys{gap:10px!important}}
+@media(prefers-reduced-motion:reduce){body.pocket-room #section-play #lever,body.pocket-room #section-play .controls .autobtn{transition:none}}
 </style>
 </head>
 <body class="start-active menu-active">
@@ -964,7 +1111,7 @@ body.menu-active .home-about summary{font-size:10px}
 <filter id="gogoLampHalo" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="2.8" result="blur"/><feFlood flood-color="#6337ff" flood-opacity=".9"/><feComposite in2="blur" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 <g filter="url(#gogoLampHalo)"><rect x="50" y="492" width="80" height="67" fill="url(#gogoBurstColor)" clip-path="url(#gogoBurst)"/></g>
 <g filter="url(#gogoLampHalo)"><rect x="50" y="492" width="80" height="67" fill="#ffd7f7" clip-path="url(#gogoTitle)"/><rect x="50" y="492" width="80" height="67" fill="#fffaff" clip-path="url(#gogoChance)"/></g></svg></div>
-<button id="cabinetLever" class="cabinet-lever" type="button" aria-label="筐体のレバーON"></button>
+<button id="cabinetLever" class="cabinet-lever" type="button" aria-label="筐体のレバーを叩く"></button>
 </div>
     <div class="gogo-wrap">
       
@@ -999,8 +1146,8 @@ body.menu-active .home-about summary{font-size:10px}
 
     </div>
     <div class="controls" style="margin-top:12px">
-      <button id="lever" class="big">🕹️ レバーON</button>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <button id="lever" class="big"><span class="lever-grip" aria-hidden="true"><i></i></span><span>レバーを叩く</span></button>
+      <div class="advance-keys" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
         <button class="autobtn" data-g="10">10G</button>
         <button class="autobtn" data-g="50">50G</button>
         <button class="autobtn" data-g="100">100G</button>
@@ -1011,7 +1158,7 @@ body.menu-active .home-about summary{font-size:10px}
       <button id="reset" class="lamp-reset"><span>リセット</span><small>差枚・履歴・集計</small></button></div>
     <details style="margin-top:12px"><summary class="small" style="cursor:pointer">抽選の詳細を見る</summary>
       <div id="rng" class="rng">取得乱数：—</div>
-      <div id="detail" class="small" style="margin-top:6px">レバーONで1/65,536の乱数を1つ取得します。</div>
+      <div id="detail" class="small" style="margin-top:6px">レバーを叩くと1/65,536の乱数を1つ取得します。</div>
     </details>
   <details class="card fold-card" id="playHistory">
     <summary><b>直近履歴</b></summary><div class="small" style="margin-top:6px">一番上が最新（1回前）。左から「何回前」「当選G数」「成立フラグ」「総回転数」。</div>
@@ -1147,7 +1294,7 @@ body.menu-active .home-about summary{font-size:10px}
   </div>
 
   <div class="card" id="section-spec" hidden>
-    <b>スペック図鑑</b>
+    <b>図鑑</b>
     <div id="specMachine" class="small" style="margin-top:6px"></div>
     <div class="spec-tabs" role="tablist" aria-label="図鑑の表示内容">
       <button id="specStatsTab" type="button" role="tab" aria-selected="true" aria-controls="specStatsPanel">スペック</button>
@@ -1877,7 +2024,7 @@ function resetSimulation(){
   renderReels(null);
   $('role').textContent='—';
   $('rng').textContent='取得乱数：—';
-  $('detail').textContent='レバーONで1/65,536の乱数を1つ取得します。';
+  $('detail').textContent='レバーを叩くと1/65,536の乱数を1つ取得します。';
   renderStats();renderHistory();
 }
 $('reset').addEventListener('click',resetSimulation);
@@ -2007,7 +2154,7 @@ function switchMachine(id,force=false,skipCapture=false){
  $('learnProgress').textContent=learnData?'この機種の前回の学習結果を表示しています。':'条件を選んでスタートしてください。';
 }
 function configureMachinePicker(id){
- const isPlay=id==='section-play'||id==='section-lab';
+ const isPlay=['section-play','section-lab','section-spec'].includes(id);
  $('pageMachineSelection').classList.toggle('play-picker',isPlay);
  $('inlineMachineSelect').hidden=isPlay;
  (isPlay?$('sheetMachineSelect'):$('inlineMachineSelect')).appendChild($('machineChoices'));
@@ -2016,7 +2163,7 @@ function configureMachinePicker(id){
  if($('machineSheet').open)$('machineSheet').close();
 }
 $('machinePicker').addEventListener('click',()=>{
- if(!['section-play','section-lab'].includes(activeMachineScreen)||learnRunning||cabinetBusy)return;
+ if(!['section-play','section-lab','section-spec'].includes(activeMachineScreen)||learnRunning||cabinetBusy)return;
  $('machineSheet').showModal();
 });
 $('closeMachineSheet').addEventListener('click',()=>$('machineSheet').close());
@@ -2044,8 +2191,9 @@ function showAppSection(id){
   appSections.forEach(section=>{section.hidden=section!==target;});
   $('appMenu').hidden=true;
   document.body.classList.remove('menu-active');
+  document.body.classList.toggle('pocket-room',['section-play','section-lab','section-spec'].includes(id));
   $('contentNav').hidden=false;
-  $('screenTitle').textContent={'section-play':'ジャグラーホール','section-lab':'ジャグラー研究所','section-spec':'スペック図鑑','section-presets':'プリセット一覧','section-options':'オプション','section-record':'実戦記録'}[id];
+  $('screenTitle').textContent={'section-play':'ジャグラーホール','section-lab':'ジャグラー研究所','section-spec':'図鑑','section-presets':'プリセット一覧','section-options':'オプション','section-record':'実戦記録'}[id];
   $('pageMachineSelection').hidden=['section-options','section-record'].includes(id);
   configureMachinePicker(id);
   if(target.tagName==='DETAILS')target.open=true;
@@ -2055,6 +2203,7 @@ function returnToMenu(){
   appSections.forEach(section=>{section.hidden=true;});
   $('appMenu').hidden=false;
   document.body.classList.add('menu-active');
+  document.body.classList.remove('pocket-room');
   $('contentNav').hidden=true;
   $('pageMachineSelection').hidden=true;
   if($('machineSheet').open)$('machineSheet').close();
