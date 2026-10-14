@@ -751,6 +751,53 @@ body.menu-active:not(.start-active){min-height:100dvh;box-sizing:border-box;back
 #rpModal .rpTools,#rpModal .rpTools button{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
 #rpModal,#rpModal *{touch-action:pan-y}
 
+
+/* Pocket game menu: open illustrations and text, without menu cards. */
+body.menu-active:not(.start-active){background:radial-gradient(ellipse at 50% 33%,#34305b 0%,#20233e 38%,#131a30 78%);background-attachment:fixed}
+body.menu-active>.wrap>h1{display:none}
+#appMenu.pocket-menu{position:relative;max-width:560px;margin:0 auto;color:#eeedf7;isolation:isolate}
+#appMenu.pocket-menu::before{content:"";position:absolute;inset:90px 0 65px;z-index:-1;pointer-events:none;opacity:.45;background:radial-gradient(circle at 7% 17%,#c1b4e2 0 1px,transparent 2px),radial-gradient(circle at 91% 31%,#ead1a7 0 1px,transparent 2px),radial-gradient(circle at 18% 65%,#aad7e3 0 1px,transparent 2px),radial-gradient(circle at 79% 7%,#c1b4e2 0 1px,transparent 2px),radial-gradient(circle at 85% 77%,#c1b4e2 0 1px,transparent 2px)}
+#appMenu .menu-links{margin:0;gap:0}
+#appMenu .menu-links a,#appMenu #backToTitle{border:0;border-radius:0;background:transparent;box-shadow:none;text-decoration:none;transform:none}
+#appMenu .menu-links a{color:inherit;transition:transform .16s,filter .16s}
+#appMenu .menu-links a:hover{filter:brightness(1.14)}
+#appMenu .menu-links a:active{transform:translateY(3px) scale(.97);filter:brightness(1.25)}
+#appMenu .menu-links a:focus-visible,#appMenu #backToTitle:focus-visible{outline:2px dashed #efd293;outline-offset:4px;border-radius:8px}
+#appMenu .pocket-top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+#appMenu #backToTitle{padding:8px 0;min-height:44px;color:#b4b7d1;font-size:12px;font-weight:500}
+#appMenu #backToTitle>span{font-size:22px;vertical-align:-1px;margin-right:3px}
+.pocket-power{font:9px Arial,sans-serif;letter-spacing:2px;color:#a6adc1;display:flex;align-items:center;gap:7px}
+.pocket-power i{width:5px;height:5px;border-radius:50%;background:#a8dec6;box-shadow:0 0 8px #a8dec66a}
+#appMenu .pocket-top .pocket-settings{display:flex;justify-content:flex-end;align-items:center;min-height:44px;min-width:60px;padding:8px 0;color:#b4b7d1}
+.pocket-brand{text-align:center;padding-top:20px}
+.pocket-brand p{font:9px Arial,sans-serif;letter-spacing:2.8px;color:#a8a9c7;margin:0 0 10px}
+.pocket-brand h2{font:900 clamp(25px,7.5vw,38px)/1.05 Arial,sans-serif;letter-spacing:-1px;margin:0;color:#f2e5c6;text-shadow:0 3px 0 #5e4c73}
+.pocket-brand h2 span{color:#c4b5ee}
+.pocket-caption{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px;color:#bebed3;font-size:11px;letter-spacing:1px}
+.pocket-caption>span{width:18px;height:1px;background:#79768d}
+#appMenu .pocket-destinations{display:block}
+#appMenu .pocket-hall{display:flex;flex-direction:column;align-items:center;gap:0;padding:12px 0 18px;min-height:0;text-align:center}
+.pocket-hall-art{display:block;width:226px;max-width:70%;filter:drop-shadow(0 9px 16px #090c2c66);transition:transform .2s}
+.pocket-hall-art svg{display:block;width:100%;height:auto}
+#appMenu .pocket-hall:hover .pocket-hall-art{transform:translateY(-3px)}
+.pocket-lamp{filter:drop-shadow(0 0 4px #dd85f1)}
+.pocket-main-label{position:relative;display:block;font-size:21px;font-weight:800;letter-spacing:.03em;line-height:1.5;color:#f7e4b6}
+.pocket-cursor{position:absolute;left:-23px;top:6px;font-size:13px;color:#eaca88}
+#appMenu .pocket-hall>small{font-size:11px;font-weight:400;color:#b2b2ca;margin-top:5px}
+.pocket-play-note{margin-top:12px;color:#c4b5ee;font:9px Arial,sans-serif;letter-spacing:2px}
+.pocket-play-note>span{margin-left:5px}
+#appMenu .pocket-submenu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-top:8px}
+#appMenu .pocket-destination{display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;min-width:0;min-height:0;padding:8px 0 12px}
+.pocket-destination svg{width:78px;height:78px;filter:drop-shadow(0 5px 6px #070b2255)}
+#appMenu .pocket-destination strong{font-size:13px;font-weight:700;line-height:1.5;margin-top:5px;white-space:nowrap}
+#appMenu .pocket-destination small{font-size:9px;font-weight:400;color:#a2a7c0;margin-top:5px;line-height:1.5;white-space:nowrap}
+.pocket-footer{display:flex;align-items:center;justify-content:center;gap:12px;margin:26px 0 12px;color:#8c92b2;font:8px Arial,sans-serif;letter-spacing:2px}
+.pocket-footer>span{color:#b5a7cf;font-size:10px}
+body.menu-active .home-about{max-width:560px;margin:18px auto 0;text-align:center;color:#848aa5}
+body.menu-active .home-about summary{font-size:10px}
+@media(min-width:600px){.pocket-brand{padding-top:32px}.pocket-hall-art{width:270px}#appMenu .pocket-hall{padding-top:20px}.pocket-destination svg{width:90px;height:90px}#appMenu .pocket-destination strong{font-size:15px}}
+@media(max-width:360px){.pocket-brand{padding-top:12px}.pocket-hall-art{width:200px}.pocket-main-label{font-size:19px}.pocket-destination svg{width:68px;height:68px}#appMenu .pocket-destination strong{font-size:12px}.pocket-footer{margin-top:18px}}
+@media(prefers-reduced-motion:reduce){#appMenu .menu-links a,.pocket-hall-art{transition:none}}
 </style>
 </head>
 <body class="start-active menu-active">
@@ -817,17 +864,19 @@ body.menu-active:not(.start-active){min-height:100dvh;box-sizing:border-box;back
 </defs></svg>
 <div class="wrap">
   <h1>🎰 ジャグラーポケット</h1>
-  <nav class="menu-panel" id="appMenu" aria-label="メインメニュー">
-
-    <div class="room-header menu-header"><button id="backToTitle" type="button" aria-label="タイトル画面へ戻る">タイトル</button><h2>メインメニュー</h2></div>
-    <section class="card menu-card" aria-label="プレイメニュー">
-    <div class="menu-links"><a class="menu-hall-button" href="#section-play"><span class="menu-icon">🎰</span><span class="menu-copy"><strong>ジャグラーホール</strong><small>好きな機種で遊ぶ</small></span><span class="menu-arrow">▶</span></a><a href="#section-lab"><span class="menu-icon">🧪</span><span class="menu-copy"><strong>ジャグラー研究所</strong><small>出方の揺れを体感する</small></span><span class="menu-arrow">▶</span></a></div>
-    </section>
-    <section class="card menu-card" aria-label="スペック図鑑"><b>📖 スペック</b><div class="menu-links spec-menu-links"><a href="#section-spec"><span class="menu-icon">📖</span><span class="menu-copy"><strong>スペック図鑑</strong><small>機種の数値を調べる</small></span><span class="menu-arrow">▶</span></a></div></section>
-    <section class="card menu-card"><div class="menu-links"><a href="#section-record"><span class="menu-icon">📋</span><span class="menu-copy"><strong>実戦記録</strong><small>ホールでの当選と収支を記録する</small></span><span class="menu-arrow">▶</span></a></div></section>
-    <section class="card menu-card"><div class="menu-links spec-menu-links"><a href="#section-options"><span class="menu-icon">⚙️</span><span class="menu-copy"><strong>オプション</strong><small>表示・演出を設定する</small></span><span class="menu-arrow">▶</span></a></div></section>
-    
-  </nav>
+  <nav class="menu-panel pocket-menu" id="appMenu" aria-label="メインメニュー">
+ <div class="pocket-top menu-links"><button id="backToTitle" type="button" aria-label="タイトル画面へ戻る"><span aria-hidden="true">‹</span> タイトル</button><span class="pocket-power"><i></i> POWER</span><a href="#section-options" class="pocket-settings" aria-label="オプション"><svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true"><path d="m10 3-1 3-3 1-2 3 2 2v3l3 2 1 4h4l1-4 3-2v-3l2-2-2-3-3-1-1-3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a></div>
+ <div class="pocket-brand"><p>YOUR LITTLE SLOT WORLD</p><h2>JUGGLER <span>POCKET</span></h2><div class="pocket-caption"><span></span> 今日は、どこで遊ぶ？ <span></span></div></div>
+ <div class="menu-links pocket-destinations">
+  <a href="#section-play" class="pocket-hall"><span class="pocket-hall-art"><svg viewBox="0 0 240 180" aria-hidden="true"><defs><linearGradient id="jpSlotBody" x2=".8" y2="1"><stop stop-color="#a29be8"/><stop offset="1" stop-color="#655eaa"/></linearGradient><linearGradient id="jpSlotReel" x2="0" y2="1"><stop stop-color="#cfc9eb"/><stop offset=".4" stop-color="#fff9eb"/><stop offset=".7" stop-color="#fff9eb"/><stop offset="1" stop-color="#cfc9eb"/></linearGradient></defs><ellipse cx="120" cy="166" rx="75" ry="8" fill="#070b29" opacity=".6"/><path d="M60 30Q60 18 73 18H169Q181 18 181 30V142L194 158Q196 165 185 165H55Q45 165 48 158L60 142Z" fill="url(#jpSlotBody)"/><path d="M70 34Q70 28 77 28H164Q171 28 171 34V60H70Z" fill="#272443"/><text x="120" y="48" text-anchor="middle" fill="#ffe7a2" font-size="14" font-weight="900" font-family="Arial,sans-serif" letter-spacing="2">JUGPOKE</text><path d="M65 64H176V119H65Z" fill="#403963"/><g fill="url(#jpSlotReel)"><rect x="71" y="69" width="29" height="43" rx="3"/><rect x="105" y="69" width="29" height="43" rx="3"/><rect x="139" y="69" width="29" height="43" rx="3"/></g><g fill="#da4c7a" font-size="33" font-weight="900" font-style="italic" font-family="Arial,sans-serif" text-anchor="middle"><text x="85" y="102">7</text><text x="119" y="102">7</text><text x="153" y="102">7</text></g><path class="pocket-lamp" d="m77 122 5 5 8-5-1 7 9 2-9 4 3 8-9-4-5 5-1-8-9-1 7-5Z" fill="#ed91ff"/><g fill="#e7daff"><circle cx="113" cy="133" r="6"/><circle cx="135" cy="133" r="6"/><circle cx="157" cy="133" r="6"/></g><path d="M60 148H182L187 156H54Z" fill="#4e467f"/><path d="M182 61H194V107" fill="none" stroke="#b8b4dc" stroke-width="6" stroke-linecap="round"/><circle cx="194" cy="56" r="10" fill="#e777a0"/><path d="m34 55 3 7 8 3-8 3-3 8-3-8-8-3 8-3ZM204 122l2 5 6 2-6 2-2 6-2-6-6-2 6-2Z" fill="#f3d996"/><circle cx="204" cy="29" r="3" fill="#95dad9"/></svg></span><span class="pocket-main-label"><span class="pocket-cursor" aria-hidden="true">▶</span> ジャグラーホール</span><small>好きな機種で、ひと遊び。</small><span class="pocket-play-note">LET’S PLAY <span aria-hidden="true">→</span></span></a>
+  <div class="pocket-submenu">
+   <a href="#section-lab" class="pocket-destination"><svg viewBox="0 0 90 90" aria-hidden="true"><path d="M32 15h27M37 16v22L19 68q-4 9 8 9h39q12 0 7-9L54 38V16" fill="#a9dff2" fill-opacity=".15" stroke="#aadfee" stroke-width="3.5" stroke-linecap="round"/><path d="m29 54-9 17q-1 4 6 4h41q6 0 4-5L61 53q-8-6-16 0t-16 1Z" fill="#86ccd5"/><circle cx="41" cy="63" r="4" fill="#d8ffff"/><circle cx="55" cy="69" r="2" fill="#d8ffff"/><circle cx="45" cy="43" r="3" fill="#a9e9ef"/><path d="m70 21 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill="#f5d998"/></svg><strong>研究所</strong><small>出方のふしぎ</small></a>
+   <a href="#section-spec" class="pocket-destination"><svg viewBox="0 0 90 90" aria-hidden="true"><path d="M14 24q15-7 31 2 16-9 31-2v47q-16-7-31 2-15-9-31-2Z" fill="#b3a5e2"/><path d="M19 19q13-4 26 5 13-9 26-5v44q-13-4-26 5-13-9-26-5Z" fill="#eee6d9"/><path d="M45 25v41" stroke="#a296bd" stroke-width="2"/><path d="M25 47l13 3m-13 6 13 3m14-23 12-4m-12 13 12-4m-12 13 12-4" stroke="#aca1ba" stroke-width="2.5" stroke-linecap="round"/><path d="m31 28 2 5 5 1-4 4 1 5-4-3-5 3 1-5-4-4 5-1Z" fill="#dba85d"/></svg><strong>スペック図鑑</strong><small>機種を知る</small></a>
+   <a href="#section-record" class="pocket-destination"><svg viewBox="0 0 90 90" aria-hidden="true"><rect x="20" y="17" width="48" height="58" rx="6" fill="#d889aa"/><rect x="27" y="20" width="36" height="49" rx="2" fill="#faebdf"/><path d="M20 29h8m-8 13h8m-8 13h8m-8 13h8" stroke="#bdc3df" stroke-width="3" stroke-linecap="round"/><path d="m35 34 3 3 5-6m-8 16 3 3 5-6m-8 16 3 3 5-6" stroke="#bc7897" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M48 35h8m-8 13h8m-8 13h8" stroke="#c9b4b4" stroke-width="2.5" stroke-linecap="round"/><circle cx="68" cy="70" r="12" fill="#f2d28c"/><circle cx="68" cy="70" r="8" fill="none" stroke="#bf9858" stroke-width="1.5"/><path d="M68 65v10m-3-8h5m-4 6h5" stroke="#bf9858" stroke-width="1.5"/></svg><strong>実戦記録</strong><small>今日の一台を残す</small></a>
+  </div>
+ </div>
+ <div class="pocket-footer" aria-hidden="true"><span>✦</span> GOOD LUCK &amp; HAVE FUN <span>✦</span></div>
+</nav>
   <div id="contentNav" class="content-nav" hidden><button id="backToMenu" aria-label="メインメニューへ戻る">メニュー</button><h2 id="screenTitle" class="screen-title"></h2></div>
     <section class="card machine-card" id="pageMachineSelection" hidden aria-label="機種選択">
     <b>🎰 機種選択</b>
