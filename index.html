@@ -946,6 +946,39 @@ body.pocket-room #section-play #reset{padding:9px 5px;color:#a8a5bd;min-height:4
 body.pocket-room #section-play #reset>span::before{content:'↺ ';color:#c4b5ee;font-size:17px}
 @media(max-width:480px){body.pocket-room #section-play .controls{gap:16px}body.pocket-room #section-play #lever{min-height:62px;font-size:17px}body.pocket-room #section-play .controls>.advance-keys{gap:10px!important}}
 @media(prefers-reduced-motion:reduce){body.pocket-room #section-play #lever,body.pocket-room #section-play .controls .autobtn{transition:none}}
+
+
+/* JugPoke UI pass 1 / v0.6.4: visual-only changes except update-news read flag. */
+html,body{max-width:100%;overflow-x:clip}body{touch-action:pan-y}
+#appMenu,#section-record,#rpBody,#rpTabs,.rpCard{min-width:0;max-width:100%;box-sizing:border-box}
+#section-record .rpCard{padding:10px;margin:10px 0}
+#section-record .rpCard h3{margin:6px 0;font-size:15px;overflow-wrap:anywhere}
+#section-record .rpCard p{margin:7px 0;line-height:1.45;overflow-wrap:anywhere}
+#section-record .rpMetrics{gap:5px;margin:8px 0}
+#section-record .rpMetrics div{padding:7px 6px;min-width:0;overflow-wrap:anywhere}
+#section-record .rpMetrics b{font-size:clamp(15px,4.4vw,19px);font-variant-numeric:tabular-nums}
+#section-record .rpTools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#section-record .rpTools button,#section-record .rpActions button{min-width:0;min-height:44px;padding:9px 5px;overflow-wrap:anywhere;font-size:clamp(12px,3.5vw,15px)}
+#section-record .rpActions{gap:7px;margin:9px 0}
+#section-record .rpTabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+#section-record .rpTabs button{min-width:0;padding:10px 2px;font-size:clamp(11px,3vw,14px)}
+#section-record select,#section-record input,#rpModal input,#rpModal select{max-width:100%}
+#section-record .rpChart{max-width:100%;min-width:0;overflow:hidden}
+#section-record .rpScroll{max-width:100%;overscroll-behavior-x:contain}
+.jp-update-menu{text-align:center;margin:8px auto 0}
+.jp-update-menu button{background:transparent;border:0;color:#e2d8ef;font:inherit;font-size:13px;padding:12px 16px;min-height:44px;cursor:pointer}
+.jp-update-dot{display:inline-block;width:7px;height:7px;background:#e9848e;border-radius:100%;margin-left:4px;vertical-align:middle}
+.jp-update-dot[hidden]{display:none}
+#jpUpdateDialog{width:min(440px,calc(100vw - 24px));max-height:80dvh;overflow:auto;background:#181d27;color:#f2f3f5;border:1px solid #46506a;border-radius:16px;padding:18px;box-sizing:border-box}
+#jpUpdateDialog::backdrop{background:#000b}
+#jpUpdateDialog header{display:flex;justify-content:space-between;align-items:center}
+#jpUpdateClose{min-width:44px;min-height:44px;font-size:24px}
+#jpUpdateEntries article{padding:12px 0;border-bottom:1px solid #384254;overflow-wrap:anywhere}
+#jpUpdateEntries article time{color:#b4bfd6;font-size:12px}
+#jpUpdateEntries h3{font-size:16px;margin:5px 0 8px}
+#jpUpdateEntries ul{padding-left:20px;line-height:1.7;font-size:14px}
+@media(max-width:390px){#section-record .rpCard{padding:8px}#section-record .rpActions button{font-size:12px}}
+
 </style>
 </head>
 <body class="start-active menu-active">
@@ -1024,8 +1057,10 @@ body.pocket-room #section-play #reset>span::before{content:'↺ ';color:#c4b5ee;
    <a href="#section-record" class="pocket-destination"><svg viewBox="0 0 90 90" aria-hidden="true"><rect x="20" y="17" width="48" height="58" rx="6" fill="#d889aa"/><rect x="27" y="20" width="36" height="49" rx="2" fill="#faebdf"/><path d="M20 29h8m-8 13h8m-8 13h8m-8 13h8" stroke="#bdc3df" stroke-width="3" stroke-linecap="round"/><path d="m35 34 3 3 5-6m-8 16 3 3 5-6m-8 16 3 3 5-6" stroke="#bc7897" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M48 35h8m-8 13h8m-8 13h8" stroke="#c9b4b4" stroke-width="2.5" stroke-linecap="round"/><circle cx="68" cy="70" r="12" fill="#f2d28c"/><circle cx="68" cy="70" r="8" fill="none" stroke="#bf9858" stroke-width="1.5"/><path d="M68 65v10m-3-8h5m-4 6h5" stroke="#bf9858" stroke-width="1.5"/></svg><strong>実戦記録</strong><small>今日の一台を残す</small></a>
   </div>
  </div>
+ <div class="jp-update-menu"><button type="button" id="jpUpdateOpen" aria-haspopup="dialog" aria-controls="jpUpdateDialog">🆕 更新情報 <span id="jpUpdateDot" class="jp-update-dot" aria-label="未読の更新情報"></span></button></div>
  <div class="pocket-footer" aria-hidden="true"><span>✦</span> GOOD LUCK &amp; HAVE FUN <span>✦</span></div>
 </nav>
+  <dialog id="jpUpdateDialog" aria-labelledby="jpUpdateTitle"><header><strong id="jpUpdateTitle">🆕 更新情報</strong><button type="button" id="jpUpdateClose" aria-label="閉じる">×</button></header><div id="jpUpdateEntries"></div></dialog>
   <div id="contentNav" class="content-nav" hidden><button id="backToMenu" aria-label="メインメニューへ戻る">メニュー</button><h2 id="screenTitle" class="screen-title"></h2></div>
     <section class="card machine-card" id="pageMachineSelection" hidden aria-label="機種選択">
     <b>🎰 機種選択</b>
@@ -2514,6 +2549,25 @@ apply.onclick=()=>{if(!selected)return;if(!confirm('選択した保存候補を�
 document.getElementById('jpRecoveryRecheck').onclick=()=>{try{const latest=v.readSaved(jpQATestStorage);if(!latest)throw Error('正常な保存データが見つかりません');msg.textContent='再読込成功。内容・件数を確認するためページを再読込してください。';if(confirm('再読込できました。ページを再読込して記録を確認しますか？'))location.reload();}catch(e){msg.textContent='再確認：'+String(e.message||e)+'。候補の選択状態を確認してください。';show();}};
 document.getElementById('jpRecoveryExport').onclick=()=>{const c=v.recoveryCandidates(jpQATestStorage),valid=c.filter(x=>x.valid);if(!valid.length){msg.textContent='有効なJSON候補がありません';return;}const bundle={exportedAt:new Date().toISOString(),candidates:valid.map(x=>({key:x.key,generation:x.generation,raw:jpQATestStorage.getItem(x.key)}))};const u=URL.createObjectURL(new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='jugpoke-recovery-candidates.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);};
 document.getElementById('jpRecoveryClose').onclick=()=>{curtain.style.display='none';};window.JugPokeRecoveryUI={show};show();
+})();
+</script>
+
+<script id="jp-update-news-script">
+(()=>{'use strict';
+const entries=[
+ {version:'0.6.4',date:'2026-10-15',title:'iPhoneで使いやすく',items:['実戦記録の表示とボタン間隔を整えました。','画面が横へずれにくいようにしました。','メインメニューに更新情報を追加しました。'],note:'開発検証版です。正式公開ではありません。'},
+ {version:'0.6.3',date:'2026-10-15',title:'保存・復元の安心を強化',items:['保存や復元に問題が起きたとき、状態を確認しやすくしました。'],note:'不具合発生時は追加登録を止め、JSONバックアップを確保してください。'},
+ {version:'0.6.1',date:'2026-10-15',title:'未確定Gの表示を改善',items:['未確定区間がある記録では確認済みGを区別します。','不完全な推定増減は算出保留と表示します。'],note:''}
+];
+const latest=entries[0].version;
+const key='jugpoke.iphoneQA.ui.newsReadVersion';
+const open=document.getElementById('jpUpdateOpen'),dlg=document.getElementById('jpUpdateDialog'),dot=document.getElementById('jpUpdateDot'),body=document.getElementById('jpUpdateEntries');
+if(!open||!dlg||!dot||!body)return;
+function refresh(){try{dot.hidden=localStorage.getItem(key)===latest}catch(e){dot.hidden=false}}
+function show(){body.replaceChildren();for(const e of entries){const a=document.createElement('article');const t=document.createElement('time');t.textContent=e.date;const h=document.createElement('h3');h.textContent='Ver.'+e.version+'｜'+e.title;const u=document.createElement('ul');for(const item of e.items){const li=document.createElement('li');li.textContent=item;u.append(li)}a.append(t,h,u);if(e.note){const p=document.createElement('p');p.textContent='注意：'+e.note;a.append(p)}body.append(a)}dlg.showModal();try{localStorage.setItem(key,latest)}catch(e){}refresh()}
+open.addEventListener('click',show);
+document.getElementById('jpUpdateClose').addEventListener('click',()=>dlg.close());
+refresh();
 })();
 </script>
 </body>
