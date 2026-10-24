@@ -1492,7 +1492,7 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 </style>
 </head>
 <body class="start-active menu-active">
-<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.3｜操作性改善・隔離QA版｜正式公開前</div>
+<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.4｜保存不具合修正・実機QA前</div>
 <div id="startScreen" class="start-screen jp-title-screen">
   <button id="startEnter" class="start-enter jp-title-button" aria-label="ジャグラーポケットのメインメニュー画面へ進む">
     <span class="jp-title-figure">
@@ -3073,13 +3073,27 @@ const integer=(n,nullable=false)=>nullable&&n===null || Number.isSafeInteger(n)&
 const unique=(items)=>{const ids=new Set();for(const v of items){if(typeof v.id!=='string'||!v.id||ids.has(v.id))throw Error('IDの重複または欠落');ids.add(v.id)}};
 function segments(s){const a=s.counterSegments||[];if(!a.length)throw Error('カウンター区間がありません');unique(a);return a;}
 function validate(d){if(!d||d.schemaVersion!==2||!Array.isArray(d.stores)||!Array.isArray(d.days))throw Error('SCHEMA 2の形式が不正');unique(d.stores);unique(d.days);const allIds=new Set([...d.stores,...d.days].map(x=>x.id));for(const day of d.days){if(!d.stores.some(st=>st.id===day.storeId)||!Array.isArray(day.sessions)||!Array.isArray(day.events))throw Error('店舗・実戦日の参照不正');unique(day.sessions);unique(day.events);for(const s of day.sessions){if(!s.seat||!Array.isArray(s.bonuses)||!Array.isArray(s.gameEvents))throw Error('台情報が不正');segments(s);unique(s.bonuses);unique(s.gameEvents);for(const b of s.bonuses){if(!['BIG','REG'].includes(b.kind)||!['self','preSeat','postExit'].includes(b.source)||!integer(b.rawGames)|| (b.source==='self'&&b.rawGames===0&&b.inputBasis!=='counter'))throw Error('ボーナス記録が不正');}
- const ids=new Set(s.gameEvents.map(e=>e.id));for(const e of s.gameEvents){if(!['update','bonus','exit','reset'].includes(e.type)||!integer(e.counterG,true)||!segments(s).some(t=>t.id===e.counterSegmentId)||!Number.isSafeInteger(e.sequence)||e.sequence<0||!['confirmed','unresolved'].includes(e.status)|| e.type==='reset'&&e.confirmedDeltaG!=null&&!integer(e.confirmedDeltaG))throw Error('G数イベントが不正');if(e.type==='bonus'&&!s.bonuses.some(b=>b.id===e.bonusId))throw Error('当選参照が不正');if(e.type==='bonus'&&!e.requestId&&e.source!=='legacyV1')throw Error('登録要求IDがありません');}
+ const ids=new Set(s.gameEvents.map(e=>e.id));for(const e of s.gameEvents){if(!['update','bonus','exit','reset'].includes(e.type)||!integer(e.counterG,true)||!segments(s).some(t=>t.id===e.counterSegmentId)||!Number.isSafeInteger(e.sequence)||e.sequence<0||!['confirmed','unresolved'].includes(e.status)|| e.type==='reset'&&e.confirmedDeltaG!=null&&!integer(e.confirmedDeltaG))throw Error('G数イベントが不正');if(e.type==='bonus'&&!s.bonuses.some(b=>b.id===e.bonusId))throw Error('当選参照が不正');if(e.type==='bonus'&&!e.requestId&&e.source!=='legacyV1')throw Error('登録要求IDがありません');if(e.type==='exit'&&e.finalTotalG!==undefined&&(!integer(e.finalTotalG)||!integer(e.finalPostBonusG)||e.finalTotalG<s.seat.total||e.finalPostBonusG>e.finalTotalG))throw Error('最終確定Gの形式が不正');}
  const requests=new Set();for(const b of s.bonuses){if(b.source!=='self'||!b.requestId)continue;if(requests.has(b.requestId))throw Error('二重登録');requests.add(b.requestId);}calculate(s);}
  for(const e of day.events){if(e.sessionId&&!day.sessions.some(s=>s.id===e.sessionId))throw Error('取引参照が不正');}}
  return true;}
 function calculate(s){const a=(s.gameEvents||[]).slice().sort((a,b)=>a.sequence-b.sequence);let last=new Map(),resolved=0,unknown=false,bonusCount=0;const steps=[];let preceding=null;const distinct=new Set();for(const e of a){if(distinct.has(e.sequence))throw Error('イベント順序が重複');distinct.add(e.sequence);if(e.type==='reset'){if(e.confirmedDeltaG==null){unknown=true;steps.push({id:e.id,delta:null,knownG:resolved,unknown:true});}else{resolved+=e.confirmedDeltaG;steps.push({id:e.id,delta:e.confirmedDeltaG,knownG:resolved,unknown});}last.set(e.counterSegmentId,0);preceding=e;continue;}
  const seg=segments(s).find(x=>x.id===e.counterSegmentId);if(!seg)throw Error('区間ID不明');const prev=last.has(seg.id)?last.get(seg.id):seg.startCounterG;
- if(e.counterG===null){unknown=true;steps.push({id:e.id,delta:null,knownG:resolved,unknown:true});}else if(e.counterG<prev){if(e.status!=='unresolved')throw Error('カウンター逆転：リセット確認が必要');unknown=true;steps.push({id:e.id,delta:null,knownG:resolved,unknown:true});}else{const delta=e.counterG-prev;resolved+=delta;last.set(seg.id,e.counterG);steps.push({id:e.id,delta,knownG:resolved,unknown});}
+ // Ver.1.2.4: an explicitly finalized total is authoritative; counterG remains the separately measured post-bonus counter.
+ // The previous total-G updates are provisional and must not be added to the exit input.
+ if(e.type==='exit'&&integer(e.finalTotalG)){
+  if(e!==a.at(-1))throw Error('最終確定Gの後にイベントが存在します。イベント順序を確認してください。');
+  const target=e.finalTotalG-s.seat.total;
+  const lastBonusStep=steps.filter(st=>a.some(ev=>ev.id===st.id&&ev.type==='bonus')).at(-1);
+  if(lastBonusStep&&target<lastBonusStep.knownG)throw Error('最終総G '+e.finalTotalG+'G（着席後'+target+'G）が、記録済みの最終ボーナスまでの消化'+lastBonusStep.knownG+'Gを下回ります。ボーナス履歴と総Gを確認してください。');
+  for(const z of s.grapeCounter?.segments||[]){
+   if(z.status==='confirmed'&&integer(z.endG,true)&&z.endG!==null&&z.endG>target)throw Error('🍇 計測済み区間の終了値'+z.endG+'Gが、最終確定の着席後'+target+'Gを超えています。ブドウ区間の確認・補正が必要です。');
+   if(z.status==='running'&&z.startG!=null&&z.startG>target)throw Error('🍇 計測開始値'+z.startG+'Gが、最終確定の着席後'+target+'Gを超えています。ブドウ区間の確認が必要です。');
+  }
+  const delta=target-resolved;
+  resolved=target;steps.push({id:e.id,delta,knownG:resolved,unknown,final:true,provisionalCorrection:delta<0});
+  last.set(seg.id,e.counterG);
+ }else if(e.counterG===null){unknown=true;steps.push({id:e.id,delta:null,knownG:resolved,unknown:true});}else if(e.counterG<prev){if(e.status!=='unresolved')throw Error('カウンター逆転：リセット確認が必要');unknown=true;steps.push({id:e.id,delta:null,knownG:resolved,unknown:true});}else{const delta=e.counterG-prev;resolved+=delta;last.set(seg.id,e.counterG);steps.push({id:e.id,delta,knownG:resolved,unknown});}
  if(e.type==='bonus')bonusCount++;preceding=e;
  }
  return {knownG:resolved,unknown,completeG:unknown?null:resolved,steps,bonusCount};}
@@ -3401,7 +3415,60 @@ function transaction(type,existing=null){const d=day(),s=sess(),e=existing;
 }
 function jpSyncCashSubmit(){const amount=Number(el('rpForm').elements.amount?.value||0);const display=el('rpCashDisplay');if(display)display.textContent=amount+'k';if(display)el('rpSubmit').disabled=!(amount>0);}
 
-function exit(move=false){const s=sess();form(move?'🔁 台移動の前にヤメを記録':'🏁 ヤメを記録',field('最後のボーナス後、ヤメまでに回したG','exitG',s.exitG??s.currentG??0)+field('ヤメ時 総回転数（任意・通常G基準）','total','','number',false)+field('最終持ちメダル（任意）','medals','','number',false)+select('枚数の確認方法','quality',[['measured','実測'],['approximate','概算']], 'measured')+field('ヤメ理由','reason',s.exitReason||'','text',false),v=>{commit(()=>{const g=number(v.exitG,'ヤメG');const segment=s.counterSegments.at(-1);const existingExit=s.gameEvents.find(e=>e.type==='exit');if(existingExit){grapeTimelineGuard(s,()=>{existingExit.counterG=g;},'ヤメG数の編集');}else{V2.addEvent(s,{id:uid(),type:'exit',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:segment.id,counterG:g,status:'confirmed'});}grapeClose(s,grapeKnown(s));s.exitG=g;s.exitTime=s.exitTime||stamp(timeNow());s.exitReason=v.reason;s.exitTotal=number(v.total,'総G',true);if(s.exitTotal!=null&&s.exitTotal!==s.seat.total+stats(s).g&&!confirm('入力した総Gと計算値が一致しません。原本をそのまま保存しますか？'))throw Error('保存を中止しました。');if(v.medals!=='')day().events.push({id:uid(),type:'correction',sessionId:s.id,amount:0,medals:number(v.medals,'枚数'),quality:v.quality,anchorGames:stats(s).g,anchorOrder:Math.max(0,...ordered(s).map(b=>b.order)),anchorEventId:s.gameEvents.at(-1)?.id??null,anchorStatus:s.gameEvents.length?'confirmed':'unresolved',timestamp:stamp(timeNow()),seq:seq(day())});if(move)day().events.push({id:uid(),type:'transfer',sessionId:s.id,amount:0,medals:0,timestamp:stamp(timeNow()),seq:seq(day())});else day().closed=true;});if(move&&s.exitG!=null){flowMode='seat';render();}});}
+// Ver.1.2.4: the displayed machine total is final, post-bonus G is stored independently.
+// Existing SCHEMA 2 sessions without finalTotalG continue through the legacy calculation path.
+function exit(move=false){
+ const initial=sess();if(!initial)return;
+ const calc=V2.calculate(initial);
+ const totalDefault=initial.exitTotal??(calc.unknown?'':initial.seat.total+calc.knownG);
+ const postDefault=initial.exitG??'';
+ const html='<p class="small">総Gは途中更新と同じ数値でも保存できます。ボーナス後Gとは別項目です。</p>'+
+  field('最後のボーナス後G（最終確定値）','exitG',postDefault)+
+  field('ヤメ時 総G（最終確定値）','total',totalDefault)+
+  field('最終持ちメダル（任意）','medals','','number',false)+
+  select('枚数の確認方法','quality',[['measured','実測'],['approximate','概算']],'measured')+
+  field('ヤメ理由','reason',initial.exitReason||'','text',false);
+ form(move?'🔁 台移動の前にヤメを記録':'🏁 ヤメを記録',html,v=>{
+  // Two final values are recorded separately; a mismatch with bonus history requires explicit acknowledgement.
+  const enteredTotal=number(v.total,'ヤメ時総G'),enteredPost=number(v.exitG,'最後のボーナス後G');
+  const prior=sess(),priorCalc=V2.calculate(prior),targetG=enteredTotal-prior.seat.total;
+  const bonusIds=new Set(prior.gameEvents.filter(x=>x.type==='bonus').map(x=>x.id));
+  const lastBonus=priorCalc.steps.filter(x=>bonusIds.has(x.id)).at(-1);
+  const expectedPost=lastBonus?targetG-lastBonus.knownG:prior.seat.current+targetG;
+  if(targetG>=0&&expectedPost>=0&&expectedPost!==enteredPost){
+   const message='最終G数と記録済みボーナス履歴の間に差があります。\n'+
+    'ヤメ時総G：'+enteredTotal+'G（着席後'+targetG+'G）\n'+
+    '入力した最後のボーナス後G：'+enteredPost+'G\n'+
+    '過去のボーナス履歴から計算した参考値：'+expectedPost+'G\n'+
+    '途中のG記録に未記録・修正が必要な区間がある可能性があります。\n'+
+    '履歴とブドウ計測区間を保持し、最終確定値を優先して保存しますか？';
+   if(!confirm(message))return false;
+  }
+  // Reacquire the session for each submission: an earlier rejected save may have restored data by cloning.
+  const ok=commit(()=>{
+   const s=sess();if(!s)throw Error('保存対象の台が見つかりません。');
+   const lastPost=number(v.exitG,'最後のボーナス後G'),finalTotal=number(v.total,'ヤメ時総G');
+   if(finalTotal<s.seat.total)throw Error('ヤメ時総G '+finalTotal+'Gが着席時総G '+s.seat.total+'Gを下回っています。');
+   if(lastPost>finalTotal)throw Error('最後のボーナス後G '+lastPost+'Gがヤメ時総G '+finalTotal+'Gを超えています。');
+   const segment=s.counterSegments.at(-1),existingExit=s.gameEvents.find(e=>e.type==='exit');
+   const previous=V2.calculate(s);
+   // Intermediary manual total-G entries are provisional; no need to delete or rewrite their actual history.
+   const e=existingExit||{id:uid(),type:'exit',sequence:Math.max(0,...s.gameEvents.map(x=>x.sequence))+1,counterSegmentId:segment.id,status:'confirmed'};
+   e.counterG=lastPost;e.finalTotalG=finalTotal;e.finalPostBonusG=lastPost;e.finalGSource='stop-confirmed';
+   if(!existingExit)s.gameEvents.push(e);
+   const after=V2.calculate(s);if(after.unknown)throw Error('途中のG数イベントに未確定区間があります。総Gは確定していますが、履歴の確認が必要です。');
+   if(after.knownG!==finalTotal-s.seat.total)throw Error('最終G数の検算に失敗しました。');
+   // The final entry may correct a provisional update, but the grape count/confirmed segments are left intact.
+   grapeClose(s,after.knownG);
+   s.exitG=lastPost;s.exitTime=s.exitTime||stamp(timeNow());s.exitReason=v.reason;s.exitTotal=finalTotal;
+   if(v.medals!=='')day().events.push({id:uid(),type:'correction',sessionId:s.id,amount:0,medals:number(v.medals,'枚数'),quality:v.quality,anchorGames:after.knownG,anchorOrder:Math.max(0,...ordered(s).map(b=>b.order)),anchorEventId:e.id,anchorStatus:'confirmed',timestamp:stamp(timeNow()),seq:seq(day())});
+   if(move){if(!day().events.some(x=>x.type==='transfer'&&x.sessionId===s.id))day().events.push({id:uid(),type:'transfer',sessionId:s.id,amount:0,medals:0,timestamp:stamp(timeNow()),seq:seq(day())});}
+   else day().closed=true;
+  });
+  if(ok&&move&&sess()?.exitG!=null){flowMode='seat';render();}
+  return ok;
+ });
+}
 function storeSettings(){const st=store();form('店舗の貸出・交換条件',field('1,000円の貸出枚数','loan',st.loan)+field('1,000円相当の交換に必要な枚数','exchange',st.exchange)+field('記録開始前の貯メダル残高','opening',st.openingBalance)+field('再プレー上限（枚・未設定可）','limit',st.replayLimit??'','number',false)+'<p class="small">初期値47枚貸・53枚交換は例です。店舗に合わせて変更してください。残高は起点＋預入−引出で計算します。</p>',v=>commit(()=>{st.loan=number(v.loan,'貸出');st.exchange=number(v.exchange,'交換');if(!st.loan||!st.exchange)throw Error('貸出・交換は1以上です。');st.openingBalance=number(v.opening,'起点残高');st.replayLimit=number(v.limit,'再プレー上限',true);}));}
 function chartRecords(s){const self=normalized(s),pre=ordered(s,'preSeat').map(b=>({...b,gamesSinceLastBonus:b.rawGames}));return [...pre,...self].sort((a,b)=>{if(a.source!==b.source)return a.source==='self'?-1:1;if(a.bonusIndexInDay!=null&&b.bonusIndexInDay!=null)return b.bonusIndexInDay-a.bonusIndexInDay;return b.order-a.order;}).slice(0,10);}
 function chart(s){const bs=chartRecords(s),max=Math.max(100,...bs.map(b=>b.gamesSinceLastBonus)),ceiling=Math.ceil(max/100)*100,base=155,top=36,height=base-top;let svg='<svg viewBox="0 0 420 196" role="group" aria-label="直近ボーナス履歴。左が最新、右が過去">';for(let i=0;i<=4;i++){const y=base-height*i/4;svg+=`<line x1="38" x2="416" y1="${y}" y2="${y}" stroke="#e0e7ef"/><text x="32" y="${y+4}" text-anchor="end" fill="#69798f" font-size="11">${Math.round(ceiling*i/4)}</text>`;}
@@ -3908,7 +3975,7 @@ body.rp-light-mode #rpModal .rpBonusHelp{font-size:12px;line-height:1.5;color:#6
 @media(max-width:360px){#section-record .rpKpiRow{gap:4px}#section-record .rpKpi{padding:8px 2px;min-height:82px}#section-record .rpKpi b{font-size:17px}#section-record .rpKpiCombined b{font-size:14px}#section-record .rpMedalHero{padding:12px}#section-record .rpFineNote{font-size:10px}}
 
 
-/* Ver.1.2.3 実戦記録・操作簡素化 第1段階：他の画面を変更しない */
+/* Ver.1.2.4 実戦記録・最終確定値優先（SCHEMA 2維持） */
 #section-record .rpSeatStage{max-width:520px;padding:12px 12px 14px;border-radius:16px}
 #section-record .rpSeatIntro{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
 #section-record .rpSeatIntro>div{min-width:0}
