@@ -1490,7 +1490,7 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 @media(min-width:620px){.jp-v118-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.jp-v118-photo{height:154px}.jp-v118-filters{grid-template-columns:2fr 2fr 1.5fr;align-items:end}.jp-v118-hero .jp-v118-photo{width:180px;height:205px}}
 @media(max-width:340px){.jp-v118-photo{height:104px}.jp-v118-info strong{font-size:12px}.jp-v118-open{padding:6px}}
 </style>
-<meta name="jagpoke-version" content="1.2.6 QA">
+<meta name="jagpoke-version" content="1.2.7 QA">
 <style id="jp-v125-realplay-ui">
 /* Ver.1.2.6 QA: five scoped real-play fixes. Existing SCHEMA 2/save key unaffected. */
 #section-record .rpStartStage, #section-record .rpFlowGrid, #section-record .rpFlowGrid label {min-width:0;max-width:100%;box-sizing:border-box}
@@ -1543,9 +1543,46 @@ body.rp-light-mode #rpModal.rpBonusTapModal[open]{position:fixed!important;inset
 #section-record .rpKpi b.is-unknown{font-size:clamp(13px,3.8vw,19px)!important;letter-spacing:-.03em;white-space:nowrap}
 @media(max-width:360px){#section-record #rpTabs{gap:4px!important}#section-record #rpTabs button{font-size:11px!important;padding-inline:1px!important}}
 </style>
+
+<style id="jp-v127-modal-checkout">
+/* 1.2.7: top-layer dialog positioning uses the measured visual viewport center.
+ * The dialog remains a native modal; no simulation or record counters are changed. */
+body.rp-light-mode #rpModal[open] {
+ position:fixed!important;
+ top:var(--rp-dialog-center-y,50dvh)!important;
+ left:var(--rp-dialog-center-x,50vw)!important;
+ right:auto!important;bottom:auto!important;
+ margin:0!important;
+ transform:translate(-50%,-50%)!important;
+ width:min(440px,calc(100vw - 24px))!important;
+ max-width:calc(100vw - 24px)!important;
+ min-width:0!important;
+ height:auto!important;
+ max-height:calc(var(--rp-visible-h,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 16px)!important;
+ box-sizing:border-box!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+ padding:clamp(10px,2.3vh,15px)!important;
+ border-radius:17px;
+ overscroll-behavior:contain;
+}
+body.rp-light-mode #rpModal.rpBonusTapModal[open]{overflow-y:hidden!important;}
+body.rp-light-mode #rpModal[open]:not(.rpBonusTapModal) #rpFormBody > label{margin:7px 0!important;gap:4px!important;}
+body.rp-light-mode #rpModal[open] header{max-width:100%;min-width:0;}
+body.rp-light-mode #rpModal[open] #rpSubmit{min-height:54px;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+body.rp-light-mode #rpModal.rpCheckoutModal #rpSubmit{min-height:62px!important;font-size:21px!important;background:#245da6!important;color:#fff!important;border:0!important;border-radius:13px!important;}
+body.rp-light-mode #rpModal.rpCheckoutModal #rpFormBody input[type=number]{font-size:21px;min-height:54px;}
+body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutLead{font-size:12px;line-height:1.4;margin:4px 0 9px;color:#526680;}
+body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutLater{width:100%;min-height:48px!important;margin-top:9px;color:#245da6!important;background:#eaf2fc!important;border:1px solid #bbd0e9!important;font-size:15px;font-weight:750;}
+body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutStatus{padding:9px 10px;border:1px solid #dce5ef;background:#f5f8fc;border-radius:11px;font-size:12px;line-height:1.45;color:#405775;}
+body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutWarning{border-color:#e5bb71;background:#fff6e9;color:#765320;}
+#section-record .rpMeasuredStatus{border-radius:10px;background:#f2f6fc;border:1px solid #d9e4f0;color:#2f4568;font-size:12px;padding:9px 10px;margin:8px 0;line-height:1.5;}
+#section-record .rpMeasureLaterButton{min-height:44px;padding:8px 12px;font-weight:800;}
+@media(max-height:600px){body.rp-light-mode #rpModal.rpCheckoutModal #rpSubmit{min-height:52px!important;}body.rp-light-mode #rpModal.rpBonusTapModal[open]{padding:8px!important;}}
+</style>
+
 </head>
 <body class="start-active menu-active">
-<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.6｜実機QA指摘修正・隔離QA版</div>
+<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.7｜ヤメ登録・計測UI検証版</div>
 <div id="startScreen" class="start-screen jp-title-screen">
   <button id="startEnter" class="start-enter jp-title-button" aria-label="ジャグラーポケットのメインメニュー画面へ進む">
     <span class="jp-title-figure">
@@ -3204,7 +3241,21 @@ function validateV1(d){
  });return true;
 }
 function validateGrape(d){for(const day of d.days||[])for(const session of day.sessions||[]){const g=session.grapeCounter;if(g==null)continue;if(g.version!==1||!Array.isArray(g.segments)||typeof g.undoReady!=='boolean')throw Error('ブドウ計測データ形式が不正');const ids=new Set();let running=0;for(const z of g.segments){if(typeof z.id!=='string'||ids.has(z.id))throw Error('ブドウ計測区間IDが不正');ids.add(z.id);if(!Number.isSafeInteger(z.grapes)||z.grapes<0||!['running','pending','confirmed'].includes(z.status))throw Error('ブドウ計測区間が不正');if(z.status==='running')running++;if(z.status==='confirmed'&&(!Number.isSafeInteger(z.measuredGames)||z.measuredGames<0))throw Error('ブドウ計測G数が不正');if(z.status!=='confirmed'&&z.measuredGames!=null)throw Error('未確定ブドウ計測G数が不正');if(z.status==='confirmed'&&z.source==='history'&&(z.startG==null||z.endG==null||z.endG-z.startG!==z.measuredGames))throw Error('ブドウ計測区間とG数が不一致');if(z.startG!=null&&(!Number.isSafeInteger(z.startG)||z.startG<0))throw Error('計測開始Gが不正');if(z.endG!=null&&(!Number.isSafeInteger(z.endG)||z.endG<0))throw Error('計測終了Gが不正');}if(running>1||session.exitG!=null&&running)throw Error('ブドウ計測状態が不正');if(g.undoReady&&g.undoSegmentId&&!ids.has(g.undoSegmentId))throw Error('ブドウ操作参照が不正');}return true;}
-const originalGrapeValidate=V2.validate;V2.validate=function(d){originalGrapeValidate(d);return validateGrape(d);};
+
+function rpValidateExitMeasurement(d){
+ for(const day of d.days||[])for(const session of day.sessions||[]){
+  const m=session.exitMeasurement;
+  if(m==null)continue;
+  if(session.exitG==null||!Number.isSafeInteger(m.medals)||m.medals<0||m.medals>1e9||
+     m.unit!=='medals'||m.quality!=='measured'||m.scope!=='single-session-receipt'||
+     typeof m.recordedAt!=='string'||!m.recordedAt){
+   throw Error('計測枚数の実測記録が不正です。既存データを保護するため保存を中止しました。');
+  }
+ }
+ return true;
+}
+
+const originalGrapeValidate=V2.validate;V2.validate=function(d){originalGrapeValidate(d);validateGrape(d);return rpValidateExitMeasurement(d);};
 function validate(d){return V2.validate(d);}
 // P0 R-01: three-state commit outcome; do not retry an ambiguous write.
 const recordFingerprint=d=>{if(d==null)return null;const c=JSON.parse(JSON.stringify(d));delete c._storageGeneration;return JSON.stringify(c);};
@@ -3319,9 +3370,29 @@ function kyen(v,label,nullable=false){if(nullable&&v==='')return null;const n=Nu
 const fmt=n=>n==null?'未確認':Math.round(n).toLocaleString(),prob=(g,n)=>n?'1/'+(g/n).toFixed(1):'—';
 const field=(label,name,value='',type='number',required=true)=>`<label>${label}<input name="${name}" type="${type}" ${type==='number'?'min="0" step="1" inputmode="numeric"':''} value="${esc(value)}" ${required?'required':''}></label>`;
 const select=(label,name,options,value)=>`<label>${label}<select name="${name}">${options.map(([v,t])=>`<option value="${esc(v)}" ${v===value?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
+
+// 1.2.7: Recenter the native dialog using the actually visible viewport on iPhone.
+// Do not rely on a CSS 50% coordinate while the body is scroll-locked.
+function rpPlaceDialog(){
+ const dlg=el('rpModal');if(!dlg||!dlg.open)return;
+ const vv=window.visualViewport;
+ const left=vv?vv.offsetLeft+vv.width/2:window.innerWidth/2;
+ const top=vv?vv.offsetTop+vv.height/2:window.innerHeight/2;
+ const height=vv?vv.height:window.innerHeight;
+ dlg.style.setProperty('--rp-dialog-center-x',left.toFixed(2)+'px');
+ dlg.style.setProperty('--rp-dialog-center-y',top.toFixed(2)+'px');
+ dlg.style.setProperty('--rp-visible-h',height.toFixed(2)+'px');
+}
+function rpOpenDialog(){
+ const dlg=el('rpModal');dlg.showModal();rpPlaceDialog();requestAnimationFrame(rpPlaceDialog);
+}
+window.visualViewport?.addEventListener('resize',rpPlaceDialog,{passive:true});
+window.visualViewport?.addEventListener('scroll',rpPlaceDialog,{passive:true});
+window.addEventListener('resize',rpPlaceDialog,{passive:true});
+
 let submitDialog=null;
-function form(title,html,onSubmit){el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html+'<p id="jpFormError" role="alert" aria-live="assertive" hidden></p>';window.jpRpSnapshotBaseline?.();submitDialog=onSubmit;el('rpSubmit').textContent=title.includes('ボーナス登録')?'登録':title.includes('実戦開始')?'🎰 実戦開始':title.includes('現金を追加投入')?'記録':'保存';el('rpModal').classList.toggle('rpBonusTapModal',!!el('rpFormBody').querySelector('.rpBonusTapSheet'));el('rpSubmit').hidden=false;el('rpSubmit').disabled=false;el('rpModal').showModal();}
-function inspect(title,html){el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html;window.jpRpSnapshotBaseline?.();submitDialog=null;el('rpModal').classList.remove('rpBonusTapModal');el('rpSubmit').hidden=true;el('rpModal').showModal();}
+function form(title,html,onSubmit){delete el('rpModal').dataset.receiptBlocked;el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html+'<p id="jpFormError" role="alert" aria-live="assertive" hidden></p>';window.jpRpSnapshotBaseline?.();submitDialog=onSubmit;el('rpSubmit').textContent=title.includes('ボーナス登録')?'登録':title.includes('実戦開始')?'🎰 実戦開始':title.includes('現金を追加投入')?'記録':title.includes('ヤメ登録')?'ヤメ登録':title.includes('計測枚数登録')?'登録':'保存';el('rpModal').classList.toggle('rpBonusTapModal',!!el('rpFormBody').querySelector('.rpBonusTapSheet'));el('rpModal').classList.toggle('rpCheckoutModal',title.includes('ヤメ登録')||title.includes('計測枚数登録'));el('rpSubmit').hidden=false;el('rpSubmit').disabled=false;rpOpenDialog();}
+function inspect(title,html){el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html;window.jpRpSnapshotBaseline?.();submitDialog=null;el('rpModal').classList.remove('rpBonusTapModal','rpCheckoutModal');el('rpSubmit').hidden=true;rpOpenDialog();}
 function machineName(s){return s.customName||names[s.machine]||s.machine;}
 // Grape counter: session-local optional SCHEMA 2 extension; no change to draw/medal calculations.
 function grapeTimelineGuard(s, change, label){
@@ -3542,14 +3613,9 @@ function exit(move=false){
  const calc=V2.calculate(initial);
  const totalDefault=initial.exitTotal??(calc.unknown?'':initial.seat.total+calc.knownG);
  const postDefault=initial.exitG??'';
- const html='<p class="small">総Gは途中更新と同じ数値でも保存できます。ボーナス後Gとは別項目です。</p>'+
-  field('最後のボーナス後G（最終確定値）','exitG',postDefault)+
-  field('ヤメ時 総G（最終確定値）','total',totalDefault)+
-  field('最終持ちメダル（任意）','medals','','number',false)+
-  select('枚数の確認方法','quality',[['measured','実測'],['approximate','概算']],'measured')+
-  field('ヤメ理由','reason',initial.exitReason||'','text',false);
- form(move?'🔁 台移動の前にヤメを記録':'🏁 ヤメを記録',html,v=>{
-  // Two final values are recorded separately; a mismatch with bonus history requires explicit acknowledgement.
+ const html=field('ヤメ時 総G（最終確定値）','total',totalDefault)+
+  field('最後のボーナス後G（最終確定値）','exitG',postDefault);
+ form(move?'🔁 台移動のヤメ登録':'🏁 ヤメ登録',html,v=>{
   const enteredTotal=number(v.total,'ヤメ時総G'),enteredPost=number(v.exitG,'最後のボーナス後G');
   const prior=sess(),priorCalc=V2.calculate(prior),targetG=enteredTotal-prior.seat.total;
   const bonusIds=new Set(prior.gameEvents.filter(x=>x.type==='bonus').map(x=>x.id));
@@ -3564,31 +3630,69 @@ function exit(move=false){
     '履歴とブドウ計測区間を保持し、最終確定値を優先して保存しますか？';
    if(!confirm(message))return false;
   }
-  // Reacquire the session for each submission: an earlier rejected save may have restored data by cloning.
+  const currentId=sess()?.id;
   const ok=commit(()=>{
-   const s=sess();if(!s)throw Error('保存対象の台が見つかりません。');
+   const s=sess();if(!s||s.id!==currentId)throw Error('保存対象の台が見つかりません。');
    const lastPost=number(v.exitG,'最後のボーナス後G'),finalTotal=number(v.total,'ヤメ時総G');
    if(finalTotal<s.seat.total)throw Error('ヤメ時総G '+finalTotal+'Gが着席時総G '+s.seat.total+'Gを下回っています。');
    if(lastPost>finalTotal)throw Error('最後のボーナス後G '+lastPost+'Gがヤメ時総G '+finalTotal+'Gを超えています。');
    const segment=s.counterSegments.at(-1),existingExit=s.gameEvents.find(e=>e.type==='exit');
-   const previous=V2.calculate(s);
-   // Intermediary manual total-G entries are provisional; no need to delete or rewrite their actual history.
    const e=existingExit||{id:uid(),type:'exit',sequence:Math.max(0,...s.gameEvents.map(x=>x.sequence))+1,counterSegmentId:segment.id,status:'confirmed'};
    e.counterG=lastPost;e.finalTotalG=finalTotal;e.finalPostBonusG=lastPost;e.finalGSource='stop-confirmed';
    if(!existingExit)s.gameEvents.push(e);
    const after=V2.calculate(s);if(after.unknown)throw Error('途中のG数イベントに未確定区間があります。総Gは確定していますが、履歴の確認が必要です。');
    if(after.knownG!==finalTotal-s.seat.total)throw Error('最終G数の検算に失敗しました。');
-   // The final entry may correct a provisional update, but the grape count/confirmed segments are left intact.
    grapeClose(s,after.knownG);
-   s.exitG=lastPost;s.exitTime=s.exitTime||stamp(timeNow());s.exitReason=v.reason;s.exitTotal=finalTotal;
-   if(v.medals!=='')day().events.push({id:uid(),type:'correction',sessionId:s.id,amount:0,medals:number(v.medals,'枚数'),quality:v.quality,anchorGames:after.knownG,anchorOrder:Math.max(0,...ordered(s).map(b=>b.order)),anchorEventId:e.id,anchorStatus:'confirmed',timestamp:stamp(timeNow()),seq:seq(day())});
+   s.exitG=lastPost;s.exitTime=s.exitTime||stamp(timeNow());s.exitTotal=finalTotal;
+   // Preserve old exitReason/corrections, but never register a new one during stop.
    if(move){if(!day().events.some(x=>x.type==='transfer'&&x.sessionId===s.id))day().events.push({id:uid(),type:'transfer',sessionId:s.id,amount:0,medals:0,timestamp:stamp(timeNow()),seq:seq(day())});}
    else day().closed=true;
   });
-  if(ok&&move&&sess()?.exitG!=null){flowMode='seat';render();}
+  // The stop is already durably committed and verified before the next form opens.
+  if(ok){flowMode='live';render();rpMeasure(currentId,move);}
   return ok;
  });
 }
+
+// 1.2.7: Independent, optional checkout measurement.  It is deliberately NOT a
+// transaction/correction and does not change any existing monetary calculations.
+// Multi-table attribution needs separate project-management approval.
+function rpMeasurementSafe(d,s){
+ return !!d&&!!s&&s.exitG!=null&&d.sessions.length===1&&
+  !d.events.some(x=>x.type==='transfer');
+}
+function rpMeasurementSummary(s){
+ const m=s?.exitMeasurement;
+ if(!m)return '<div class="rpMeasuredStatus">計測枚数：未確認（あとから登録できます）</div>';
+ return '<div class="rpMeasuredStatus">🧾 計測実績：<b>'+fmt(m.medals)+'枚</b>（実測・収支とは別管理）</div>';
+}
+function rpMeasurementLater(move){
+ el('rpModal').close();if(move){flowMode='seat';render();}
+}
+function rpMeasure(sessionId,afterMove=false){
+ const d=day(),s=d?.sessions.find(x=>x.id===sessionId);
+ if(!d||!s||s.exitG==null){alert('ヤメ登録済みの台を選択してください。');return;}
+ const safe=rpMeasurementSafe(d,s),prev=s.exitMeasurement;
+ const info=safe?'レシートで確認した枚数を入力してください。0枚も実測値として登録できます。':'複数台・台移動の計測範囲は未確定です。台別に配分せず、現在は「あとで入力」を選択してください。';
+ const html='<p class="rpCheckoutLead">'+esc(machineName(s))+'｜'+esc(s.table)+'番台・'+esc(d.date)+'</p>'+
+  field('計測枚数（実測）','medals',prev?.medals??'','number',false)+
+  '<div class="rpCheckoutStatus'+(safe?'':' rpCheckoutWarning')+'">'+esc(info)+'</div>'+
+  '<button type="button" class="rpCheckoutLater" data-rp-measure-later="'+(afterMove?'move':'stay')+'">あとで入力</button>';
+ form('🧾 計測枚数登録',html,v=>{
+  if(!safe)throw Error('複数台・台移動を含む計測の保存仕様が未承認です。「あとで入力」を選択してください。');
+  if(v.medals==='')throw Error('計測枚数を入力してください。未確認なら「あとで入力」を選択してください。');
+  const n=number(v.medals,'計測枚数');
+  const ok=commit(()=>{
+   const current=day()?.sessions.find(x=>x.id===sessionId);
+   if(!current||!rpMeasurementSafe(day(),current))throw Error('計測対象の台・計測範囲を再確認してください。');
+   current.exitMeasurement={medals:n,unit:'medals',quality:'measured',scope:'single-session-receipt',recordedAt:stamp(timeNow())};
+  });
+  if(ok&&afterMove){flowMode='seat';render();}
+  return ok;
+ });
+ el('rpModal').dataset.receiptBlocked=safe?'0':'1';if(!safe)el('rpSubmit').disabled=true;
+}
+
 function storeSettings(){const st=store();form('店舗の貸出・交換条件',field('1,000円の貸出枚数','loan',st.loan)+field('1,000円相当の交換に必要な枚数','exchange',st.exchange)+field('記録開始前の貯メダル残高','opening',st.openingBalance)+field('再プレー上限（枚・未設定可）','limit',st.replayLimit??'','number',false)+'<p class="small">初期値47枚貸・53枚交換は例です。店舗に合わせて変更してください。残高は起点＋預入−引出で計算します。</p>',v=>commit(()=>{st.loan=number(v.loan,'貸出');st.exchange=number(v.exchange,'交換');if(!st.loan||!st.exchange)throw Error('貸出・交換は1以上です。');st.openingBalance=number(v.opening,'起点残高');st.replayLimit=number(v.limit,'再プレー上限',true);}));}
 function chartRecords(s){const self=normalized(s),pre=ordered(s,'preSeat').map(b=>({...b,gamesSinceLastBonus:b.rawGames}));return [...pre,...self].sort((a,b)=>{if(a.source!==b.source)return a.source==='self'?-1:1;if(a.bonusIndexInDay!=null&&b.bonusIndexInDay!=null)return b.bonusIndexInDay-a.bonusIndexInDay;return b.order-a.order;}).slice(0,10);}
 function chart(s){const bs=chartRecords(s),max=Math.max(100,...bs.map(b=>b.gamesSinceLastBonus)),ceiling=Math.ceil(max/100)*100,base=155,top=36,height=base-top;let svg='<svg viewBox="0 0 420 196" role="group" aria-label="直近ボーナス履歴。左が最新、右が過去">';for(let i=0;i<=4;i++){const y=base-height*i/4;svg+=`<line x1="38" x2="416" y1="${y}" y2="${y}" stroke="#e0e7ef"/><text x="32" y="${y+4}" text-anchor="end" fill="#69798f" font-size="11">${Math.round(ceiling*i/4)}</text>`;}
@@ -3627,6 +3731,7 @@ function render(){const d=day(),s=sess();el('rpNotice').textContent=storageBlock
  <div class="rpBonusPrimary"><button data-rp-action="big" ${s.exitG!=null?'disabled':''}>＋ BIG</button><button data-rp-action="reg" ${s.exitG!=null?'disabled':''}>＋ REG</button></div>
  <div class="rpQuickTools"><button data-rp-action="cash" ${s.exitG!=null?'disabled':''}>💴 ＋投資を記録</button><button data-rp-action="correction" ${s.exitG!=null?'disabled':''}>🪙 持ちメダル実績補正</button></div>
  <div class="rpMachineAction"><button data-rp-action="${s.exitG==null?'seatEdit':'seat'}">台選び・着席情報 <span aria-hidden="true">›</span></button></div>
+ ${s.exitG!=null?rpMeasurementSummary(s)+`<button type="button" class="rpMeasureLaterButton" data-rp-action="measure">🧾 計測枚数を${s.exitMeasurement?'確認・修正':'あとから登録'}</button>`:''}
  ${grapeWidget(s)}
  <section class="rpHistoryPanel"><div class="rpPanelTitle"><h3>ボーナス履歴</h3><span>左が最新</span></div><div class="rpChart">${chart(s)}</div>${!s.bonuses.length?'<p class="rpFineNote">ボーナスはまだ登録されていません。</p>':''}${historyList(s)}</section>
  <details class="rpDeepPanel"><summary>詳細分析・推定差枚グラフ</summary><div class="rpChartArea"><h3>推定差枚推移（実測値ではありません）</h3>${realPlaySlump(d)}</div>${analysis(s)}<p class="rpFineNote">設定別の推定確率・設定4以上／5以上の期待度・今後1,000Gの期待差枚は、検証済みの統計モデルがないため数値表示を保留しています。</p></details>
@@ -3703,10 +3808,10 @@ function deleteGameSafe(id){
  if(deletionCommit(()=>{grapeTimelineGuard(s,()=>V2.removeEvent(s,id),'G数更新の削除');})){alert('G数更新記録を削除しました。');}
 }
 
-const actions={grapePlus:()=>grapeAction('plus'),grapeMinus:()=>grapeAction('minus'),grapeUndo:()=>grapeAction('minus'),grapeStart:()=>grapeAction('start'),grapePause:()=>grapeAction('pause'),start,deleteCurrent:()=>{if(currentDay)deleteDayById(currentDay);},deleteAll:deleteAllDays,seat:()=>{flowMode='seat';render();},backLive:()=>{flowMode='live';render();},seatEdit:()=>seat(sess()),store:storeSettings,dayEdit,big:()=>bonus('BIG'),reg:()=>bonus('REG'),pre:()=>bonus('BIG',null,'preSeat'),post:()=>bonus('BIG',null,'postExit'),cash:()=>transaction('cash'),correction:()=>transaction('correction'),withdraw:()=>transaction('withdraw'),deposit:()=>transaction('deposit'),exchange:()=>transaction('exchange'),move:()=>exit(true),exit:()=>exit(false),model:editModel,reset:()=>{const s=sess();form('⚠️ カウンターリセットを確認',field('確認した区間消化G（不明なら空欄）','delta','','number',false)+'<p class="small">不明Gは自動補完しません。確認できたGだけ加算します。</p>',v=>commit(()=>{const n=number(v.delta,'確認済みG',true);grapeClose(s,grapeKnown(s),true);const seg=s.counterSegments.at(-1);V2.addEvent(s,{id:uid(),type:'reset',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:null,confirmedDeltaG:n,status:n===null?'unresolved':'confirmed'});V2.rebuildSegments(s);}));},current:()=>{const s=sess(),seg=s.counterSegments.at(-1),last=s.gameEvents.filter(e=>e.counterSegmentId===seg.id&&e.counterG!=null).at(-1)?.counterG??seg.startCounterG;form('現在Gを更新',field('ホール表示のボーナス後G','g',last),v=>commit(()=>{const g=number(v.g,'表示G');V2.addEvent(s,{id:uid(),type:'update',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:g,status:'confirmed'});s.currentG=0;}));}};
-let rpSubmitting=false;el('rpForm').addEventListener('invalid',e=>{const p=el('jpFormError');if(p){const input=e.target;const label=input.closest('label')?.textContent?.trim()||input.name||'入力欄';p.textContent=label+'を確認してください。'+(input.validity.valueMissing?'必須項目です。':input.validity.stepMismatch?'入力単位が正しくありません。':input.validationMessage);p.hidden=false;}},true);el('rpForm').addEventListener('input',e=>{const p=el('jpFormError');if(p)p.hidden=true;if(e.target?.name==='medals'&&el('rpCashDisplay'))e.target.dataset.rpManual='1';});el('rpForm').addEventListener('submit',e=>{e.preventDefault();if(!submitDialog||rpSubmitting)return;rpSubmitting=true;const v=Object.fromEntries(new FormData(e.target)),callback=submitDialog;el('rpSubmit').disabled=true;try{el('rpModal').close();const ok=callback(v);if(ok===false&&!el('rpModal').open)el('rpModal').showModal();}catch(err){if(!el('rpModal').open)el('rpModal').showModal();const p=el('jpFormError');if(p){p.textContent='保存できません：'+err.message;p.hidden=false;}else alert(err.message);}finally{rpSubmitting=false;el('rpSubmit').disabled=false;}});el('rpClose').onclick=()=>{if(typeof window.jpRpRequestClose==='function')window.jpRpRequestClose();else el('rpModal').close();};
+const actions={grapePlus:()=>grapeAction('plus'),grapeMinus:()=>grapeAction('minus'),grapeUndo:()=>grapeAction('minus'),grapeStart:()=>grapeAction('start'),grapePause:()=>grapeAction('pause'),start,deleteCurrent:()=>{if(currentDay)deleteDayById(currentDay);},deleteAll:deleteAllDays,seat:()=>{flowMode='seat';render();},backLive:()=>{flowMode='live';render();},seatEdit:()=>seat(sess()),store:storeSettings,dayEdit,big:()=>bonus('BIG'),reg:()=>bonus('REG'),pre:()=>bonus('BIG',null,'preSeat'),post:()=>bonus('BIG',null,'postExit'),cash:()=>transaction('cash'),correction:()=>transaction('correction'),withdraw:()=>transaction('withdraw'),deposit:()=>transaction('deposit'),exchange:()=>transaction('exchange'),move:()=>exit(true),exit:()=>exit(false),measure:()=>{const s=sess();if(s)rpMeasure(s.id,false);},model:editModel,reset:()=>{const s=sess();form('⚠️ カウンターリセットを確認',field('確認した区間消化G（不明なら空欄）','delta','','number',false)+'<p class="small">不明Gは自動補完しません。確認できたGだけ加算します。</p>',v=>commit(()=>{const n=number(v.delta,'確認済みG',true);grapeClose(s,grapeKnown(s),true);const seg=s.counterSegments.at(-1);V2.addEvent(s,{id:uid(),type:'reset',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:null,confirmedDeltaG:n,status:n===null?'unresolved':'confirmed'});V2.rebuildSegments(s);}));},current:()=>{const s=sess(),seg=s.counterSegments.at(-1),last=s.gameEvents.filter(e=>e.counterSegmentId===seg.id&&e.counterG!=null).at(-1)?.counterG??seg.startCounterG;form('現在Gを更新',field('ホール表示のボーナス後G','g',last),v=>commit(()=>{const g=number(v.g,'表示G');V2.addEvent(s,{id:uid(),type:'update',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:g,status:'confirmed'});s.currentG=0;}));}};
+let rpSubmitting=false;el('rpForm').addEventListener('invalid',e=>{const p=el('jpFormError');if(p){const input=e.target;const label=input.closest('label')?.textContent?.trim()||input.name||'入力欄';p.textContent=label+'を確認してください。'+(input.validity.valueMissing?'必須項目です。':input.validity.stepMismatch?'入力単位が正しくありません。':input.validationMessage);p.hidden=false;}},true);el('rpForm').addEventListener('input',e=>{const p=el('jpFormError');if(p)p.hidden=true;if(e.target?.name==='medals'&&el('rpCashDisplay'))e.target.dataset.rpManual='1';});el('rpForm').addEventListener('submit',e=>{e.preventDefault();if(!submitDialog||rpSubmitting)return;rpSubmitting=true;const v=Object.fromEntries(new FormData(e.target)),callback=submitDialog;el('rpSubmit').disabled=true;try{el('rpModal').close();const ok=callback(v);if(ok===false&&!el('rpModal').open)rpOpenDialog();}catch(err){if(!el('rpModal').open)rpOpenDialog();const p=el('jpFormError');if(p){p.textContent='保存できません：'+err.message;p.hidden=false;}else alert(err.message);}finally{rpSubmitting=false;el('rpSubmit').disabled=el('rpModal').open&&el('rpModal').dataset.receiptBlocked==='1';}});el('rpClose').onclick=()=>{if(typeof window.jpRpRequestClose==='function')window.jpRpRequestClose();else el('rpModal').close();};
 function editGameEvent(id){const s=sess(),e=s.gameEvents.find(x=>x.id===id);if(!e)return;if(e.type==='reset'){alert('リセット記録の訂正は現在、安全な再確認手順が未実装のため保留しています。');return;}form('G数更新を編集',field('ホール表示のボーナス後G','g',e.counterG),v=>commit(()=>{grapeTimelineGuard(s,()=>{e.counterG=number(v.g,'表示G');},'G数更新の編集');}));}
-function dispatch(e){if(handleBonusTap(e))return;const quick=e.target.closest('[data-rp-cashamount]');if(quick){const formEl=el('rpForm');const fieldEl=formEl.elements.amount;const before=Number(fieldEl.value)||0;const v=quick.dataset.rpCashamount;const next=v==='clear'?0:Math.max(0,before+Number(v)/1000);fieldEl.value=next;const display=el('rpCashDisplay');if(display)display.textContent=next+'k';const medalEl=formEl.elements.medals;if(medalEl){if(v==='clear')medalEl.dataset.rpManual='0';if(store()&&medalEl.dataset.rpManual!=='1')medalEl.value=Math.round(next*store().loan);}jpSyncCashSubmit();return;}const grapeConfirmTarget=e.target.closest('[data-rp-grapeconfirm]');if(grapeConfirmTarget){grapeConfirm(grapeConfirmTarget.dataset.rpGrapeconfirm);return;}const target=e.target.closest('[data-rp-action],[data-rp-tab],[data-rp-bonus],[data-rp-openday],[data-rp-editbonus],[data-rp-deletebonus],[data-rp-edittx],[data-rp-deletetx],[data-rp-editgame],[data-rp-deletegame],[data-rp-deleteday]');if(!target)return;const x=target.dataset;
+function dispatch(e){const later=e.target.closest('[data-rp-measure-later]');if(later){rpMeasurementLater(later.dataset.rpMeasureLater==='move');return;}if(handleBonusTap(e))return;const quick=e.target.closest('[data-rp-cashamount]');if(quick){const formEl=el('rpForm');const fieldEl=formEl.elements.amount;const before=Number(fieldEl.value)||0;const v=quick.dataset.rpCashamount;const next=v==='clear'?0:Math.max(0,before+Number(v)/1000);fieldEl.value=next;const display=el('rpCashDisplay');if(display)display.textContent=next+'k';const medalEl=formEl.elements.medals;if(medalEl){if(v==='clear')medalEl.dataset.rpManual='0';if(store()&&medalEl.dataset.rpManual!=='1')medalEl.value=Math.round(next*store().loan);}jpSyncCashSubmit();return;}const grapeConfirmTarget=e.target.closest('[data-rp-grapeconfirm]');if(grapeConfirmTarget){grapeConfirm(grapeConfirmTarget.dataset.rpGrapeconfirm);return;}const target=e.target.closest('[data-rp-action],[data-rp-tab],[data-rp-bonus],[data-rp-openday],[data-rp-editbonus],[data-rp-deletebonus],[data-rp-edittx],[data-rp-deletetx],[data-rp-editgame],[data-rp-deletegame],[data-rp-deleteday]');if(!target)return;const x=target.dataset;
  if(x.rpDeleteday){deleteDayById(x.rpDeleteday);return;}if(x.rpEditgame){editGameEvent(x.rpEditgame);return;}if(x.rpDeletegame){deleteGameSafe(x.rpDeletegame);return;}if(x.rpAction){actions[x.rpAction]?.();return;}if(x.rpTab){tab=x.rpTab;if(tab==='live'&&flowMode==='start'&&day())flowMode='live';render();return;}if(x.rpOpenday){currentDay=x.rpOpenday;currentSession=day().sessions.at(-1)?.id;tab='live';flowMode='live';render();return;}if(x.rpBonus){detail(x.rpBonus);return;}if(x.rpEditbonus){el('rpModal').close();bonus('BIG',sess().bonuses.find(b=>b.id===x.rpEditbonus));return;}if(x.rpDeletebonus){deleteBonusSafe(x.rpDeletebonus);return;}if(x.rpEdittx){const e=day().events.find(e=>e.id===x.rpEdittx);transaction(e.type,e);return;}if(x.rpDeletetx){deleteTxSafe(x.rpDeletetx);return;}}
 let rpFlowBusy=false;
 el('section-record').addEventListener('submit',e=>{const id=e.target.id;if(!['rpFlowStart','rpFlowSeat'].includes(id)&&!e.target.matches('[data-rp-totalform]'))return;e.preventDefault();if(rpFlowBusy)return;rpFlowBusy=true;const button=e.target.querySelector('button[type=submit]');if(button)button.disabled=true;try{const v=Object.fromEntries(new FormData(e.target));if(id==='rpFlowStart')startFromFlow({...v,store:v.storeChoice==='__other'?v.storeOther:v.storeChoice});else if(id==='rpFlowSeat')seatFromFlow(v);else commit(()=>recordCurrentTotal(v.total));}catch(err){alert('保存できません：'+err.message);}finally{rpFlowBusy=false;if(button?.isConnected)button.disabled=false;}});
