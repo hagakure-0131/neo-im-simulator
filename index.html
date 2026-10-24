@@ -1490,9 +1490,9 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 @media(min-width:620px){.jp-v118-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.jp-v118-photo{height:154px}.jp-v118-filters{grid-template-columns:2fr 2fr 1.5fr;align-items:end}.jp-v118-hero .jp-v118-photo{width:180px;height:205px}}
 @media(max-width:340px){.jp-v118-photo{height:104px}.jp-v118-info strong{font-size:12px}.jp-v118-open{padding:6px}}
 </style>
-<meta name="jagpoke-version" content="1.2.5 QA">
+<meta name="jagpoke-version" content="1.2.6 QA">
 <style id="jp-v125-realplay-ui">
-/* Ver.1.2.5 QA: real-play only. Existing SCHEMA 2/save key unaffected. */
+/* Ver.1.2.6 QA: five scoped real-play fixes. Existing SCHEMA 2/save key unaffected. */
 #section-record .rpStartStage, #section-record .rpFlowGrid, #section-record .rpFlowGrid label {min-width:0;max-width:100%;box-sizing:border-box}
 #section-record .rpStartStage input[type=date]{display:block;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;overflow:hidden;font-size:16px}
 #section-record .rpQuickTools button{min-height:52px;display:flex;align-items:center;justify-content:center;gap:4px;text-align:center;line-height:1.25;font-size:clamp(11px,3.25vw,14px);font-weight:800;padding:8px 4px;white-space:normal}
@@ -1527,9 +1527,25 @@ body.rp-light-mode #rpModal.rpBonusTapModal[open]{box-sizing:border-box;display:
 @media(max-height:670px){#rpModal.rpBonusTapModal{padding:9px 11px}#rpModal.rpBonusTapModal header{height:33px;min-height:33px;margin-bottom:3px}#rpModal.rpBonusTapModal #rpClose{width:34px;height:34px;min-height:34px}#rpModal.rpBonusTapModal .rpBonusTapLabel{margin:2px 0 5px}#rpModal.rpBonusTapModal .rpTriggerButtons{gap:5px}#rpModal.rpBonusTapModal .rpTriggerButtons button{min-height:42px}#rpModal.rpBonusTapModal .rpBonusTapGameLabel{margin-top:6px;margin-bottom:0}#rpModal.rpBonusTapModal .rpBonusTapValue{font-size:42px;padding:4px 0 6px}#rpModal.rpBonusTapModal .rpBonusTapAdd button{min-height:61px}#rpModal.rpBonusTapModal .rpBonusTapAdd button[data-rp-gadd="1"]{min-height:66px}#rpModal.rpBonusTapModal .rpBonusTapUndo{min-height:37px;margin-top:5px}#rpModal.rpBonusTapModal #rpSubmit{min-height:57px!important;margin-top:7px}}
 @media(max-height:570px){#rpModal.rpBonusTapModal .rpTriggerButtons button{min-height:39px}#rpModal.rpBonusTapModal .rpBonusTapValue{padding:1px 0 3px;font-size:38px}#rpModal.rpBonusTapModal .rpBonusTapAdd button[data-rp-gadd="1"]{min-height:60px}#rpModal.rpBonusTapModal .rpBonusTapAdd button{min-height:58px}#rpModal.rpBonusTapModal #rpSubmit{min-height:52px!important}#rpModal.rpBonusTapModal .rpBonusTapUndo{min-height:34px}}
 </style>
+<style id="jp-v126-fixes">
+
+/* Ver.1.2.6: scoped iPhone alignment and date containment. */
+#section-record #rpTabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;min-width:0;max-width:100%;box-sizing:border-box}
+#section-record #rpTabs button{min-width:0;width:100%;box-sizing:border-box;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;margin:0!important;padding:8px 2px!important;line-height:1.3!important;white-space:normal}
+#section-record .rpStartStage,#section-record #rpFlowStart,#section-record .rpStartStage .rpFlowGrid,#section-record .rpStartStage .rpFlowGrid label{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+#section-record .rpStartStage input[type="date"]{display:block!important;min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;overflow:clip!important;-webkit-appearance:none;appearance:none;padding-inline:8px!important;margin-inline:0!important;font-size:16px!important}
+#section-record .rpStartStage input[type="date"]::-webkit-date-and-time-value{min-width:0;text-align:left}
+#section-record .rpStartStage input[type="date"]::-webkit-calendar-picker-indicator{margin:0;flex-shrink:0}
+/* iOS Safari modal: center with inset and automatic margins rather than 50% transform. */
+body.rp-light-mode #rpModal.rpBonusTapModal[open]{position:fixed!important;inset:0!important;left:0!important;right:0!important;top:0!important;bottom:0!important;margin:auto!important;transform:none!important;box-sizing:border-box!important;width:min(440px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;min-width:0!important;height:fit-content!important;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 12px)!important;overflow:hidden!important}
+@supports not (height:100dvh){body.rp-light-mode #rpModal.rpBonusTapModal[open]{max-height:calc(100vh - 24px)!important}}
+#section-record .rpMyPlaySummary{font-size:11px!important;line-height:1.4!important;color:#526580!important;margin:0 0 12px!important;font-weight:600}
+#section-record .rpKpi b.is-unknown{font-size:clamp(13px,3.8vw,19px)!important;letter-spacing:-.03em;white-space:nowrap}
+@media(max-width:360px){#section-record #rpTabs{gap:4px!important}#section-record #rpTabs button{font-size:11px!important;padding-inline:1px!important}}
+</style>
 </head>
 <body class="start-active menu-active">
-<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.5｜実戦入力UI改修・隔離QA版</div>
+<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.6｜実機QA指摘修正・隔離QA版</div>
 <div id="startScreen" class="start-screen jp-title-screen">
   <button id="startEnter" class="start-enter jp-title-button" aria-label="ジャグラーポケットのメインメニュー画面へ進む">
     <span class="jp-title-figure">
@@ -3407,9 +3423,41 @@ function seatFlowScreen(){const d=day();if(!d)return startFlowScreen();
  <label>着席時 BIG（任意）<input name="big" type="number" inputmode="numeric" min="0" step="1" value="" placeholder="未確認なら空欄"></label>
  <label>着席時 REG（任意）<input name="reg" type="number" inputmode="numeric" min="0" step="1" value="" placeholder="未確認なら空欄"></label>
  <label class="rpSpan2">ボーナス後G（任意）<input name="current" type="number" inputmode="numeric" min="0" step="1" value="" placeholder="未確認なら空欄"></label>
- </div><p class="rpSeatHint">総Gは必須です。BIG・REG・ボーナス後Gは未確認なら空欄で着席できます。0Gは「0」を入力してください。</p><button type="submit" class="rpFlowSubmit rpSeatSubmit">着席</button></form></div>`;
+ </div><p class="rpSeatHint">総Gは必須です。BIG・REG・ボーナス後Gは未確認なら空欄で着席できます。0G未稼働では空欄のB・R・ボーナス後Gを自動0として記録（明示0と区別）。カウンターリセットの疑いがある場合は、当選回数を確認してください。</p><button type="submit" class="rpFlowSubmit rpSeatSubmit">着席</button></form></div>`;
 }
-function seatFromFlow(v){const d=day();if(!d)throw Error('実戦日がありません。');if(d.closed)throw Error('終了済みの実戦日には新しい台を追加できません。');const table=String(v.table||'').trim();if(!table)throw Error('台番号を入力してください。');if(!Object.hasOwn(names,String(v.machine)))throw Error('機種が不正です。');const seatKnown={big:v.big!=='',reg:v.reg!=='',current:v.current!==''};const seatData={total:number(v.total,'総G'),big:number(v.big,'BIG',true)??0,reg:number(v.reg,'REG',true)??0,current:number(v.current,'ボーナス後G',true)??0,time:timeNow(),inputKnown:seatKnown};if(seatData.current>seatData.total)throw Error('ボーナス後Gは総G以下で入力してください。');
+// Ver.1.2.6: distinguish confirmed zero-start defaults from explicit input and unknown values.
+// A 0G counter with existing bonus evidence can indicate a reset: never infer missing counts then.
+function rpSeatValues(v,existing=null){
+ const total=number(v.total,'総G');
+ const raw={big:String(v.big??''),reg:String(v.reg??''),current:String(v.current??'')};
+ const table=String(v.table||existing?.table||'').trim();
+ const possibleReset=total===0&&(Number(raw.big)>0||Number(raw.reg)>0||
+  (existing&&(existing.seat?.total>0||((existing.bonuses||[]).length>0&&['big','reg','current'].some(k=>existing.seat.inputKnown?.[k]===false))))||
+  (!!day()&&day().sessions.some(other=>other.id!==existing?.id&&other.table===table&&other.machine===v.machine&&
+    (other.seat.total>0||other.seat.big>0||other.seat.reg>0||(other.bonuses||[]).length>0))));
+ const assumedZero=total===0&&!possibleReset;
+ const inputKnown={},inputOrigin={},values={};
+ for(const name of ['big','reg','current']){
+  if(raw[name]!==''){
+   values[name]=number(raw[name],name==='current'?'ボーナス後G':name.toUpperCase());
+   inputKnown[name]=true;inputOrigin[name]='explicit';
+  }else if(assumedZero){
+   values[name]=0;inputKnown[name]=true;inputOrigin[name]='auto-zero-start';
+  }else{
+   values[name]=0;inputKnown[name]=false;inputOrigin[name]='unknown';
+  }
+ }
+ const seatData={total,big:values.big,reg:values.reg,current:values.current,
+  inputKnown,inputOrigin,time:existing?.seat?.time||timeNow()};
+ if(seatData.current>seatData.total)throw Error('ボーナス後Gは総G以下で入力してください。');
+ return seatData;
+}
+function rpSeatEditValue(s,name){
+ if(!s)return '';
+ if(s.seat.inputKnown?.[name]===false||s.seat.inputOrigin?.[name]==='auto-zero-start')return '';
+ return s.seat[name];
+}
+function seatFromFlow(v){const d=day();if(!d)throw Error('実戦日がありません。');if(d.closed)throw Error('終了済みの実戦日には新しい台を追加できません。');const table=String(v.table||'').trim();if(!table)throw Error('台番号を入力してください。');if(!Object.hasOwn(names,String(v.machine)))throw Error('機種が不正です。');const seatData=rpSeatValues(v);
  const cashAmount=v.cashK?kyen(v.cashK,'初期投資'):0;
  const cashMedals=number(v.cashMedals??'','現金貸出枚数',true)??0;
  const withdrawMedals=number(v.withdrawMedals??'','貯メダル使用',true)??0;
@@ -3424,7 +3472,7 @@ function seatFromFlow(v){const d=day();if(!d)throw Error('実戦日がありま�
  currentSession=x.id;flowMode='live';});return ok;
 }
 
-function seat(existing=null){const s=existing;form(s?'着席情報を編集':'🎰 台に着席',select('機種','machine',Object.entries(names),s?.machine||rpStartMachine||'neo')+field('その他の正式機種名（任意）','customName',s?.customName||'','text',false)+field('台番号','table',s?.table||'','text')+field('着席時 総回転数','total',s?.seat.total??0)+field('着席時 BIG回数（任意）','big',s?(s.seat.inputKnown?.big===false?'':s.seat.big):'', 'number',false)+field('着席時 REG回数（任意）','reg',s?(s.seat.inputKnown?.reg===false?'':s.seat.reg):'', 'number',false)+field('着席時 ボーナス後G（任意）','current',s?(s.seat.inputKnown?.current===false?'':s.seat.current):'', 'number',false)+field('着席理由・メモ','memo',s?.memo||'','text',false),v=>commit(()=>{const seatData={total:number(v.total,'総G'),big:number(v.big,'BIG',true)??0,reg:number(v.reg,'REG',true)??0,current:number(v.current,'現在G',true)??0,inputKnown:{big:v.big!=='',reg:v.reg!=='',current:v.current!==''},time:s?.seat.time||timeNow()};if(seatData.current>seatData.total)throw Error('現在Gは総回転数以下で入力してください。');if(!s&&day().sessions.some(s=>s.exitG==null))throw Error('現在の台をヤメてから着席してください。');if(s){grapeRequireSafeSeatEdit(s,{...seatData,machine:v.machine});if(s.gameEvents.length===0&&s.bonuses.length===0&&s.counterSegments.length===1&&(s.grapeCounter?.segments||[]).every(z=>z.status==='running'&&z.grapes===0&&(z.startG===0||z.startG==null)))s.counterSegments[0].startCounterG=seatData.current;const machineChanged=s.machine!==v.machine;s.seat=seatData;s.machine=v.machine;if(machineChanged)s.model=model({machine:s.machine});s.customName=v.customName;s.table=v.table;s.memo=v.memo;}else{const x={id:uid(),machine:v.machine,customName:v.customName,table:v.table,seat:seatData,bonuses:[],gameEvents:[],counterSegments:[{id:uid(),startCounterG:seatData.current,reason:'seat'}],calcState:{status:'confirmed'},currentG:0,exitG:null,memo:v.memo};x.model=model(x);day().sessions.push(x);grapeStart(x);const transfer=day().events.filter(e=>e.type==='transfer'&&!e.toSessionId).at(-1);if(transfer)transfer.toSessionId=x.id;currentSession=x.id;}day().closed=false;}));}
+function seat(existing=null){const s=existing;form(s?'着席情報を編集':'🎰 台に着席',select('機種','machine',Object.entries(names),s?.machine||rpStartMachine||'neo')+field('その他の正式機種名（任意）','customName',s?.customName||'','text',false)+field('台番号','table',s?.table||'','text')+field('着席時 総回転数','total',s?.seat.total??0)+field('着席時 BIG回数（任意）','big',rpSeatEditValue(s,'big'), 'number',false)+field('着席時 REG回数（任意）','reg',rpSeatEditValue(s,'reg'), 'number',false)+field('着席時 ボーナス後G（任意）','current',rpSeatEditValue(s,'current'), 'number',false)+field('着席理由・メモ','memo',s?.memo||'','text',false),v=>commit(()=>{const seatData=rpSeatValues(v,s);if(!s&&day().sessions.some(s=>s.exitG==null))throw Error('現在の台をヤメてから着席してください。');if(s){grapeRequireSafeSeatEdit(s,{...seatData,machine:v.machine});if(s.gameEvents.length===0&&s.bonuses.length===0&&s.counterSegments.length===1&&(s.grapeCounter?.segments||[]).every(z=>z.status==='running'&&z.grapes===0&&(z.startG===0||z.startG==null)))s.counterSegments[0].startCounterG=seatData.current;const machineChanged=s.machine!==v.machine;s.seat=seatData;s.machine=v.machine;if(machineChanged)s.model=model({machine:s.machine});s.customName=v.customName;s.table=v.table;s.memo=v.memo;}else{const x={id:uid(),machine:v.machine,customName:v.customName,table:v.table,seat:seatData,bonuses:[],gameEvents:[],counterSegments:[{id:uid(),startCounterG:seatData.current,reason:'seat'}],calcState:{status:'confirmed'},currentG:0,exitG:null,memo:v.memo};x.model=model(x);day().sessions.push(x);grapeStart(x);const transfer=day().events.filter(e=>e.type==='transfer'&&!e.toSessionId).at(-1);if(transfer)transfer.toSessionId=x.id;currentSession=x.id;}day().closed=false;}));}
 
 // Ver.1.2.5: a single compact tap-first UI for new self-play bonuses only.
 // These are UI-local values; persistent SCHEMA 2 bonus and game-event structures remain unchanged.
@@ -3572,8 +3620,9 @@ function render(){const d=day(),s=sess();el('rpNotice').textContent=storageBlock
  const medalValue=bal.value==null?'未確定':fmt(bal.value)+'枚';
  const medalLabel=bal.value==null?'G数・補正記録を要確認':'参考モデルに基づく推定・実測値ではありません';
  el('rpBody').innerHTML=`<div class="rpRecordStage"><div class="rpDayHeading"><div><span class="rpEyebrow">REAL PLAY / 実戦記録</span><b>${esc(d.date)}｜${esc(store()?.name||'ホール不明')}</b><strong>${esc(machineName(s))} <span>${esc(s.table)}番台</span></strong></div></div>
- <div class="rpKpiRow"><div class="rpKpi rpKpiGames"><span>台の総G</span><b>${trueTotal?fmt(seatG):'未確定'}</b><small>G</small></div><div class="rpKpi rpKpiBig"><span>BIG</span><b>${seatBigKnown?wholeB:'未確認'}</b><small>${trueTotal&&seatBigKnown?prob(seatG,wholeB):'算出保留'}</small></div><div class="rpKpi rpKpiReg"><span>REG</span><b>${seatRegKnown?wholeR:'未確認'}</b><small>${trueTotal&&seatRegKnown?prob(seatG,wholeR):'算出保留'}</small></div><div class="rpKpi rpKpiCombined"><span>合算</span><b>${trueTotal&&wholeKnown?prob(seatG,combined):'未確定'}</b><small>${wholeKnown?combined+'回':'回数未確認'}</small></div></div>
- <p class="rpFineNote">台全体の数値：着席前 B${seatBigKnown?s.seat.big:'未確認'} / R${seatRegKnown?s.seat.reg:'未確認'}・${fmt(s.seat.total)}Gを含む。自分の記録は ${fmt(st.g)}G / BIG ${selfB} / REG ${selfR}${st.gUnknown?'（未確定区間あり）':''}。</p>
+ <div class="rpKpiRow"><div class="rpKpi rpKpiGames"><span>台の総G</span><b>${trueTotal?fmt(seatG):'未確定'}</b><small>G</small></div><div class="rpKpi rpKpiBig"><span>BIG</span><b class="${seatBigKnown?'':'is-unknown'}">${seatBigKnown?wholeB:'未確認'}</b><small>${trueTotal&&seatBigKnown?prob(seatG,wholeB):'算出保留'}</small></div><div class="rpKpi rpKpiReg"><span>REG</span><b class="${seatRegKnown?'':'is-unknown'}">${seatRegKnown?wholeR:'未確認'}</b><small>${trueTotal&&seatRegKnown?prob(seatG,wholeR):'算出保留'}</small></div><div class="rpKpi rpKpiCombined"><span>合算</span><b>${trueTotal&&wholeKnown?prob(seatG,combined):'未確定'}</b><small>${wholeKnown?combined+'回':'回数未確認'}</small></div></div>
+ <p class="rpMyPlaySummary">自分の実戦：${st.gUnknown?'未確定':fmt(st.g)+'G'} ｜ BIG ${selfB}回 ｜ REG ${selfR}回</p>
+  <p class="rpFineNote">台全体：着席時 ${fmt(s.seat.total)}G・BIG ${seatBigKnown?s.seat.big+'回':'未確認'}・REG ${seatRegKnown?s.seat.reg+'回':'未確認'}${s.seat.inputOrigin?.big==='auto-zero-start'||s.seat.inputOrigin?.reg==='auto-zero-start'?'（0G未稼働として自動0）':''}。不明な回数を0とみなしません。</p>
  <section class="rpMedalHero" aria-label="推定持ちメダル"><div class="rpMedalTitle">現在の推定持ちメダル <span>推定値</span></div><div class="rpMedalValue">${medalValue}</div><div class="rpMedalMeta"><div><span>前回記録比</span><b class="${delta!=null&&delta>0?'is-up':delta!=null&&delta<0?'is-down':''}">${rpSigned(delta)}</b></div><div><span>推定最高</span><b>${bal.peak==null?'未確定':fmt(bal.peak)+'枚'}</b></div></div><p class="rpFineNote">${medalLabel}</p></section>
  <div class="rpBonusPrimary"><button data-rp-action="big" ${s.exitG!=null?'disabled':''}>＋ BIG</button><button data-rp-action="reg" ${s.exitG!=null?'disabled':''}>＋ REG</button></div>
  <div class="rpQuickTools"><button data-rp-action="cash" ${s.exitG!=null?'disabled':''}>💴 ＋投資を記録</button><button data-rp-action="correction" ${s.exitG!=null?'disabled':''}>🪙 持ちメダル実績補正</button></div>
