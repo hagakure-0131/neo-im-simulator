@@ -1490,7 +1490,7 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 @media(min-width:620px){.jp-v118-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.jp-v118-photo{height:154px}.jp-v118-filters{grid-template-columns:2fr 2fr 1.5fr;align-items:end}.jp-v118-hero .jp-v118-photo{width:180px;height:205px}}
 @media(max-width:340px){.jp-v118-photo{height:104px}.jp-v118-info strong{font-size:12px}.jp-v118-open{padding:6px}}
 </style>
-<meta name="jagpoke-version" content="1.2.10 QA">
+<meta name="jagpoke-version" content="1.2.12 QA | PM-011 settlement preview only">
 <style id="jp-v1210-pm005-006">
 /* PM-006: ascending visual button sizing across left-to-right 100 / 10 / 1; same heights/fonts. */
 #rpModal.rpBonusTapModal .rpBonusTapAdd{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,2fr)!important}
@@ -1513,6 +1513,26 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 #section-record .rpCashEntryActions [data-rp-cash-cancel]{background:#fff3f2;border:1px solid #e7b7b0;color:#912e2a}
 #section-record .rpCashAudit{width:100%;font-size:11px;color:#52647b;white-space:pre-wrap;overflow-wrap:anywhere}
 </style>
+<style id="jp-v1211-pm008">
+/* PM-008: The entire native <summary> card toggles the existing cash ledger.
+   No new events, save fields, JS listeners or calculation changes. */
+#section-record details.rpCashLedgerUnified{display:block;border:0;background:transparent;padding:0;margin:6px 0 12px;min-width:0;max-width:100%;box-sizing:border-box}
+#section-record details.rpCashLedgerUnified > summary.rpCashSummaryTap{display:block;box-sizing:border-box;list-style:none;width:100%;max-width:100%;min-width:0;margin:0;padding:10px 13px;border:1px solid #cbdced;border-radius:13px;background:#f5f9ff;cursor:pointer;user-select:none;-webkit-tap-highlight-color:rgba(25,66,113,.08);touch-action:manipulation;text-align:left;min-height:85px}
+#section-record details.rpCashLedgerUnified > summary.rpCashSummaryTap::-webkit-details-marker{display:none}
+#section-record .rpCashSummaryHeading{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+#section-record .rpCashSummaryHeading small{font-size:12px;font-weight:750;color:#3d5978;min-width:0}
+#section-record .rpCashSummaryArrow{display:inline-flex;align-items:center;justify-content:center;font-size:26px;line-height:1;font-weight:500;color:#41658b;transition:transform .16s ease;flex:none}
+#section-record details.rpCashLedgerUnified[open] .rpCashSummaryArrow{transform:rotate(90deg)}
+#section-record .rpCashSummaryAmount{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;min-width:0}
+#section-record .rpCashSummaryAmount strong{display:inline-block;font-size:24px;line-height:1.25;font-weight:850;color:#15385f;font-variant-numeric:tabular-nums}
+#section-record .rpCashCount{font-size:12px;font-weight:750;color:#3e5976}
+#section-record .rpCashSummaryHint{display:block;font-size:11px;font-weight:600;color:#526c87;margin-top:2px}
+#section-record details.rpCashLedgerUnified > summary.rpCashSummaryTap:focus-visible{outline:3px solid #3981c6;outline-offset:3px}
+#section-record details.rpCashLedgerUnified > summary.rpCashSummaryTap:active{background:#e8f2ff}
+#section-record .rpCashLedgerItems{margin-top:7px;border:1px solid #dce5ef;border-radius:12px;background:#fff;padding:5px 10px 10px;min-width:0;overflow-wrap:anywhere}
+@media(max-width:340px){#section-record .rpCashSummaryAmount strong{font-size:22px}#section-record details.rpCashLedgerUnified > summary.rpCashSummaryTap{padding:9px 11px}}
+</style>
+
 <style id="jp-v125-realplay-ui">
 /* Ver.1.2.6 QA: five scoped real-play fixes. Existing SCHEMA 2/save key unaffected. */
 #section-record .rpStartStage, #section-record .rpFlowGrid, #section-record .rpFlowGrid label {min-width:0;max-width:100%;box-sizing:border-box}
@@ -1602,9 +1622,45 @@ body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutWarning{border-color:#e5b
 @media(max-height:600px){body.rp-light-mode #rpModal.rpCheckoutModal #rpSubmit{min-height:52px!important;}body.rp-light-mode #rpModal.rpBonusTapModal[open]{padding:8px!important;}}
 </style>
 
+<style id="jp-pm011-settlement-preview-ui">
+/* PM-011: read-only settlement calculator, never writes the production SCHEMA2 root. */
+#section-record .rpSettlementLink{width:100%;margin:8px 0 11px;min-height:48px;border:1px solid #9ec6ef;border-radius:13px;background:#f0f7ff;color:#17446f;font-weight:800;font-size:14px;box-sizing:border-box}
+#section-record .rpSettlementPreview{max-width:560px;width:100%;margin:8px auto 24px;box-sizing:border-box;padding:0 1px;color:#1a324c}
+#section-record .rpSettlementPreview *{box-sizing:border-box;min-width:0}
+#section-record .rpSettlementTag{margin:4px 0 10px;padding:10px 12px;border:1px solid #f0cc80;border-radius:12px;background:#fff8ea;color:#66480b;font-size:13px;font-weight:700;line-height:1.5}
+#section-record .rpSettlementStepHead{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:8px 0 7px}
+#section-record .rpSettlementStepHead h2{font-size:20px;line-height:1.3;margin:0;color:#182e49}
+#section-record .rpSettlementStepHead span{font-size:12px;color:#536b85;white-space:nowrap;font-weight:700}
+#section-record .rpSettlementProgress{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:7px 0 15px}
+#section-record .rpSettlementProgress i{display:block;height:5px;border-radius:9px;background:#d8e3f0}
+#section-record .rpSettlementProgress i.is-current{background:#1c68b2}
+#section-record .rpSettlementCard{background:#fff;border:1px solid #d5e1ef;border-radius:15px;padding:14px 13px;margin:10px 0;box-shadow:0 2px 6px rgba(30,56,80,.04)}
+#section-record .rpSettlementCard h3{font-size:16px;color:#1d3e63;margin:0 0 9px}
+#section-record .rpSettlementCard label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:#445e79;font-weight:700;margin:9px 0}
+#section-record .rpSettlementCard input,#section-record .rpSettlementCard select{display:block;width:100%;min-width:0;max-width:100%;min-height:44px;border:1px solid #becfe2;background:#fff;border-radius:10px;padding:9px 11px;color:#1a324c;font:inherit;font-size:16px}
+#section-record .rpSettlementCard p{font-size:13px;color:#536782;line-height:1.6;margin:8px 0}
+#section-record .rpSettlementCard strong{color:#1b426d}
+#section-record .rpSettlementGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#section-record .rpSettlementGrid>div{padding:10px;background:#f6f9fd;border-radius:11px}
+#section-record .rpSettlementGrid span{display:block;font-size:11px;color:#526b86}
+#section-record .rpSettlementGrid b{font-size:20px;display:block;margin-top:3px;overflow-wrap:anywhere}
+#section-record .rpSettlementCard .rpSettlementItem{border-top:1px solid #e0e8f3;padding:9px 0}
+#section-record .rpSettlementCard .rpSettlementItem:first-of-type{border-top:none}
+#section-record .rpSettlementActions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+#section-record .rpSettlementActions button{flex:1 1 120px;min-height:46px;padding:11px 8px;border:1px solid #a9c6df;border-radius:11px;background:#eaf3fd;color:#17466d;font-size:14px;font-weight:800}
+#section-record .rpSettlementActions button.rpSettlementPrimary{background:#19599d;color:#fff;border-color:#19599d}
+#section-record .rpSettlementActions button:disabled{opacity:.45;cursor:not-allowed}
+#section-record .rpSettlementAlert{padding:10px 11px;border-radius:11px;background:#fff4e7;color:#704522;border:1px solid #efd2ad;line-height:1.55;font-size:13px;margin:9px 0}
+#section-record .rpSettlementOK{padding:10px 11px;border-radius:11px;background:#eef8f1;color:#26613b;border:1px solid #cae4d0;font-size:13px;line-height:1.55;margin:9px 0}
+#section-record .rpSettlementLine{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #e9eff5;font-size:13px}
+#section-record .rpSettlementLine b{text-align:right;overflow-wrap:anywhere}
+#section-record .rpSettlementLine.rpSettlementTotal{font-size:17px;color:#123e6c}
+#section-record .rpSettlementNavBack{margin:0 0 10px;font-size:13px}
+@media(max-width:360px){#section-record .rpSettlementPreview .rpSettlementCard{padding:11px 10px}#section-record .rpSettlementStepHead h2{font-size:18px}#section-record .rpSettlementGrid b{font-size:18px}}
+</style>
 </head>
 <body class="start-active menu-active">
-<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.10｜投資履歴・ボーナスUI統合QA版</div>
+<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.12｜最終精算UI試作・保存なし QA版</div>
 <div id="startScreen" class="start-screen jp-title-screen">
   <button id="startEnter" class="start-enter jp-title-button" aria-label="ジャグラーポケットのメインメニュー画面へ進む">
     <span class="jp-title-figure">
@@ -3741,10 +3797,10 @@ function cashChangeNote(kind,before,after){const at=dateNow()+' '+timeNow()+' JS
 function cashAuditDetails(e){const memo=String(e.memo||'');const hasAudit=memo.includes('【現金投資訂正')||memo.includes(CASH_CANCEL_MARK);return hasAudit?'<details class="rpCashAudit"><summary>訂正・取消履歴</summary>'+esc(memo).replace(/\n/g,'<br>')+'</details>':'';}
 function cashLedger(d,s){
  const entries=d.events.filter(e=>e.type==='cash').slice().sort((a,b)=>a.seq-b.seq),t=totals(d),mine=entries.filter(e=>e.sessionId===s?.id).reduce((sum,e)=>sum+e.amount,0);
- const heading='<div class="rpCashSummary"><small>本日の現金投資額'+(d.sessions.length>1?'（全台合計）':'')+'</small><strong>'+fmt(t.investment)+'円</strong>'+(d.sessions.length>1?'<small>この台の現金投資：'+fmt(mine)+'円</small>':'')+'</div>';
+ const heading='<summary class="rpCashSummary rpCashSummaryTap"><span class="rpCashSummaryHeading"><small>本日の現金投資額'+(d.sessions.length>1?'（全台合計）':'')+'</small><span class="rpCashSummaryArrow" aria-hidden="true">›</span></span><span class="rpCashSummaryAmount"><strong>'+fmt(t.investment)+'円</strong><span class="rpCashCount">'+entries.length+'件</span></span>'+(d.sessions.length>1?'<small>この台の現金投資：'+fmt(mine)+'円</small>':'')+'<span class="rpCashSummaryHint">履歴の確認・訂正</span></summary>';
  const rows=entries.map((e,i)=>{const session=d.sessions.find(z=>z.id===e.sessionId),cancelled=cashCancelled(e),where=session?esc(machineName(session))+'｜'+esc(session.table)+'番台':'台未指定';
  return '<div class="rpCashEntry'+(cancelled?' is-cancelled':'')+'"><div class="rpCashEntryMain"><strong>'+(cancelled?'取消済み（集計対象外）':fmt(e.amount)+'円')+'</strong><small>記録'+(i+1)+'｜'+where+'｜貸出 '+fmt(e.medals)+'枚</small>'+cashAuditDetails(e)+'</div><div class="rpCashEntryActions">'+(cancelled?'':'<button type="button" data-rp-cash-edit="'+esc(e.id)+'">訂正</button><button type="button" data-rp-cash-cancel="'+esc(e.id)+'">取消</button>')+'</div></div>';}).join('');
- return heading+'<details class="rpCashLedger"><summary>投資履歴を確認・訂正（'+entries.length+'件）</summary>'+(rows||'<p class="small">投資記録はありません。</p>')+'</details>';
+ return '<details class="rpCashLedger rpCashLedgerUnified">'+heading+'<div class="rpCashLedgerItems">'+(rows||'<p class="small">投資記録はありません。</p>')+'</div></details>';
 }
 function cashCancelSafe(id){
  const d=day(),e=d?.events.find(z=>z.id===id&&z.type==='cash');
@@ -3826,9 +3882,135 @@ function rpHistoryDay(d){
  <button data-rp-deleteday="${esc(d.id)}" class="rpDangerAction">この実戦日を削除</button>
  </article>`;
 }
+
+// PM-011 Phase 1: read-only, in-memory preview. NO commit/persist/safeSave/event creation.
+let rpSettlementDraft={step:1,dayId:null,demo:false,receipts:[{id:'preview-1',medals:null,source:'manual'}],prizeQty:null,medalsPerPrize:null,faceValue:null,deposit:null,other:null,recovery:null,usedStoreRate:false};
+const rpSNumber=x=>x==null||x===''?null:(Number.isSafeInteger(Number(x))&&Number(x)>=0&&Number(x)<=1e9?Number(x):null);
+const rpSMoney=v=>v==null?'未確認':fmt(v)+'円';
+const rpSMedals=v=>v==null?'未確認':fmt(v)+'枚';
+function rpSettlementData(){
+ if(rpSettlementDraft.demo)return {date:'2026-10-24',id:'synthetic-preview',storeId:'synthetic-store',name:'キコーナキセラ川西店（合成例）',tables:['829'],investment:3000,recoveryExisting:null,rate:53,refReceipt:{medals:723,table:'829',sessionId:'synthetic-session'},sessionCount:1,isDemo:true};
+ const d=data.days.find(z=>z.id===rpSettlementDraft.dayId);
+ if(!d)return null;
+ const st=data.stores.find(z=>z.id===d.storeId);
+ const confirmed=d.sessions.filter(s=>s.exitMeasurement&&s.exitMeasurement.quality==='measured'&&s.exitMeasurement.scope==='single-session-receipt');
+ const ref=(d.sessions.length===1&&confirmed.length===1&&rpMeasurementSafe(d,confirmed[0]))?{medals:confirmed[0].exitMeasurement.medals,table:confirmed[0].table,sessionId:confirmed[0].id}:null;
+ return {date:d.date,id:d.id,storeId:d.storeId,name:st?.name||'店舗未確認',tables:d.sessions.map(s=>s.table),investment:totals(d).investment,recoveryExisting:d.events.some(e=>e.type==='exchange')?totals(d).recovery:null,rate:st?.exchange,refReceipt:ref,sessionCount:d.sessions.length,isDemo:false};
+}
+function rpSettlementReset(){rpSettlementDraft={step:1,dayId:data.days.at(-1)?.id||null,demo:false,receipts:[{id:'preview-1',medals:null,source:'manual'}],prizeQty:null,medalsPerPrize:null,faceValue:null,deposit:null,other:null,recovery:null,usedStoreRate:false};}
+function rpSettlementOpen(){rpSettlementReset();tab='settlement-preview';flowMode='live';render();}
+function rpSettlementInput(name,val){
+ if(!Object.hasOwn(rpSettlementDraft,name))return;
+ if(['prizeQty','medalsPerPrize','faceValue','deposit','other','recovery'].includes(name)){
+  rpSettlementDraft[name]=rpSNumber(val);return;
+ }
+}
+function rpSettlementComputed(){
+ const a=rpSettlementDraft,r=rpSettlementData();
+ const measured=a.receipts.length&&a.receipts.every(z=>z.medals!==null&&Number.isSafeInteger(z.medals))?a.receipts.reduce((t,z)=>t+z.medals,0):null;
+ const used=a.prizeQty===0?0:a.prizeQty!=null&&a.medalsPerPrize!=null?a.prizeQty*a.medalsPerPrize:null;
+ const face=a.prizeQty===0?0:a.prizeQty!=null&&a.faceValue!=null?a.prizeQty*a.faceValue:null;
+ const depositCandidate=measured!=null&&used!=null?measured-used:null;
+ const unknown=measured!=null&&used!=null&&a.deposit!=null&&a.other!=null?measured-used-a.deposit-a.other:null;
+ return {measured,used,face,depositCandidate,unknown,net:r&&a.recovery!=null?a.recovery-r.investment:null};
+}
+function rpSNumInput(label,name,val,extra=''){
+ return `<label>${label}<input type="number" inputmode="numeric" min="0" step="1" max="1000000000" data-rp-settlement-field="${name}" value="${val==null?'':val}" placeholder="未入力＝未確認" ${extra}></label>`;
+}
+function rpSButton(label,action,cls=''){
+ return `<button type="button" class="${cls}" data-rp-settlement-action="${action}">${label}</button>`;
+}
+function rpSettlementView(){
+ const a=rpSettlementDraft,d=rpSettlementData(),c=rpSettlementComputed(),x=esc;
+ const steps=['対象確認','計測レシート','景品交換','預入・現金回収','最終照合'];
+ let body='';
+ if(a.step===1){
+  const options=data.days.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(day=>{const st=data.stores.find(v=>v.id===day.storeId);return `<option value="${x(day.id)}" ${a.dayId===day.id&&!a.demo?'selected':''}>${x(day.date)}｜${x(st?.name||'店舗不明')}（${day.sessions.length}台）</option>`;}).join('');
+  body=`<section class="rpSettlementCard"><h3>対象の日付・店舗</h3><p>実戦日×店舗で確認します。保存済みの実戦データは読み取るだけで、変更しません。</p>
+  <label>実戦日・店舗<select data-rp-settlement-day="1"><option value="">選択してください</option>${options}<option value="__synthetic__" ${a.demo?'selected':''}>【合成サンプル】2026/10/24 キコーナキセラ川西店</option></select></label>
+  ${d?`<div class="rpSettlementGrid"><div><span>台数</span><b>${d.sessionCount}台</b></div><div><span>有効な現金投資</span><b>${rpSMoney(d.investment)}</b></div></div><p>機種・台番号：${x(d.tables.join('・')||'未登録')}</p>`:'<div class="rpSettlementAlert">まだ実戦日を選択できていません。保存済みデータがない場合は合成サンプルで操作を確認できます。</div>'}
+  </section>`;
+ }else if(a.step===2){
+  body=`<section class="rpSettlementCard"><h3>計測枚数・レシート</h3><p>実測値を入力します。空欄は未確認、0は実測0です。台をまたぐ計測は特定の台へ自動配分しません。</p>
+  ${d?.refReceipt?`<div class="rpSettlementOK">既存の${x(d.refReceipt.table)}番台：実測${fmt(d.refReceipt.medals)}枚（単一台レシート）。確認して試算へ取り込めます。${rpSButton('参照値を取り込む','use-existing')}</div>`:d?.sessionCount>1?'<div class="rpSettlementAlert">複数台の記録です。既存の台別計測を自動合算しません。日別レシートの実測値を別途確認してください。</div>':''}
+  ${a.receipts.map((r,i)=>`<div class="rpSettlementItem"><b>レシート ${i+1} ${r.source==='existing'?'（既存参照・確認済み）':''}</b><label>実測枚数<input type="number" inputmode="numeric" min="0" step="1" max="1000000000" data-rp-settlement-receipt="${i}" value="${r.medals==null?'':r.medals}" placeholder="未入力＝未確認"></label>${a.receipts.length>1?rpSButton('この入力欄を外す','remove-receipt-'+i):''}</div>`).join('')}
+  <div class="rpSettlementActions">${rpSButton('＋ レシートを追加','add-receipt')}</div>
+  <p>※レシート識別・複数台の正式な紐付けは第2段階で設計審査後に実装します。ここでの入力は保存されません。</p></section>`;
+ }else if(a.step===3){
+  body=`<section class="rpSettlementCard"><h3>景品交換</h3><p>景品個数と交換条件を入力します。店舗設定は参考表示であり、過去の精算レートとして自動確定しません。</p>
+  ${d?.rate!=null?`<div class="rpSettlementOK">現行の店舗設定：${fmt(d.rate)}枚／1,000円（過去の適用条件は要確認）</div>`:''}
+  ${rpSNumInput('景品交換数（個）','prizeQty',a.prizeQty)}${rpSNumInput('1個に使用する枚数','medalsPerPrize',a.medalsPerPrize)}${rpSNumInput('景品1個の額面（円）','faceValue',a.faceValue)}
+  <div class="rpSettlementGrid"><div><span>交換使用枚数・計算候補</span><b>${rpSMedals(c.used)}</b></div><div><span>額面相当・候補</span><b>${rpSMoney(c.face)}</b></div></div>
+  <p>実際の現金回収額は次工程で別に入力します。</p></section>`;
+ }else if(a.step===4){
+  body=`<section class="rpSettlementCard"><h3>カード預入・現金回収</h3><div class="rpSettlementGrid"><div><span>計測合計（実測）</span><b>${rpSMedals(c.measured)}</b></div><div><span>交換後の残り・候補</span><b>${rpSMedals(c.depositCandidate)}</b></div></div>
+  <p>差額が34枚でも、実際にカードへ預けたことが未確認なら、預入枚数は空欄のままにしてください。</p>
+  ${rpSNumInput('カード預入枚数（実測）','deposit',a.deposit)}${rpSNumInput('その他の確認済み使途（枚）','other',a.other)}${rpSNumInput('現金回収の実額（円）','recovery',a.recovery)}
+  <div class="rpSettlementOK">既存の現金回収記録：${rpSMoney(d?.recoveryExisting??null)}（参照のみ・この試算で追加登録はしません）</div>
+  <div class="rpSettlementActions">${rpSButton('既存の現金回収額を入力候補にする','use-recovery')}</div>
+  <p>貯メダル残高、現金収支の正本、現金回収イベントは一切更新しません。</p></section>`;
+ }else{
+  const warnings=[];
+  if(c.measured===null)warnings.push('実測計測枚数が未確認');
+  if(c.used===null)warnings.push('景品交換条件が未確認');
+  if(a.deposit===null)warnings.push('カード預入実績が未確認');
+  if(a.other===null)warnings.push('その他使途が未確認');
+  if(a.recovery===null)warnings.push('現金回収実額が未確認');
+  if(c.unknown!=null&&c.unknown<0)warnings.push('計測枚数より使用枚数が多いため不一致');
+  if(c.unknown!=null&&c.unknown>0)warnings.push('使途未確認の端数が'+fmt(c.unknown)+'枚あります');
+  if(c.face!=null&&a.recovery!=null&&c.face!==a.recovery)warnings.push('景品額面の候補と現金回収実額の差：'+fmt(a.recovery-c.face)+'円');
+  body=`<section class="rpSettlementCard"><h3>試算結果と照合</h3>
+  <div class="rpSettlementLine"><span>計測枚数（実測値）</span><b>${rpSMedals(c.measured)}</b></div>
+  <div class="rpSettlementLine"><span>景品交換使用枚数（計算値）</span><b>${rpSMedals(c.used)}</b></div>
+  <div class="rpSettlementLine"><span>カード預入枚数（入力実績）</span><b>${rpSMedals(a.deposit)}</b></div>
+  <div class="rpSettlementLine"><span>その他確認済み使途</span><b>${rpSMedals(a.other)}</b></div>
+  <div class="rpSettlementLine"><span>未確認端数・差異</span><b>${c.unknown==null?'未確定':(c.unknown>0?fmt(c.unknown)+'枚（未確認）':c.unknown<0?fmt(c.unknown)+'枚（不一致）':'0枚')}</b></div>
+  <div class="rpSettlementLine"><span>景品額面相当（候補）</span><b>${rpSMoney(c.face)}</b></div>
+  <div class="rpSettlementLine"><span>現金投資（既存記録参照）</span><b>${rpSMoney(d?.investment??null)}</b></div>
+  <div class="rpSettlementLine"><span>現金回収（入力実績・未保存）</span><b>${rpSMoney(a.recovery)}</b></div>
+  <div class="rpSettlementLine rpSettlementTotal"><span>最終現金収支の試算</span><b>${c.net==null?'未確定':(c.net>0?'+':'')+fmt(c.net)+'円'}</b></div>
+  ${warnings.length?`<div class="rpSettlementAlert"><b>要確認（${warnings.length}項目）</b><ul>${warnings.map(w=>`<li>${x(w)}</li>`).join('')}</ul></div>`:'<div class="rpSettlementOK">入力上の数値は一致しています。ただしこれは試算であり、精算の確定・保存は行われていません。</div>'}
+  <p>※金額は計算候補です。実際の貯メダル・現金回収・収支残高に一切反映されません。</p></section>`;
+ }
+ return `<main class="rpSettlementPreview" aria-label="最終精算の保存なし試算"><div class="rpSettlementTag">🧪 Ver.1.2.12 検証用UI｜<b>試算のみ・保存しません</b>。入力内容は再読み込みで失われ、実戦記録・収支・貯メダル残高には反映されません。</div>
+ <div class="rpSettlementNavBack">${rpSButton('← 実戦履歴へ戻る','close')}</div>
+ <div class="rpSettlementStepHead"><h2>${steps[a.step-1]}</h2><span>${a.step} / 5</span></div><div class="rpSettlementProgress" aria-hidden="true">${steps.map((_,i)=>`<i class="${i+1<=a.step?'is-current':''}"></i>`).join('')}</div>
+ ${d?`<p class="rpFineNote">対象：${x(d.date)}｜${x(d.name)}${a.demo?'｜合成データ':''}</p>`:''}${body}
+ <div class="rpSettlementActions">${a.step>1?rpSButton('前へ','previous'):''}${a.step<5?rpSButton('次へ →','next','rpSettlementPrimary'):rpSButton('試算を終了（保存なし）','close','rpSettlementPrimary')}</div><p class="rpFineNote">PM-011 第1段階：日別精算の確定・下書き保存・取引生成は未実装です。</p></main>`;
+}
+function renderSettlementPreview(){if(storageBlocked){el('rpBody').innerHTML='<p class="rpSettlementAlert">保存記録の読み込みに問題があるため、正本データの参照を停止しました。既存データを削除しないでください。</p>'+rpSButton('実戦履歴へ戻る','close');return;}el('rpBody').innerHTML=rpSettlementView();}
+function rpSettlementHandleClick(e){
+ const open=e.target.closest('[data-rp-settlement-open]');if(open){e.preventDefault();rpSettlementOpen();return true;}
+ const button=e.target.closest('[data-rp-settlement-action]');if(!button)return false;
+ e.preventDefault();const act=button.dataset.rpSettlementAction,a=rpSettlementDraft,d=rpSettlementData();
+ if(act==='close'){tab='history';render();return true;}
+ if(act==='next'){if(a.step===1&&!d){alert('対象日・店舗を選択してください。');return true;}a.step=Math.min(5,a.step+1);}
+ if(act==='previous')a.step=Math.max(1,a.step-1);
+ if(act==='add-receipt'){a.receipts.push({id:'preview-'+(a.receipts.length+1)+'-'+Date.now(),medals:null,source:'manual'});}
+ if(act.startsWith('remove-receipt-')){const i=Number(act.slice(15));if(Number.isInteger(i)&&a.receipts.length>1)a.receipts.splice(i,1);}
+ if(act==='use-existing'&&d?.refReceipt){a.receipts=[{id:'preview-existing-'+d.refReceipt.sessionId,medals:d.refReceipt.medals,source:'existing'}];}
+ if(act==='use-recovery'&&d&&d.recoveryExisting!=null){a.recovery=d.recoveryExisting;}
+ renderSettlementPreview();return true;
+}
+function rpSettlementHandleChange(e){
+ if(e.target.matches('[data-rp-settlement-day]')){
+  const v=e.target.value;rpSettlementReset();if(v==='__synthetic__'){rpSettlementDraft.demo=true;rpSettlementDraft.dayId=null;}else rpSettlementDraft.dayId=v||null;
+  renderSettlementPreview();return;
+ }
+ if(e.target.matches('[data-rp-settlement-field]')){
+  rpSettlementInput(e.target.dataset.rpSettlementField,e.target.value);
+  // Keep focus and selection: do not redraw during editing.
+  return;
+ }
+ if(e.target.matches('[data-rp-settlement-receipt]')){
+  const i=Number(e.target.dataset.rpSettlementReceipt),r=rpSettlementDraft.receipts[i];if(r){r.medals=rpSNumber(e.target.value);r.source='manual';}
+ }
+}
+
 function render(){const d=day(),s=sess();el('rpNotice').textContent=storageBlocked?'保存データを読み込めません。元データを上書きせず停止しています。JSON原本の退避を行ってください。':'';
  el('rpTabs').innerHTML=[['live','実戦中'],['history','実戦履歴'],['analysis','収支分析']].map(([v,t])=>`<button data-rp-tab="${v}" aria-pressed="${tab===v}">${t}</button>`).join('');
- if(tab==='history'){el('rpBody').innerHTML=`<button data-rp-action="start">🎰 実戦開始</button><details class="rp-advanced"><summary>記録管理・削除</summary><p class="small">削除前に外部JSONを保存してください。</p><button data-rp-action="deleteAll" class="rpDangerAction">すべての実戦記録を削除</button></details>${data.days.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(rpHistoryDay).join('')||'<p>まだ実戦記録がありません。</p>'}`;return;}
+ if(tab==='settlement-preview'){renderSettlementPreview();return;}
+ if(tab==='history'){el('rpBody').innerHTML=`<button data-rp-action="start">🎰 実戦開始</button><button type="button" class="rpSettlementLink" data-rp-settlement-open="true">🧾 最終精算を試算する（保存なし） ›</button><details class="rp-advanced"><summary>記録管理・削除</summary><p class="small">削除前に外部JSONを保存してください。</p><button data-rp-action="deleteAll" class="rpDangerAction">すべての実戦記録を削除</button></details>${data.days.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(rpHistoryDay).join('')||'<p>まだ実戦記録がありません。</p>'}`;return;}
  if(tab==='analysis'){renderReport();return;}
  if(flowMode==='start'||!d){el('rpBody').innerHTML=startFlowScreen();return;}
  if(flowMode==='seat'){el('rpBody').innerHTML=seatFlowScreen();return;}
@@ -3847,6 +4029,7 @@ function render(){const d=day(),s=sess();el('rpNotice').textContent=storageBlock
  <section class="rpMedalHero" aria-label="推定持ちメダル"><div class="rpMedalTitle">現在の推定持ちメダル <span>推定値</span></div><div class="rpMedalValue">${medalValue}</div><div class="rpMedalMeta"><div><span>前回記録比</span><b class="${delta!=null&&delta>0?'is-up':delta!=null&&delta<0?'is-down':''}">${rpSigned(delta)}</b></div><div><span>推定最高</span><b>${bal.peak==null?'未確定':fmt(bal.peak)+'枚'}</b></div></div><p class="rpFineNote">${medalLabel}</p></section>
  <div class="rpBonusPrimary"><button data-rp-action="big" ${s.exitG!=null?'disabled':''}>＋ BIG</button><button data-rp-action="reg" ${s.exitG!=null?'disabled':''}>＋ REG</button></div>
  ${cashLedger(d,s)}
+ <button type="button" class="rpSettlementLink" data-rp-settlement-open="true">🧾 本日の最終精算を試算（保存なし） ›</button>
  <div class="rpQuickTools"><button data-rp-action="cash" ${s.exitG!=null?'disabled':''}>💴 ＋投資を記録</button><button data-rp-action="correction" ${s.exitG!=null?'disabled':''}>🪙 持ちメダル実績補正</button></div>
  <div class="rpMachineAction"><button data-rp-action="${s.exitG==null?'seatEdit':'seat'}">台選び・着席情報 <span aria-hidden="true">›</span></button></div>
  ${s.exitG!=null?rpMeasurementSummary(s)+`<button type="button" class="rpMeasureLaterButton" data-rp-action="measure">🧾 計測枚数を${s.exitMeasurement?'確認・修正':'あとから登録'}</button>`:''}
@@ -3931,7 +4114,7 @@ let rpSubmitting=false;el('rpForm').addEventListener('invalid',e=>{const p=el('j
 // Native close also handles × / Escape, respecting the existing unsaved-input guard.
 el('rpModal').addEventListener('close',()=>{const m=el('rpModal');const d=m.dataset.rpReceiptDay,t=m.dataset.rpReceiptSession;if(!d)return;requestAnimationFrame(()=>{if(!m.open&&m.dataset.rpReceiptDay===d)rpShowHistoryAfterExit(d,t);});});
 function editGameEvent(id){const s=sess(),e=s.gameEvents.find(x=>x.id===id);if(!e)return;if(e.type==='reset'){alert('リセット記録の訂正は現在、安全な再確認手順が未実装のため保留しています。');return;}form('G数更新を編集',field('ホール表示のボーナス後G','g',e.counterG),v=>commit(()=>{grapeTimelineGuard(s,()=>{e.counterG=number(v.g,'表示G');},'G数更新の編集');}));}
-function dispatch(e){const later=e.target.closest('[data-rp-measure-later]');if(later){rpMeasurementLater(later.dataset.rpMeasureLater==='move');return;}if(handleBonusTap(e))return;const quick=e.target.closest('[data-rp-cashamount]');if(quick){const formEl=el('rpForm');const fieldEl=formEl.elements.amount;const before=Number(fieldEl.value)||0;const v=quick.dataset.rpCashamount;const next=v==='clear'?0:Math.max(0,before+Number(v)/1000);fieldEl.value=next;const display=el('rpCashDisplay');if(display)display.textContent=next+'k';const medalEl=formEl.elements.medals;if(medalEl){if(v==='clear')medalEl.dataset.rpManual='0';if(store()&&medalEl.dataset.rpManual!=='1')medalEl.value=Math.round(next*store().loan);}jpSyncCashSubmit();return;}const grapeConfirmTarget=e.target.closest('[data-rp-grapeconfirm]');if(grapeConfirmTarget){grapeConfirm(grapeConfirmTarget.dataset.rpGrapeconfirm);return;}const target=e.target.closest('[data-rp-measure-day][data-rp-measure-session],[data-rp-open-session][data-rp-open-day],[data-rp-action],[data-rp-tab],[data-rp-bonus],[data-rp-openday],[data-rp-editbonus],[data-rp-deletebonus],[data-rp-cash-edit],[data-rp-cash-cancel],[data-rp-edittx],[data-rp-deletetx],[data-rp-editgame],[data-rp-deletegame],[data-rp-deleteday]');if(!target)return;const x=target.dataset;
+function dispatch(e){if(rpSettlementHandleClick(e))return;const later=e.target.closest('[data-rp-measure-later]');if(later){rpMeasurementLater(later.dataset.rpMeasureLater==='move');return;}if(handleBonusTap(e))return;const quick=e.target.closest('[data-rp-cashamount]');if(quick){const formEl=el('rpForm');const fieldEl=formEl.elements.amount;const before=Number(fieldEl.value)||0;const v=quick.dataset.rpCashamount;const next=v==='clear'?0:Math.max(0,before+Number(v)/1000);fieldEl.value=next;const display=el('rpCashDisplay');if(display)display.textContent=next+'k';const medalEl=formEl.elements.medals;if(medalEl){if(v==='clear')medalEl.dataset.rpManual='0';if(store()&&medalEl.dataset.rpManual!=='1')medalEl.value=Math.round(next*store().loan);}jpSyncCashSubmit();return;}const grapeConfirmTarget=e.target.closest('[data-rp-grapeconfirm]');if(grapeConfirmTarget){grapeConfirm(grapeConfirmTarget.dataset.rpGrapeconfirm);return;}const target=e.target.closest('[data-rp-measure-day][data-rp-measure-session],[data-rp-open-session][data-rp-open-day],[data-rp-action],[data-rp-tab],[data-rp-bonus],[data-rp-openday],[data-rp-editbonus],[data-rp-deletebonus],[data-rp-cash-edit],[data-rp-cash-cancel],[data-rp-edittx],[data-rp-deletetx],[data-rp-editgame],[data-rp-deletegame],[data-rp-deleteday]');if(!target)return;const x=target.dataset;
  if(x.rpMeasureDay&&x.rpMeasureSession){
   const targetDay=data.days.find(d=>d.id===x.rpMeasureDay);
   const targetSession=targetDay?.sessions.find(s=>s.id===x.rpMeasureSession);
@@ -3945,6 +4128,7 @@ let rpFlowBusy=false;
 el('section-record').addEventListener('submit',e=>{const id=e.target.id;if(!['rpFlowStart','rpFlowSeat'].includes(id)&&!e.target.matches('[data-rp-totalform]'))return;e.preventDefault();if(rpFlowBusy)return;rpFlowBusy=true;const button=e.target.querySelector('button[type=submit]');if(button)button.disabled=true;try{const v=Object.fromEntries(new FormData(e.target));if(id==='rpFlowStart')startFromFlow({...v,store:v.storeChoice==='__other'?v.storeOther:v.storeChoice});else if(id==='rpFlowSeat')seatFromFlow(v);else commit(()=>recordCurrentTotal(v.total));}catch(err){alert('保存できません：'+err.message);}finally{rpFlowBusy=false;if(button?.isConnected)button.disabled=false;}});
 el('section-record').addEventListener('click',dispatch);el('rpModal').addEventListener('click',dispatch);el('section-record').addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.matches('g[data-rp-bonus]')){e.preventDefault();detail(e.target.dataset.rpBonus);}});
 el('section-record').addEventListener('change',e=>{if(e.target.id==='rpStoreChoice'){const label=el('rpStoreOtherLabel');if(label){label.hidden=e.target.value!=='__other';label.querySelector('input').required=!label.hidden;}return;}if(e.target.id==='rpSession'){currentSession=e.target.value;render();}if(e.target.id==='rpAnalysisScope')renderAnalysis();if(e.target.id==='rpPeriod')renderReport();});
+el('section-record').addEventListener('input',rpSettlementHandleChange);el('section-record').addEventListener('change',rpSettlementHandleChange);
 el('rpExport').onclick=download;el('rpImport').addEventListener('change',async e=>{
  const file=e.target.files[0];if(!file)return;
  try{
@@ -3961,7 +4145,7 @@ el('rpExport').onclick=download;el('rpImport').addEventListener('change',async e
 });
 currentDay=data.days.findLast?.(d=>!d.closed)?.id||data.days.at(-1)?.id;currentSession=day()?.sessions.at(-1)?.id;render();
 // Exposed pure functions for regression verification; no data mutation.
-window.RealPlayCore={normalized,stats,chartRecords,chart,validate,validateV1,totals,balance,V2,recordFingerprint,reconcileWrite,restoreSafely,getWriteState:()=>({status:writeStatus,blocked:storageBlocked,reloadRequired}),getCurrentData:()=>data};
+window.RealPlayCore={normalized,stats,chartRecords,chart,validate,validateV1,totals,balance,V2,recordFingerprint,reconcileWrite,restoreSafely,getWriteState:()=>({status:writeStatus,blocked:storageBlocked,reloadRequired}),getCurrentData:()=>data,getSettlementPreviewState:()=>JSON.parse(JSON.stringify(rpSettlementDraft)),getSettlementPreviewComputed:()=>rpSettlementComputed()};
 })();
 
 </script>
