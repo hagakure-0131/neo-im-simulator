@@ -1490,7 +1490,7 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 @media(min-width:620px){.jp-v118-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.jp-v118-photo{height:154px}.jp-v118-filters{grid-template-columns:2fr 2fr 1.5fr;align-items:end}.jp-v118-hero .jp-v118-photo{width:180px;height:205px}}
 @media(max-width:340px){.jp-v118-photo{height:104px}.jp-v118-info strong{font-size:12px}.jp-v118-open{padding:6px}}
 </style>
-<meta name="jagpoke-version" content="1.2.12 QA | PM-011 settlement preview only">
+<meta name="jagpoke-version" content="1.2.13 QA | PM-015 Kachikachi integrated">
 <style id="jp-v1210-pm005-006">
 /* PM-006: ascending visual button sizing across left-to-right 100 / 10 / 1; same heights/fonts. */
 #rpModal.rpBonusTapModal .rpBonusTapAdd{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,2fr)!important}
@@ -1660,7 +1660,7 @@ body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutWarning{border-color:#e5b
 </style>
 </head>
 <body class="start-active menu-active">
-<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.12｜最終精算UI試作・保存なし QA版</div>
+<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.13｜横画面カチカチモード組込 QA版</div>
 <div id="startScreen" class="start-screen jp-title-screen">
   <button id="startEnter" class="start-enter jp-title-button" aria-label="ジャグラーポケットのメインメニュー画面へ進む">
     <span class="jp-title-figure">
@@ -3305,6 +3305,8 @@ const dateNow=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'}).forma
 const timeNow=()=>new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit'}).format(new Date());
 const names={...Object.fromEntries(Object.entries(machines).map(([k,m])=>[k,m.name])),funky:'ファンキージャグラー2',other:'その他（機種名を入力）'};
 let data={schemaVersion:SCHEMA,stores:[],days:[]},storageBlocked=false,currentDay=null,currentSession=null,tab='live',flowMode='live';
+// PM-015: kachikachi is a VIEW ONLY; same day/session and all existing save actions.
+let rpKachiMode=false;
 try{const incoming=V2.readSaved(jpQATestStorage);if(incoming){data=incoming;}else{const old=jpQATestStorage.getItem(OLD_KEY);if(old)data=V2.migrateV1(JSON.parse(old),validateV1);}validateGrape(data);}catch(e){storageBlocked=true;console.error('実戦記録の読み込みに失敗',e);}
 function number(v,label,nullable=false){if(nullable&&v==='')return null;const n=Number(v);if(v===''||!Number.isFinite(n)||n<0||!Number.isInteger(n)||n>1e9)throw Error(label+'は0以上の整数で入力してください。');return n;}
 function validateV1(d){
@@ -3466,8 +3468,8 @@ window.visualViewport?.addEventListener('scroll',rpPlaceDialog,{passive:true});
 window.addEventListener('resize',rpPlaceDialog,{passive:true});
 
 let submitDialog=null;
-function form(title,html,onSubmit){delete el('rpModal').dataset.rpReceiptDay;delete el('rpModal').dataset.rpReceiptSession;delete el('rpModal').dataset.receiptBlocked;el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html+'<p id="jpFormError" role="alert" aria-live="assertive" hidden></p>';window.jpRpSnapshotBaseline?.();submitDialog=onSubmit;el('rpSubmit').textContent=title.includes('ボーナス登録')?'登録':title.includes('実戦開始')?'🎰 実戦開始':title.includes('現金を追加投入')?'記録':title.includes('ヤメ登録')?'ヤメ登録':title.includes('計測枚数登録')?'登録':'保存';el('rpModal').classList.toggle('rpBonusTapModal',!!el('rpFormBody').querySelector('.rpBonusTapSheet'));el('rpModal').classList.toggle('rpBonusBigTitle',title==='BIGボーナス登録');el('rpModal').classList.toggle('rpBonusRegTitle',title==='REGボーナス登録');el('rpModal').classList.toggle('rpCheckoutModal',title.includes('ヤメ登録')||title.includes('計測枚数登録'));el('rpSubmit').hidden=false;el('rpSubmit').disabled=false;rpOpenDialog();}
-function inspect(title,html){delete el('rpModal').dataset.rpReceiptDay;delete el('rpModal').dataset.rpReceiptSession;el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html;window.jpRpSnapshotBaseline?.();submitDialog=null;el('rpModal').classList.remove('rpBonusTapModal','rpCheckoutModal','rpBonusBigTitle','rpBonusRegTitle');el('rpSubmit').hidden=true;rpOpenDialog();}
+function form(title,html,onSubmit){el('rpModal').classList.remove('rpKachiTotalModal');delete el('rpModal').dataset.rpReceiptDay;delete el('rpModal').dataset.rpReceiptSession;delete el('rpModal').dataset.receiptBlocked;el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html+'<p id="jpFormError" role="alert" aria-live="assertive" hidden></p>';window.jpRpSnapshotBaseline?.();submitDialog=onSubmit;el('rpSubmit').textContent=title.includes('ボーナス登録')?'登録':title.includes('実戦開始')?'🎰 実戦開始':title.includes('現金を追加投入')?'記録':title.includes('ヤメ登録')?'ヤメ登録':title.includes('計測枚数登録')?'登録':'保存';el('rpModal').classList.toggle('rpBonusTapModal',!!el('rpFormBody').querySelector('.rpBonusTapSheet'));el('rpModal').classList.toggle('rpBonusBigTitle',title==='BIGボーナス登録');el('rpModal').classList.toggle('rpBonusRegTitle',title==='REGボーナス登録');el('rpModal').classList.toggle('rpCheckoutModal',title.includes('ヤメ登録')||title.includes('計測枚数登録'));el('rpSubmit').hidden=false;el('rpSubmit').disabled=false;rpOpenDialog();}
+function inspect(title,html){el('rpModal').classList.remove('rpKachiTotalModal');delete el('rpModal').dataset.rpReceiptDay;delete el('rpModal').dataset.rpReceiptSession;el('rpModalTitle').textContent=title;el('rpFormBody').innerHTML=html;window.jpRpSnapshotBaseline?.();submitDialog=null;el('rpModal').classList.remove('rpBonusTapModal','rpCheckoutModal','rpBonusBigTitle','rpBonusRegTitle');el('rpSubmit').hidden=true;rpOpenDialog();}
 function machineName(s){return s.customName||names[s.machine]||s.machine;}
 // Grape counter: session-local optional SCHEMA 2 extension; no change to draw/medal calculations.
 function grapeTimelineGuard(s, change, label){
@@ -3972,7 +3974,7 @@ function rpSettlementView(){
   ${warnings.length?`<div class="rpSettlementAlert"><b>要確認（${warnings.length}項目）</b><ul>${warnings.map(w=>`<li>${x(w)}</li>`).join('')}</ul></div>`:'<div class="rpSettlementOK">入力上の数値は一致しています。ただしこれは試算であり、精算の確定・保存は行われていません。</div>'}
   <p>※金額は計算候補です。実際の貯メダル・現金回収・収支残高に一切反映されません。</p></section>`;
  }
- return `<main class="rpSettlementPreview" aria-label="最終精算の保存なし試算"><div class="rpSettlementTag">🧪 Ver.1.2.12 検証用UI｜<b>試算のみ・保存しません</b>。入力内容は再読み込みで失われ、実戦記録・収支・貯メダル残高には反映されません。</div>
+ return `<main class="rpSettlementPreview" aria-label="最終精算の保存なし試算"><div class="rpSettlementTag">🧪 Ver.1.2.13 検証用UI｜<b>試算のみ・保存しません</b>。入力内容は再読み込みで失われ、実戦記録・収支・貯メダル残高には反映されません。</div>
  <div class="rpSettlementNavBack">${rpSButton('← 実戦履歴へ戻る','close')}</div>
  <div class="rpSettlementStepHead"><h2>${steps[a.step-1]}</h2><span>${a.step} / 5</span></div><div class="rpSettlementProgress" aria-hidden="true">${steps.map((_,i)=>`<i class="${i+1<=a.step?'is-current':''}"></i>`).join('')}</div>
  ${d?`<p class="rpFineNote">対象：${x(d.date)}｜${x(d.name)}${a.demo?'｜合成データ':''}</p>`:''}${body}
@@ -4007,8 +4009,69 @@ function rpSettlementHandleChange(e){
  }
 }
 
+
+// PM-015 | Landscape Kachikachi mode: shares grapeAction / recordCurrentTotal / bonus.
+// Never creates a new day, session, counter or storage field.
+function rpKachiEnter(){
+ const s=sess();
+ if(tab!=='live'||flowMode!=='live'||!day()||!s||s.exitG!=null){
+  alert('実戦中の台に着席してからカチカチモードを開いてください。');return;
+ }
+ if(storageBlocked||reloadRequired||writeStatus==='unknown'){
+  alert('保存データを安全に確認できません。再読込後に確認してください。');return;
+ }
+ rpKachiMode=true;render();
+}
+function rpKachiLeave(){
+ if(el('rpModal').open){alert('入力画面を保存または閉じてから通常画面へ戻ってください。');return;}
+ rpKachiMode=false;render();
+}
+function rpKachiTotal(){
+ const s=sess();if(!s||s.exitG!=null)return;
+ const calc=V2.calculate(s),current=calc.unknown?'':s.seat.total+calc.knownG;
+ form('台総ゲーム数を更新',
+  '<p class="rpKachiTotalHelp">台全体の通常G数です。ボーナス後G・自分の消化Gとの混同に注意してください。</p>'+
+  field('台総G','total',current,'number')+
+  `<p class="rpKachiTotalHelp">着席時 ${fmt(s.seat.total)}G｜${calc.unknown?'消化G：未確定':'自分の消化 '+fmt(calc.knownG)+'G'}</p>`,
+  v=>commit(()=>recordCurrentTotal(v.total)));
+ el('rpModal').classList.add('rpKachiTotalModal');
+ el('rpSubmit').textContent='更新する';
+}
+function rpKachiScreen(s){
+ const calc=V2.calculate(s),t=grapePreview(s),g=grapeData(s),z=grapeCurrent(s);
+ const grapeValid=!calc.unknown&&!t.pending&&!t.missing&&t.displayGames>0&&t.displayCount>0;
+ const rate=grapeValid?'1/'+(t.displayGames/t.displayCount).toFixed(2):'未確定';
+ const count=t.count||0, total=calc.unknown?null:s.seat.total+calc.knownG;
+ const state=!g?'未計測':t.pending?'⚠ 未確定区間あり':z?'● 計測中':'⏸ 停止中';
+ const enabled=!!z&&!storageBlocked&&!reloadRequired&&writeStatus!=='unknown';
+ return `<div class="rpKachiScreen" id="rpKachiScreen" aria-label="横画面カチカチモード">
+  <div class="rpKachiLandscape">
+   <header class="rpKachiTop"><span class="rpKachiBrand">🎰 カチカチモード</span><span class="rpKachiMachine">${esc(machineName(s))} · ${esc(s.table)}番台</span><button type="button" class="rpKachiBack" data-rp-action="kachiLeave">通常画面へ戻る ×</button></header>
+   <div class="rpKachiGrid">
+    <section class="rpKachiPane rpKachiGrape"><div class="rpKachiPaneTitle">🍇 ブドウ <span>${state}</span></div>
+      <div class="rpKachiGrapeCount"><strong>${fmt(count)}</strong><small>回</small></div>
+      <div class="rpKachiRate">計測 ${t.pending||t.missing||calc.unknown?'未確定':fmt(t.displayGames)+'G'} <b>${rate}</b></div>
+      <div class="rpKachiGrapeBtns"><button type="button" class="rpKachiPlus" data-rp-action="grapePlus" ${!enabled?'disabled':''}>🍇 ＋1</button><button type="button" class="rpKachiMinus" data-rp-action="grapeMinus" ${!enabled||z.grapes===0?'disabled':''}>−1</button></div>
+    </section>
+    <section class="rpKachiPane rpKachiGames"><div class="rpKachiPaneTitle">台の総ゲーム数 <span>通常G</span></div>
+      <button class="rpKachiTotalTouch" type="button" data-rp-action="kachiTotal" aria-label="台の総ゲーム数を編集" ${storageBlocked?'disabled':''}><strong>${total==null?'未確定':fmt(total)}</strong><span>G</span><small>タップして更新 ✎</small></button>
+      <div class="rpKachiOwn">着席 ${fmt(s.seat.total)}G ・ 自分 ${calc.unknown?'未確定':fmt(calc.knownG)+'G'}</div>
+    </section>
+    <section class="rpKachiPane rpKachiBonuses"><div class="rpKachiPaneTitle">ボーナスを登録</div>
+      <button type="button" class="rpKachiBig" data-rp-action="big">BIG 登録</button>
+      <button type="button" class="rpKachiReg" data-rp-action="reg">REG 登録</button>
+    </section>
+   </div>
+   <div class="rpKachiFoot">${t.pending||t.missing||calc.unknown?'⚠ 計測区間またはG数が未確定です。通常画面の詳細操作で確認してください。':'ブドウ確率は着席後の計測区間だけを使用します。'}</div>
+  </div>
+  <div class="rpKachiPortrait"><div class="rpKachiPortraitInner"><b>📱 iPhoneを横向きにしてください</b><p>画面方向ロックが有効な場合は解除してください。横向き固定は行いません。</p><button type="button" data-rp-action="kachiLeave">通常画面へ戻る</button></div></div>
+ </div>`;
+}
+
 function render(){const d=day(),s=sess();el('rpNotice').textContent=storageBlocked?'保存データを読み込めません。元データを上書きせず停止しています。JSON原本の退避を行ってください。':'';
  el('rpTabs').innerHTML=[['live','実戦中'],['history','実戦履歴'],['analysis','収支分析']].map(([v,t])=>`<button data-rp-tab="${v}" aria-pressed="${tab===v}">${t}</button>`).join('');
+ if(rpKachiMode&&tab==='live'&&d&&s&&s.exitG==null){document.documentElement.classList.add('rpKachiActive');el('rpBody').innerHTML=rpKachiScreen(s);return;}
+ if(rpKachiMode)rpKachiMode=false;document.documentElement.classList.remove('rpKachiActive');
  if(tab==='settlement-preview'){renderSettlementPreview();return;}
  if(tab==='history'){el('rpBody').innerHTML=`<button data-rp-action="start">🎰 実戦開始</button><button type="button" class="rpSettlementLink" data-rp-settlement-open="true">🧾 最終精算を試算する（保存なし） ›</button><details class="rp-advanced"><summary>記録管理・削除</summary><p class="small">削除前に外部JSONを保存してください。</p><button data-rp-action="deleteAll" class="rpDangerAction">すべての実戦記録を削除</button></details>${data.days.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(rpHistoryDay).join('')||'<p>まだ実戦記録がありません。</p>'}`;return;}
  if(tab==='analysis'){renderReport();return;}
@@ -4027,6 +4090,7 @@ function render(){const d=day(),s=sess();el('rpNotice').textContent=storageBlock
  <p class="rpMyPlaySummary">自分の実戦：${st.gUnknown?'未確定':fmt(st.g)+'G'} ｜ BIG ${selfB}回 ｜ REG ${selfR}回</p>
   <p class="rpFineNote">台全体：着席時 ${fmt(s.seat.total)}G・BIG ${seatBigKnown?s.seat.big+'回':'未確認'}・REG ${seatRegKnown?s.seat.reg+'回':'未確認'}${s.seat.inputOrigin?.big==='auto-zero-start'||s.seat.inputOrigin?.reg==='auto-zero-start'?'（0G未稼働として自動0）':''}。不明な回数を0とみなしません。</p>
  <section class="rpMedalHero" aria-label="推定持ちメダル"><div class="rpMedalTitle">現在の推定持ちメダル <span>推定値</span></div><div class="rpMedalValue">${medalValue}</div><div class="rpMedalMeta"><div><span>前回記録比</span><b class="${delta!=null&&delta>0?'is-up':delta!=null&&delta<0?'is-down':''}">${rpSigned(delta)}</b></div><div><span>推定最高</span><b>${bal.peak==null?'未確定':fmt(bal.peak)+'枚'}</b></div></div><p class="rpFineNote">${medalLabel}</p></section>
+ <button type="button" class="rpKachiLaunch" data-rp-action="kachiEnter">📟 カチカチモード <span>横画面で記録 ›</span></button>
  <div class="rpBonusPrimary"><button data-rp-action="big" ${s.exitG!=null?'disabled':''}>＋ BIG</button><button data-rp-action="reg" ${s.exitG!=null?'disabled':''}>＋ REG</button></div>
  ${cashLedger(d,s)}
  <button type="button" class="rpSettlementLink" data-rp-settlement-open="true">🧾 本日の最終精算を試算（保存なし） ›</button>
@@ -4109,7 +4173,7 @@ function deleteGameSafe(id){
  if(deletionCommit(()=>{grapeTimelineGuard(s,()=>V2.removeEvent(s,id),'G数更新の削除');})){alert('G数更新記録を削除しました。');}
 }
 
-const actions={grapePlus:()=>grapeAction('plus'),grapeMinus:()=>grapeAction('minus'),grapeUndo:()=>grapeAction('minus'),grapeStart:()=>grapeAction('start'),grapePause:()=>grapeAction('pause'),start,deleteCurrent:()=>{if(currentDay)deleteDayById(currentDay);},deleteAll:deleteAllDays,seat:()=>{flowMode='seat';render();},backLive:()=>{flowMode='live';render();},seatEdit:()=>seat(sess()),store:storeSettings,dayEdit,big:()=>bonus('BIG'),reg:()=>bonus('REG'),pre:()=>bonus('BIG',null,'preSeat'),post:()=>bonus('BIG',null,'postExit'),cash:()=>transaction('cash'),correction:()=>transaction('correction'),withdraw:()=>transaction('withdraw'),deposit:()=>transaction('deposit'),exchange:()=>transaction('exchange'),move:()=>exit(true),exit:()=>exit(false),measure:()=>{const s=sess();if(s)rpMeasure(s.id,false);},model:editModel,reset:()=>{const s=sess();form('⚠️ カウンターリセットを確認',field('確認した区間消化G（不明なら空欄）','delta','','number',false)+'<p class="small">不明Gは自動補完しません。確認できたGだけ加算します。</p>',v=>commit(()=>{const n=number(v.delta,'確認済みG',true);grapeClose(s,grapeKnown(s),true);const seg=s.counterSegments.at(-1);V2.addEvent(s,{id:uid(),type:'reset',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:null,confirmedDeltaG:n,status:n===null?'unresolved':'confirmed'});V2.rebuildSegments(s);}));},current:()=>{const s=sess(),seg=s.counterSegments.at(-1),last=s.gameEvents.filter(e=>e.counterSegmentId===seg.id&&e.counterG!=null).at(-1)?.counterG??seg.startCounterG;form('現在Gを更新',field('ホール表示のボーナス後G','g',last),v=>commit(()=>{const g=number(v.g,'表示G');V2.addEvent(s,{id:uid(),type:'update',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:g,status:'confirmed'});s.currentG=0;}));}};
+const actions={kachiEnter:rpKachiEnter,kachiLeave:rpKachiLeave,kachiTotal:rpKachiTotal,grapePlus:()=>grapeAction('plus'),grapeMinus:()=>grapeAction('minus'),grapeUndo:()=>grapeAction('minus'),grapeStart:()=>grapeAction('start'),grapePause:()=>grapeAction('pause'),start,deleteCurrent:()=>{if(currentDay)deleteDayById(currentDay);},deleteAll:deleteAllDays,seat:()=>{flowMode='seat';render();},backLive:()=>{flowMode='live';render();},seatEdit:()=>seat(sess()),store:storeSettings,dayEdit,big:()=>bonus('BIG'),reg:()=>bonus('REG'),pre:()=>bonus('BIG',null,'preSeat'),post:()=>bonus('BIG',null,'postExit'),cash:()=>transaction('cash'),correction:()=>transaction('correction'),withdraw:()=>transaction('withdraw'),deposit:()=>transaction('deposit'),exchange:()=>transaction('exchange'),move:()=>exit(true),exit:()=>exit(false),measure:()=>{const s=sess();if(s)rpMeasure(s.id,false);},model:editModel,reset:()=>{const s=sess();form('⚠️ カウンターリセットを確認',field('確認した区間消化G（不明なら空欄）','delta','','number',false)+'<p class="small">不明Gは自動補完しません。確認できたGだけ加算します。</p>',v=>commit(()=>{const n=number(v.delta,'確認済みG',true);grapeClose(s,grapeKnown(s),true);const seg=s.counterSegments.at(-1);V2.addEvent(s,{id:uid(),type:'reset',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:null,confirmedDeltaG:n,status:n===null?'unresolved':'confirmed'});V2.rebuildSegments(s);}));},current:()=>{const s=sess(),seg=s.counterSegments.at(-1),last=s.gameEvents.filter(e=>e.counterSegmentId===seg.id&&e.counterG!=null).at(-1)?.counterG??seg.startCounterG;form('現在Gを更新',field('ホール表示のボーナス後G','g',last),v=>commit(()=>{const g=number(v.g,'表示G');V2.addEvent(s,{id:uid(),type:'update',sequence:Math.max(0,...s.gameEvents.map(e=>e.sequence))+1,counterSegmentId:seg.id,counterG:g,status:'confirmed'});s.currentG=0;}));}};
 let rpSubmitting=false;el('rpForm').addEventListener('invalid',e=>{const p=el('jpFormError');if(p){const input=e.target;const label=input.closest('label')?.textContent?.trim()||input.name||'入力欄';p.textContent=label+'を確認してください。'+(input.validity.valueMissing?'必須項目です。':input.validity.stepMismatch?'入力単位が正しくありません。':input.validationMessage);p.hidden=false;}},true);el('rpForm').addEventListener('input',e=>{const p=el('jpFormError');if(p)p.hidden=true;if(e.target?.name==='medals'&&el('rpCashDisplay'))e.target.dataset.rpManual='1';});el('rpForm').addEventListener('submit',e=>{e.preventDefault();if(!submitDialog||rpSubmitting)return;rpSubmitting=true;const v=Object.fromEntries(new FormData(e.target)),callback=submitDialog;el('rpSubmit').disabled=true;try{el('rpModal').close();const ok=callback(v);if(ok===false&&!el('rpModal').open)rpOpenDialog();}catch(err){if(!el('rpModal').open)rpOpenDialog();const p=el('jpFormError');if(p){p.textContent='保存できません：'+err.message;p.hidden=false;}else alert(err.message);}finally{rpSubmitting=false;el('rpSubmit').disabled=el('rpModal').open&&el('rpModal').dataset.receiptBlocked==='1';}});el('rpClose').onclick=()=>{if(typeof window.jpRpRequestClose==='function')window.jpRpRequestClose();else el('rpModal').close();};
 // Native close also handles × / Escape, respecting the existing unsaved-input guard.
 el('rpModal').addEventListener('close',()=>{const m=el('rpModal');const d=m.dataset.rpReceiptDay,t=m.dataset.rpReceiptSession;if(!d)return;requestAnimationFrame(()=>{if(!m.open&&m.dataset.rpReceiptDay===d)rpShowHistoryAfterExit(d,t);});});
@@ -4664,5 +4728,82 @@ body.rp-light-mode #rpModal.rpBonusBigTitle #rpModalTitle{color:#be2c40!importan
 body.rp-light-mode #rpModal.rpBonusRegTitle #rpModalTitle{color:#2367bd!important}
 @media(max-width:350px){#section-record .rpHistoryDayCard .rpHInner{padding:8px 6px}#section-record .rpHistoryDayCard .rpHBonusRow{padding:8px 5px;gap:6px}}
 </style>
+
+<style id="jp-pm015-kachikachi-landscape">
+/* PM-015: All kachikachi elements are volatile view-only layout. */
+#section-record .rpKachiLaunch{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:52px;margin:10px 0;border:1px solid #438da8;border-radius:14px;background:#193f58;color:#f9fcff;font-size:17px;font-weight:850}
+#section-record .rpKachiLaunch span{font-size:12px;color:#c7e4f5;font-weight:500}
+html.rpKachiActive,html.rpKachiActive body{overflow:hidden!important}
+/* QA banner would otherwise cover the small landscape top bar. */
+html.rpKachiActive #jugpokeQAStatus{display:none!important}
+#section-record #rpKachiScreen{position:fixed;inset:0;z-index:200000;background:#090f19;color:#f8fafc;overflow:hidden;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif}
+#rpKachiScreen *{box-sizing:border-box}
+#rpKachiScreen button{font-family:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#rpKachiScreen .rpKachiLandscape{display:flex;flex-direction:column;width:100%;height:100%;height:100dvh;max-height:100dvh;padding:calc(env(safe-area-inset-top,0px) + 4px) calc(env(safe-area-inset-right,0px) + 12px) calc(env(safe-area-inset-bottom,0px) + 3px) calc(env(safe-area-inset-left,0px) + 12px);gap:5px}
+#rpKachiScreen .rpKachiTop{flex:0 0 auto;display:flex;align-items:center;gap:8px;min-height:34px}
+#rpKachiScreen .rpKachiBrand{font-size:clamp(12px,1.7vw,17px);font-weight:900;color:#bff5ee;white-space:nowrap}
+#rpKachiScreen .rpKachiMachine{min-width:0;flex:1;text-align:center;font-size:clamp(10px,1.4vw,14px);color:#b8c9e3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rpKachiScreen .rpKachiBack{min-height:32px;border-radius:9px;border:1px solid #66839c;background:#203249;color:#f6f9ff;white-space:nowrap;font-size:clamp(10px,1.5vw,13px);padding:5px 9px}
+#rpKachiScreen .rpKachiGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr) minmax(0,.88fr);gap:8px;flex:1 1 auto;min-height:0}
+#rpKachiScreen .rpKachiPane{min-width:0;min-height:0;border:1px solid #324761;border-radius:14px;background:linear-gradient(160deg,#15273b,#101a2b);padding:clamp(6px,1.5vh,11px);display:flex;flex-direction:column;gap:5px;overflow:hidden}
+#rpKachiScreen .rpKachiPaneTitle{font-size:clamp(11px,1.55vw,15px);font-weight:850;color:#e5f0ff;display:flex;justify-content:space-between;align-items:center;gap:4px;line-height:1.15;white-space:nowrap}
+#rpKachiScreen .rpKachiPaneTitle span{font-size:clamp(8px,1.12vw,11px);color:#9ab5d1;font-weight:500}
+#rpKachiScreen .rpKachiGrapeCount{display:flex;align-items:baseline;justify-content:center;gap:7px;min-height:0}
+#rpKachiScreen .rpKachiGrapeCount strong{font-size:clamp(30px,7vh,68px);letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums;color:#f6e2ff}
+#rpKachiScreen .rpKachiGrapeCount small{font-size:14px}
+#rpKachiScreen .rpKachiRate{display:flex;align-items:center;justify-content:center;gap:7px;font-size:clamp(10px,1.38vw,14px);color:#b8cede;min-width:0;white-space:nowrap}
+#rpKachiScreen .rpKachiRate b{font-size:clamp(14px,2.3vw,23px);color:#d5c7fa}
+#rpKachiScreen .rpKachiGrapeBtns{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:6px;flex:1;min-height:54px}
+#rpKachiScreen .rpKachiGrapeBtns button{width:100%;height:100%;min-height:48px;border-radius:11px;border:1px solid #42688c;font-weight:900}
+#rpKachiScreen .rpKachiPlus{font-size:clamp(19px,4.7vw,35px);background:#7053aa;color:white}
+#rpKachiScreen .rpKachiMinus{font-size:clamp(18px,3vw,28px);background:#233752;color:#e5f0ff}
+#rpKachiScreen button:disabled{opacity:.43}
+#rpKachiScreen .rpKachiTotalTouch{flex:1;min-height:84px;width:100%;border:1px solid #4e7da4;border-radius:12px;background:#1c3b51;color:#f8fcff;display:flex;align-items:baseline;justify-content:center;gap:4px;flex-wrap:wrap;align-content:center;padding:4px}
+#rpKachiScreen .rpKachiTotalTouch strong{font-size:clamp(32px,6.8vh,69px);font-variant-numeric:tabular-nums;letter-spacing:-.055em}
+#rpKachiScreen .rpKachiTotalTouch span{font-size:16px}
+#rpKachiScreen .rpKachiTotalTouch small{display:block;flex-basis:100%;font-size:12px;color:#b0d9f2}
+#rpKachiScreen .rpKachiOwn{font-size:clamp(10px,1.3vw,12px);color:#b6c8e3;text-align:center;line-height:1.25}
+#rpKachiScreen .rpKachiBonuses button{flex:1;min-height:60px;width:100%;border:0;border-radius:12px;color:white;font-size:clamp(18px,3.2vw,31px);font-weight:900}
+#rpKachiScreen .rpKachiBig{background:linear-gradient(130deg,#a51235,#e44e65)}
+#rpKachiScreen .rpKachiReg{background:linear-gradient(130deg,#1152a5,#378de7)}
+#rpKachiScreen .rpKachiFoot{font-size:clamp(9px,1.2vw,11px);text-align:center;flex:0 0 auto;color:#a1b6cd;line-height:1.1}
+#rpKachiScreen .rpKachiPortrait{display:none}
+@media(orientation:portrait){
+ #rpKachiScreen .rpKachiLandscape{display:none}
+ #rpKachiScreen .rpKachiPortrait{display:flex;height:100dvh;width:100%;align-items:center;justify-content:center;padding:24px;text-align:center}
+ #rpKachiScreen .rpKachiPortraitInner{max-width:320px}
+ #rpKachiScreen .rpKachiPortraitInner b{display:block;font-size:20px;color:#effcff}
+ #rpKachiScreen .rpKachiPortraitInner p{color:#c8d9eb;font-size:14px;line-height:1.6}
+ #rpKachiScreen .rpKachiPortraitInner button{border:0;border-radius:12px;padding:12px 20px;background:#346083;color:#fff;font-weight:750}
+}
+/* Retain the proven centered native dialog shell. Only the inner panel changes in landscape. */
+@media(orientation:landscape) and (max-height:480px){
+ html.rpKachiActive body.rp-light-mode #rpModal #rpDialogPanel{width:calc(100% - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px) - 24px)!important;max-width:760px!important;max-height:calc(var(--rp-visible-h,100dvh) - 8px)!important;padding:6px 12px!important;overflow-y:auto!important}
+ html.rpKachiActive #rpModal.rpBonusTapModal #rpDialogPanel{overflow-y:auto!important}
+ html.rpKachiActive #rpModal.rpBonusTapModal header{height:28px;min-height:28px;margin:0 0 3px}
+ html.rpKachiActive #rpModal.rpBonusTapModal #rpFormBody .rpBonusTapSheet{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-rows:auto 1fr;column-gap:12px;align-items:start}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpBonusGameArea{grid-column:1;grid-row:1 / span 2}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpBonusTriggerLabel{grid-column:2;grid-row:1;margin-top:2px}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpTriggerButtons{grid-column:2;grid-row:2;gap:5px}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpTriggerButtons button{min-height:38px;padding:3px 1px}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpBonusTapLabel{margin:1px 0 2px}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpBonusTapGameLabel{margin:1px 0 0}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpBonusTapValue{font-size:clamp(32px,9vh,48px);padding:0 0 3px}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpBonusTapAdd button{min-height:45px}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpBonusTapUndo{min-height:28px;margin-top:3px;padding:1px}
+ html.rpKachiActive #rpModal.rpBonusTapModal #rpSubmit{min-height:42px;margin-top:4px}
+ html.rpKachiActive #rpModal.rpKachiTotalModal #rpFormBody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center}
+ html.rpKachiActive #rpModal.rpKachiTotalModal #rpFormBody label{margin:0}
+ html.rpKachiActive #rpModal.rpKachiTotalModal #rpFormBody .rpKachiTotalHelp{margin:4px 0;font-size:12px}
+}
+@media(orientation:landscape) and (max-height:340px){
+ #rpKachiScreen .rpKachiLandscape{gap:3px;padding-top:2px;padding-bottom:2px}
+ #rpKachiScreen .rpKachiTop{min-height:26px}
+ #rpKachiScreen .rpKachiPane{gap:3px;padding:5px}
+ #rpKachiScreen .rpKachiFoot{display:none}
+ html.rpKachiActive #rpModal.rpBonusTapModal .rpTriggerButtons button{min-height:34px}
+}
+</style>
+
 </body>
 </html>
