@@ -1490,7 +1490,7 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 @media(min-width:620px){.jp-v118-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.jp-v118-photo{height:154px}.jp-v118-filters{grid-template-columns:2fr 2fr 1.5fr;align-items:end}.jp-v118-hero .jp-v118-photo{width:180px;height:205px}}
 @media(max-width:340px){.jp-v118-photo{height:104px}.jp-v118-info strong{font-size:12px}.jp-v118-open{padding:6px}}
 </style>
-<meta name="jagpoke-version" content="1.2.13 QA | PM-015 Kachikachi integrated">
+<meta name="jagpoke-version" content="1.2.15 QA | PM-019 Kachikachi grape button color">
 <style id="jp-v1210-pm005-006">
 /* PM-006: ascending visual button sizing across left-to-right 100 / 10 / 1; same heights/fonts. */
 #rpModal.rpBonusTapModal .rpBonusTapAdd{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,2fr)!important}
@@ -1660,7 +1660,7 @@ body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutWarning{border-color:#e5b
 </style>
 </head>
 <body class="start-active menu-active">
-<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.14｜カチカチモード総G加算・REG契機修正 QA版</div>
+<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.15｜カチカチモード ブドウ＋1配色 QA版</div>
 <div id="startScreen" class="start-screen jp-title-screen">
   <button id="startEnter" class="start-enter jp-title-button" aria-label="ジャグラーポケットのメインメニュー画面へ進む">
     <span class="jp-title-figure">
@@ -3976,7 +3976,7 @@ function rpSettlementView(){
   ${warnings.length?`<div class="rpSettlementAlert"><b>要確認（${warnings.length}項目）</b><ul>${warnings.map(w=>`<li>${x(w)}</li>`).join('')}</ul></div>`:'<div class="rpSettlementOK">入力上の数値は一致しています。ただしこれは試算であり、精算の確定・保存は行われていません。</div>'}
   <p>※金額は計算候補です。実際の貯メダル・現金回収・収支残高に一切反映されません。</p></section>`;
  }
- return `<main class="rpSettlementPreview" aria-label="最終精算の保存なし試算"><div class="rpSettlementTag">🧪 Ver.1.2.14 検証用UI｜<b>試算のみ・保存しません</b>。入力内容は再読み込みで失われ、実戦記録・収支・貯メダル残高には反映されません。</div>
+ return `<main class="rpSettlementPreview" aria-label="最終精算の保存なし試算"><div class="rpSettlementTag">🧪 Ver.1.2.15 検証用UI｜<b>試算のみ・保存しません</b>。入力内容は再読み込みで失われ、実戦記録・収支・貯メダル残高には反映されません。</div>
  <div class="rpSettlementNavBack">${rpSButton('← 実戦履歴へ戻る','close')}</div>
  <div class="rpSettlementStepHead"><h2>${steps[a.step-1]}</h2><span>${a.step} / 5</span></div><div class="rpSettlementProgress" aria-hidden="true">${steps.map((_,i)=>`<i class="${i+1<=a.step?'is-current':''}"></i>`).join('')}</div>
  ${d?`<p class="rpFineNote">対象：${x(d.date)}｜${x(d.name)}${a.demo?'｜合成データ':''}</p>`:''}${body}
@@ -4808,7 +4808,7 @@ html.rpKachiActive #jugpokeQAStatus{display:none!important}
 #rpKachiScreen .rpKachiRate b{font-size:clamp(14px,2.3vw,23px);color:#d5c7fa}
 #rpKachiScreen .rpKachiGrapeBtns{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:6px;flex:1;min-height:54px}
 #rpKachiScreen .rpKachiGrapeBtns button{width:100%;height:100%;min-height:48px;border-radius:11px;border:1px solid #42688c;font-weight:900}
-#rpKachiScreen .rpKachiPlus{font-size:clamp(19px,4.7vw,35px);background:#7053aa;color:white}
+#rpKachiScreen .rpKachiPlus{font-size:clamp(19px,4.7vw,35px);background:#e1f1e4;color:#205b37;border-color:#b7d5bf!important}
 #rpKachiScreen .rpKachiMinus{font-size:clamp(18px,3vw,28px);background:#233752;color:#e5f0ff}
 #rpKachiScreen button:disabled{opacity:.43}
 #rpKachiScreen .rpKachiTotalTouch{flex:1;min-height:84px;width:100%;border:1px solid #4e7da4;border-radius:12px;background:#1c3b51;color:#f8fcff;display:flex;align-items:baseline;justify-content:center;gap:4px;flex-wrap:wrap;align-content:center;padding:4px}
