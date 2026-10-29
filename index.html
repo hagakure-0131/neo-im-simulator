@@ -1490,7 +1490,7 @@ body.pocket-room #section-play .bonus-history-chart{min-width:0}
 @media(min-width:620px){.jp-v118-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.jp-v118-photo{height:154px}.jp-v118-filters{grid-template-columns:2fr 2fr 1.5fr;align-items:end}.jp-v118-hero .jp-v118-photo{width:180px;height:205px}}
 @media(max-width:340px){.jp-v118-photo{height:104px}.jp-v118-info strong{font-size:12px}.jp-v118-open{padding:6px}}
 </style>
-<meta name="jagpoke-version" content="1.2.15 QA | PM-019 Kachikachi grape button color">
+<meta name="jagpoke-version" content="1.2.16 QA | PM-020 Kachikachi bonus display">
 <style id="jp-v1210-pm005-006">
 /* PM-006: ascending visual button sizing across left-to-right 100 / 10 / 1; same heights/fonts. */
 #rpModal.rpBonusTapModal .rpBonusTapAdd{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,2fr)!important}
@@ -1658,9 +1658,10 @@ body.rp-light-mode #rpModal.rpCheckoutModal .rpCheckoutWarning{border-color:#e5b
 #section-record .rpSettlementNavBack{margin:0 0 10px;font-size:13px}
 @media(max-width:360px){#section-record .rpSettlementPreview .rpSettlementCard{padding:11px 10px}#section-record .rpSettlementStepHead h2{font-size:18px}#section-record .rpSettlementGrid b{font-size:18px}}
 </style>
+<style id="jp-pm022-bonus-edit-confirmation">#rpModal .rpBonusEditConfirmation{display:grid;gap:7px;line-height:1.45;color:#1c3652;font-size:13px}#rpModal .rpBonusEditConfirmation p{margin:0}#rpModal .rpBonusEditStatus{background:#e8f4ee;border:1px solid #b5d8c3;color:#1f6941;padding:8px;border-radius:10px;font-weight:700}#rpModal .rpBonusEditConfirmation strong{font-size:19px;color:#0e4168}#rpModal .rpBonusEditAuditRow{display:flex;flex-direction:column;gap:3px;padding:7px;border:1px solid #dce7f0;border-radius:9px;background:#f5f8fd;font-size:12px}#rpModal .rpBonusEditAuditRow span{overflow-wrap:anywhere}#rpModal .rpBonusEditUnchanged{font-size:12px;color:#3c566d}#rpModal .rpBonusEditAgree{display:flex;align-items:flex-start;gap:8px;margin:4px 0 0;padding:9px;border-radius:10px;background:#edf5fc;font-size:13px;font-weight:700}#rpModal .rpBonusEditAgree input{width:19px;height:19px;flex:none;accent-color:#2269a5}#rpModal .rpBonusEditConfirmation{max-width:100%;box-sizing:border-box}@media(max-width:360px) and (max-height:620px){#rpModal:has(.rpBonusEditConfirmation){padding:10px 12px;max-height:calc(100dvh - 12px)}#rpModal:has(.rpBonusEditConfirmation) header{margin:0 0 3px}#rpModal .rpBonusEditConfirmation{gap:4px;font-size:12px;line-height:1.3}#rpModal .rpBonusEditStatus{padding:5px}#rpModal .rpBonusEditAuditRow{gap:2px;padding:5px;font-size:11px}#rpModal .rpBonusEditAgree{padding:6px;font-size:12px}#rpModal:has(.rpBonusEditConfirmation) #rpSubmit{min-height:40px!important;margin-top:6px!important}}</style>
 </head>
 <body class="start-active menu-active">
-<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.15｜カチカチモード ブドウ＋1配色 QA版</div>
+<div id="jugpokeQAStatus" role="status" style="position:fixed;top:0;left:0;right:0;z-index:2147483000;background:#513a13;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 3px) 8px 4px;pointer-events:none;opacity:.96">Ver.1.2.17｜ボーナスG訂正 検証版</div>
 <div id="startScreen" class="start-screen jp-title-screen">
   <button id="startEnter" class="start-enter jp-title-button" aria-label="ジャグラーポケットのメインメニュー画面へ進む">
     <span class="jp-title-figure">
@@ -3658,9 +3659,126 @@ function bonusTapFields(kind,machine){
  const error=el('jpFormError');if(error)error.hidden=true;
  return true;
 }
+
+// PM-022: selected-event correction planner; never mutates canonical session before confirmation.
+function jpBonusEditSafeInt(n){return Number.isSafeInteger(n)&&n>=0&&n<=1000000000;}
+function jpValidateBonusEditAudit(d){
+ for(const day of d.days||[])for(const ss of day.sessions||[]){
+  if(ss.bonusEditAudit===undefined)continue;
+  if(!Array.isArray(ss.bonusEditAudit))throw Error('ボーナス訂正監査履歴の形式が不正です。');
+  const ids=new Set(),requests=new Set();
+  for(const a of ss.bonusEditAudit){
+   if(!a||typeof a.id!=='string'||!a.id||ids.has(a.id)||typeof a.requestId!=='string'||!a.requestId||requests.has(a.requestId)||
+     typeof a.bonusId!=='string'||!a.bonusId||typeof a.gameEventId!=='string'||!a.gameEventId||
+     typeof a.editedAt!=='string'||!a.editedAt||a.confirmedByUser!==true||
+     !jpBonusEditSafeInt(a.before?.rawGames)||!jpBonusEditSafeInt(a.after?.rawGames)||
+     !jpBonusEditSafeInt(a.before?.counterG)||!jpBonusEditSafeInt(a.after?.counterG)||
+     !Array.isArray(a.segmentChanges)||a.segmentChanges.some(z=>!z||typeof z.id!=='string'||!z.id))
+    throw Error('ボーナス訂正監査履歴が不正です。');
+   ids.add(a.id);requests.add(a.requestId);
+  }
+ }
+ return true;
+}
+const jpBonusAuditPriorValidate=V2.validate;
+V2.validate=function(d){jpBonusAuditPriorValidate(d);jpValidateBonusEditAudit(d);return true;};
+function jpPlanBonusGEdit(dayId,sessionId,bonusId,desiredG,requestId){
+ if(!jpBonusEditSafeInt(desiredG)||desiredG<1)throw Error('訂正後の当選Gは1G以上の整数で入力してください。');
+ const d=data.days.find(x=>x.id===dayId),original=d?.sessions.find(x=>x.id===sessionId);
+ if(!d||!original)throw Error('訂正対象の実戦日・台が見つかりません。');
+ const matches=original.bonuses.filter(x=>x.id===bonusId),events=original.gameEvents.filter(x=>x.bonusId===bonusId&&x.type==='bonus');
+ if(matches.length!==1||events.length!==1)throw Error('ボーナスIDと対応Gイベントの紐付けが一意ではありません。ボーナスID：'+bonusId);
+ const b=matches[0],e=events[0];
+ if(b.source!=='self'||b.inputBasis!=='counter'||e.counterG!==b.rawGames||e.status!=='confirmed'||e.counterSegmentId==null)
+  throw Error('このボーナスは表示GとGイベントの対応が不明です。元'+b.rawGames+'G、イベント'+e.counterG+'G。保存は行いません。');
+ if(desiredG===b.rawGames)throw Error('当選G数は変更されていません。');
+ if(original.exitG!=null||original.gameEvents.some(x=>x.type==='exit'))throw Error('ヤメ時の最終Gが確定しています。確定Gとの再照合が必要なため訂正を保留します。');
+ const orderedEvents=original.gameEvents.slice().sort((x,y)=>x.sequence-y.sequence);
+ if(orderedEvents.some(x=>x.type==='reset'||x.status==='unresolved'||x.counterG==null))throw Error('リセット・未確定Gイベントがあります。計測区間の自動訂正はできません。');
+ const last=orderedEvents.at(-1);
+ if(!last||last.id!==e.id)throw Error('対象ボーナス以降にG更新または次のボーナスがあります（末尾：'+(last?.id||'なし')+'）。後続確定値の照合が必要です。');
+ const resultBefore=V2.calculate(original),stepBefore=resultBefore.steps.find(x=>x.id===e.id);
+ if(!stepBefore||resultBefore.unknown)throw Error('当選前のG数が未確定です。履歴の照合が必要です。');
+ const draft=JSON.parse(JSON.stringify(original));
+ const de=draft.gameEvents.find(x=>x.id===e.id),db=draft.bonuses.find(x=>x.id===b.id);
+ db.rawGames=desiredG;de.counterG=desiredG;
+ const resultAfter=V2.calculate(draft),stepAfter=resultAfter.steps.find(x=>x.id===e.id);
+ if(!stepAfter||resultAfter.unknown||stepAfter.knownG<0)throw Error('訂正後のG数を確定できません。');
+ for(const prev of resultBefore.steps.filter(x=>x.id!==e.id)){
+  const after=resultAfter.steps.find(x=>x.id===prev.id);
+  if(!after||after.knownG!==prev.knownG||after.delta!==prev.delta||after.unknown!==prev.unknown)
+   throw Error('過去の別Gイベントに影響するため保存できません（ID：'+prev.id+'）。');
+ }
+ const endBefore=stepBefore.knownG,endAfter=stepAfter.knownG;
+ const changes=[];
+ const g=original.grapeCounter?.segments||[];
+ if(g.length){
+  if(g.some(z=>z.status==='pending'||z.source==='manual'||z.startG==null&&z.status==='confirmed'))
+   throw Error('未確定／手動計測区間があります。計測G実測値の再確認が必要です。');
+  const matches=g.map((z,i)=>({z,i})).filter(({z})=>z.status==='confirmed'&&z.source==='history'&&z.endG===endBefore);
+  if(matches.length!==1)throw Error('当選位置'+endBefore+'Gに一致する履歴由来の確定計測区間が一意ではありません（'+matches.length+'件）。');
+  const {z:closed,i}=matches[0],running=g[i+1]||null;
+  if(g.length!==i+1+(running?1:0)||running&&(running.status!=='running'||running.startG!==endBefore||running.endG!=null))
+   throw Error('ボーナス前後の計測区間が連続していません。計測終了・再開の詳細確認が必要です。');
+  if(closed.startG==null||closed.measuredGames!==closed.endG-closed.startG||endAfter<closed.startG)
+   throw Error('確定区間の計測G・境界に矛盾があります。対象区間ID：'+closed.id);
+  const dz=draft.grapeCounter.segments[i];
+  changes.push({id:dz.id,before:{startG:dz.startG,endG:dz.endG,measuredGames:dz.measuredGames,grapes:dz.grapes,status:dz.status,source:dz.source}});
+  dz.endG=endAfter;dz.measuredGames=endAfter-dz.startG;
+  changes.at(-1).after={startG:dz.startG,endG:dz.endG,measuredGames:dz.measuredGames,grapes:dz.grapes,status:dz.status,source:dz.source};
+  if(running){const dr=draft.grapeCounter.segments[i+1];
+   changes.push({id:dr.id,before:{startG:dr.startG,endG:dr.endG,measuredGames:dr.measuredGames,grapes:dr.grapes,status:dr.status,source:dr.source}});
+   dr.startG=endAfter;
+   changes.at(-1).after={startG:dr.startG,endG:dr.endG,measuredGames:dr.measuredGames,grapes:dr.grapes,status:dr.status,source:dr.source};
+  }
+  if(g.some((z,j)=>z.grapes!==draft.grapeCounter.segments[j].grapes))throw Error('ブドウ実測回数の不変条件が破られました。');
+ }
+ // Evaluate the full candidate with the standard SCHEMA 2 validator on a detached copy.
+ const check=JSON.parse(JSON.stringify(data));
+ const at=check.days.find(x=>x.id===dayId).sessions.find(x=>x.id===sessionId);
+ Object.assign(at,draft);
+ V2.validate(check);
+ if(original.bonuses.filter(x=>x.id!==bonusId).some((x)=>JSON.stringify(x)!==JSON.stringify(draft.bonuses.find(y=>y.id===x.id))))
+  throw Error('他のボーナス履歴が変更されています。');
+ const oldGrapes=g.reduce((t,z)=>t+z.grapes,0),newGrapes=(draft.grapeCounter?.segments||[]).reduce((t,z)=>t+z.grapes,0);
+ if(oldGrapes!==newGrapes)throw Error('ブドウ実測回数が変化するため保存できません。');
+ return {dayId,sessionId,bonusId,gameEventId:e.id,requestId,base:JSON.stringify(data),
+  before:{rawGames:b.rawGames,counterG:e.counterG,knownG:endBefore},after:{rawGames:desiredG,counterG:desiredG,knownG:endAfter},
+  kind:b.kind,changes,draft};
+}
+function jpShowBonusEditConfirmation(plan){
+ const row=plan.changes.map(z=>`<div class="rpBonusEditAuditRow"><b>🍇 区間 ${esc(z.id.slice(-10))}</b><span>開始 ${z.before.startG??'未確認'} → ${z.after.startG??'未確認'}G／終了 ${z.before.endG??'未確認'} → ${z.after.endG??'未確認'}G</span><span>計測 ${z.before.measuredGames??'未確認'} → ${z.after.measuredGames??'未確認'}G／実測ブドウ ${z.before.grapes}回（変更なし）</span></div>`).join('');
+ const html=`<div class="rpBonusEditConfirmation"><p class="rpBonusEditStatus">✓ 訂正候補の整合性を確認できました（未保存）</p><p><b>${esc(plan.kind)}</b> 当選G：<strong>${plan.before.rawGames}G → ${plan.after.rawGames}G</strong></p><p>着席後累計：${plan.before.knownG}G → ${plan.after.knownG}G</p><p>Gイベント：${esc(plan.gameEventId.slice(-12))}</p>${row||'<p>🍇 計測区間の変更はありません。</p>'}<p class="rpBonusEditUnchanged">ブドウ実測回数・他のボーナス・投資・計測枚数・貯メダルは変更しません。</p><label class="rpBonusEditAgree"><input type="checkbox" name="accept" required>実機の当選Gと上記の影響を確認しました</label></div>`;
+ form('ボーナスG訂正の影響確認',html,v=>{
+  if(v.accept!=='on')throw Error('変更内容を確認してから確定してください。');
+  if(JSON.stringify(data)!==plan.base)throw Error('確認後に実戦記録が変更されました。もう一度訂正内容を計算してください。');
+  return commit(()=>{
+   if(JSON.stringify(data)!==plan.base)throw Error('別の記録更新が発生しました。訂正を停止しました。');
+   const current=data.days.find(x=>x.id===plan.dayId)?.sessions.find(x=>x.id===plan.sessionId);
+   if(!current)throw Error('訂正対象の台が見つかりません。');
+   if((current.bonusEditAudit||[]).some(x=>x.requestId===plan.requestId))throw Error('同じ訂正要求は既に処理済みです。二重訂正を拒否しました。');
+   // A single commit replaces the exact session's planned data and its audit trail together.
+   Object.assign(current,JSON.parse(JSON.stringify(plan.draft)));
+   if(!Array.isArray(current.bonusEditAudit))current.bonusEditAudit=[];
+   current.bonusEditAudit.push({id:uid(),requestId:plan.requestId,bonusId:plan.bonusId,gameEventId:plan.gameEventId,
+    editedAt:stamp(timeNow()),before:plan.before,after:plan.after,segmentChanges:plan.changes,confirmedByUser:true,reason:'実機当選Gの訂正を確認'});
+   V2.validate(data);
+  });
+ });
+ el('rpSubmit').textContent='訂正を確定';
+}
+
 function bonus(kind='BIG',record=null,source='self'){const s=sess();if(!s)return;const b=record;source=b?.source||source;const requestId=b?.requestId||uid();
  const options=[['counter','実機表示のボーナス後G'],['seat','着席後の累計消化G（自分の当選のみ）']];
- form(b?'ボーナスを編集':(source==='self'?(kind==='BIG'?'BIGボーナス登録':'REGボーナス登録'):source==='preSeat'?'着席前履歴を追加':'ヤメ後履歴を追加'),(!b&&source==='self')?bonusTapFields(kind,s.machine):(select('種別','kind',[['BIG','🔴 BIG'],['REG','🔵 REG']],b?.kind||kind)+field(source==='self'?'当選G（実機のボーナス後表示G）':'当選G','games',b?.source==='self'&&b?.inputBasis==='seat'?(s.gameEvents.find(e=>e.bonusId===b.id)?.counterG??b.rawGames):(b?.rawGames??''), 'number')+(source==='self'?'<input type="hidden" name="basis" value="counter"><p class="rpBonusHelp">前回ボーナス後からの表示Gを入力。着席時・前回ボーナスのG数は重複加算されません。</p>':select('G数の入力基準','basis',options.slice(0,1),'counter'))+select('当選契機','trigger',[['unknown','不明'],['single','単独'],['cherry','チェリー重複'],['rare','レアチェリー']],b?.triggerDetail==='rareCherry'?'rare':(b?.trigger||'unknown')))+(source!=='self'?field('当日の当選番号（不明なら空欄）','index',b?.bonusIndexInDay??'','number',false):'')+((!b&&source==='self')?'':`<label class="rpCheck"><input name="provisional" type="checkbox" ${b?.provisional?'checked':''}>暫定記録</label>`)+(source!=='self'?'<p class="small">当日の番号が分かる履歴は、どの順でも追加できます。番号不明の履歴は入力順で表示します。欠けた履歴は補完しません。</p>':''),v=>{if(source==='self'&&!b){if(!['unknown','single','cherry','rare'].includes(v.trigger))throw Error('当選契機を選択してください。');if(v.games===''||number(v.games,'当選G')<1)throw Error('当選ゲーム数を1G以上で入力してください。');if(s.seat.inputKnown?.current===false)throw Error('着席時のボーナス後Gが未確認です。着席情報で実測Gを確認してから登録してください。');}if(s.machine==='girls'&&v.kind==='REG'&&v.trigger==='rare'&&!(b&&b.kind==='REG'&&b.triggerDetail==='rareCherry'))throw Error('ジャグラーガールズSSのREGにレアチェリー重複は登録できません。');return commit(()=>{const raw=number(v.games,'当選G');if(source!=='self'&&raw===0)throw Error('着席前・ヤメ後の0G履歴は要確認です。');const x={...(b||{}),id:b?.id||uid(),machineSessionId:s.id,kind:v.kind,trigger:v.trigger==='rare'?'cherry':v.trigger,triggerDetail:v.trigger==='rare'?'rareCherry':null,rawGames:raw,inputBasis:v.basis,source,provisional:!!v.provisional,timestamp:b?.timestamp||(source==='self'?stamp(timeNow()):undefined),order:b?.order??Math.max(0,...ordered(s,source).map(b=>b.order))+1,seq:b?.seq??seq(day())};if(source!=='self'){x.bonusIndexInDay=number(v.index,'当選番号',true);if(x.bonusIndexInDay===0)throw Error('当選番号は1以上です。');if(source==='preSeat'&&(s.seat.inputKnown?.big===false||s.seat.inputKnown?.reg===false))throw Error('着席時BIG・REG回数が未確認です。着席情報を確認してください。');if(source==='preSeat'&&x.bonusIndexInDay>s.seat.big+s.seat.reg)throw Error('着席前の当選番号が着席時の総回数を超えています。');if(source==='postExit'&&x.bonusIndexInDay!=null&&x.bonusIndexInDay<=s.seat.big+s.seat.reg+ordered(s).length)throw Error('ヤメ後の当選番号を確認してください。');}else if(!b){const seg=s.counterSegments.at(-1),already=V2.calculate(s).knownG;const counterValue=v.basis==='seat'?raw-already+(s.gameEvents.some(e=>e.type==='bonus')?0:seg.startCounterG):raw;if(counterValue<0)throw Error('自己累計Gが前回記録より小さいため確認してください。');const grapeBefore=grapeKnown(s);const result=V2.bonus(s,{id:x.id,requestId,kind:x.kind,trigger:x.trigger,counterG:counterValue});if(!result.added)return;grapeOnBonus(s,grapeBefore,grapeKnown(s));Object.assign(s.bonuses.find(z=>z.id===x.id),x,{requestId});s.currentG=0;}if(b){s.bonuses[s.bonuses.findIndex(z=>z.id===b.id)]={...x,requestId:b.requestId};const ev=s.gameEvents.find(e=>e.bonusId===b.id);if(ev){if(v.basis==='seat')throw Error('累計基準の編集は現在未対応です。表示Gで登録してください。');grapeTimelineGuard(s,()=>{ev.counterG=raw;},'ボーナスG数の編集');}}else if(source!=='self')s.bonuses.push(x);const normalizedSelf=normalized(s);normalizedSelf.forEach(n=>Object.assign(s.bonuses.find(b=>b.id===n.id),{bonusIndexInDay:n.bonusIndexInDay,gamesSinceLastBonus:n.gamesSinceLastBonus,gamesSinceSeat:n.gamesSinceSeat}));});});}
+ form(b?'ボーナスを編集':(source==='self'?(kind==='BIG'?'BIGボーナス登録':'REGボーナス登録'):source==='preSeat'?'着席前履歴を追加':'ヤメ後履歴を追加'),(!b&&source==='self')?bonusTapFields(kind,s.machine):(select('種別','kind',[['BIG','🔴 BIG'],['REG','🔵 REG']],b?.kind||kind)+field(source==='self'?'当選G（実機のボーナス後表示G）':'当選G','games',b?.source==='self'&&b?.inputBasis==='seat'?(s.gameEvents.find(e=>e.bonusId===b.id)?.counterG??b.rawGames):(b?.rawGames??''), 'number')+(source==='self'?'<input type="hidden" name="basis" value="counter"><p class="rpBonusHelp">前回ボーナス後からの表示Gを入力。着席時・前回ボーナスのG数は重複加算されません。</p>':select('G数の入力基準','basis',options.slice(0,1),'counter'))+select('当選契機','trigger',[['unknown','不明'],['single','単独'],['cherry','チェリー重複'],['rare','レアチェリー']],b?.triggerDetail==='rareCherry'?'rare':(b?.trigger||'unknown')))+(source!=='self'?field('当日の当選番号（不明なら空欄）','index',b?.bonusIndexInDay??'','number',false):'')+((!b&&source==='self')?'':`<label class="rpCheck"><input name="provisional" type="checkbox" ${b?.provisional?'checked':''}>暫定記録</label>`)+(source!=='self'?'<p class="small">当日の番号が分かる履歴は、どの順でも追加できます。番号不明の履歴は入力順で表示します。欠けた履歴は補完しません。</p>':''),v=>{if(source==='self'&&!b){if(!['unknown','single','cherry','rare'].includes(v.trigger))throw Error('当選契機を選択してください。');if(v.games===''||number(v.games,'当選G')<1)throw Error('当選ゲーム数を1G以上で入力してください。');if(s.seat.inputKnown?.current===false)throw Error('着席時のボーナス後Gが未確認です。着席情報で実測Gを確認してから登録してください。');}if(s.machine==='girls'&&v.kind==='REG'&&v.trigger==='rare'&&!(b&&b.kind==='REG'&&b.triggerDetail==='rareCherry'))throw Error('ジャグラーガールズSSのREGにレアチェリー重複は登録できません。');
+ if(b&&source==='self'&&number(v.games,'当選G')!==b.rawGames){
+  const previousTrigger=b.triggerDetail==='rareCherry'?'rare':(b.trigger||'unknown');
+  if(v.kind!==b.kind||v.trigger!==previousTrigger||v.provisional==='on'!==!!b.provisional)
+   throw Error('当選Gの訂正と種別・契機の変更は同時に行えません。まず当選Gだけ訂正してください。');
+  const plan=jpPlanBonusGEdit(day()?.id,s.id,b.id,number(v.games,'当選G'),uid());
+  jpShowBonusEditConfirmation(plan);return true;
+ }
+ return commit(()=>{const raw=number(v.games,'当選G');if(source!=='self'&&raw===0)throw Error('着席前・ヤメ後の0G履歴は要確認です。');const x={...(b||{}),id:b?.id||uid(),machineSessionId:s.id,kind:v.kind,trigger:v.trigger==='rare'?'cherry':v.trigger,triggerDetail:v.trigger==='rare'?'rareCherry':null,rawGames:raw,inputBasis:v.basis,source,provisional:!!v.provisional,timestamp:b?.timestamp||(source==='self'?stamp(timeNow()):undefined),order:b?.order??Math.max(0,...ordered(s,source).map(b=>b.order))+1,seq:b?.seq??seq(day())};if(source!=='self'){x.bonusIndexInDay=number(v.index,'当選番号',true);if(x.bonusIndexInDay===0)throw Error('当選番号は1以上です。');if(source==='preSeat'&&(s.seat.inputKnown?.big===false||s.seat.inputKnown?.reg===false))throw Error('着席時BIG・REG回数が未確認です。着席情報を確認してください。');if(source==='preSeat'&&x.bonusIndexInDay>s.seat.big+s.seat.reg)throw Error('着席前の当選番号が着席時の総回数を超えています。');if(source==='postExit'&&x.bonusIndexInDay!=null&&x.bonusIndexInDay<=s.seat.big+s.seat.reg+ordered(s).length)throw Error('ヤメ後の当選番号を確認してください。');}else if(!b){const seg=s.counterSegments.at(-1),already=V2.calculate(s).knownG;const counterValue=v.basis==='seat'?raw-already+(s.gameEvents.some(e=>e.type==='bonus')?0:seg.startCounterG):raw;if(counterValue<0)throw Error('自己累計Gが前回記録より小さいため確認してください。');const grapeBefore=grapeKnown(s);const result=V2.bonus(s,{id:x.id,requestId,kind:x.kind,trigger:x.trigger,counterG:counterValue});if(!result.added)return;grapeOnBonus(s,grapeBefore,grapeKnown(s));Object.assign(s.bonuses.find(z=>z.id===x.id),x,{requestId});s.currentG=0;}if(b){s.bonuses[s.bonuses.findIndex(z=>z.id===b.id)]={...x,requestId:b.requestId};const ev=s.gameEvents.find(e=>e.bonusId===b.id);if(ev){if(v.basis==='seat')throw Error('累計基準の編集は現在未対応です。表示Gで登録してください。');grapeTimelineGuard(s,()=>{ev.counterG=raw;},'ボーナスG数の編集');}}else if(source!=='self')s.bonuses.push(x);const normalizedSelf=normalized(s);normalizedSelf.forEach(n=>Object.assign(s.bonuses.find(b=>b.id===n.id),{bonusIndexInDay:n.bonusIndexInDay,gamesSinceLastBonus:n.gamesSinceLastBonus,gamesSinceSeat:n.gamesSinceSeat}));});});}
 function transaction(type,existing=null){const d=day(),s=sess(),e=existing;if(type==='cash'&&cashCancelled(e)){alert('取消済みの投資は編集できません。');return;}
  const titles={cash:'💸 現金を追加投入',withdraw:'🪙 貯メダルを引き出す',deposit:'🪙 貯メダルへ預ける',exchange:'💴 景品交換・現金回収',correction:'🪙 持ちメダルを補正'};
  const money=type==='cash'?Number((e?.amount||0)/1000):0;
@@ -4091,6 +4209,13 @@ function rpKachiScreen(s){
  const state=!g?'未計測':t.pending?'⚠ 未確定区間あり':z?'● 計測中':'⏸ 停止中';
  const enabled=!!z&&!storageBlocked&&!reloadRequired&&writeStatus!=='unknown';
  const totalEnabled=total!==null&&!storageBlocked&&!reloadRequired&&writeStatus!=='unknown';
+ // PM-020: share the live screen's whole-machine numerator, known flags and prob() rounding.
+ // Unknown pre-seat BIG/REG is never treated as zero, even if own hits are known.
+ const own=stats(s),seatBigKnown=s.seat.inputKnown?.big!==false,seatRegKnown=s.seat.inputKnown?.reg!==false;
+ const wholeBig=seatBigKnown?s.seat.big+own.big:null,wholeReg=seatRegKnown?s.seat.reg+own.reg:null;
+ const countLabel=n=>n===null?'未確認':fmt(n)+'回';
+ const rateLabel=n=>total===null||n===null?'未確認':(total<=0||n<=0)?'—':prob(total,n);
+ const combinedRate=wholeBig===null||wholeReg===null?'未確認':rateLabel(wholeBig+wholeReg);
  return `<div class="rpKachiScreen" id="rpKachiScreen" aria-label="横画面カチカチモード">
   <div class="rpKachiLandscape">
    <header class="rpKachiTop"><span class="rpKachiBrand">🎰 カチカチモード</span><span class="rpKachiMachine">${esc(machineName(s))} · ${esc(s.table)}番台</span><button type="button" class="rpKachiBack" data-rp-action="kachiLeave">通常画面へ戻る ×</button></header>
@@ -4108,11 +4233,12 @@ function rpKachiScreen(s){
         <button type="button" data-rp-action="kachiG1" ${!totalEnabled?'disabled':''}>＋1</button>
       </div>
       <button type="button" class="rpKachiGUndo" data-rp-action="kachiGUndo" ${!rpKachiGUndoStack.length?'disabled':''}>↶ 直前の加算を戻す</button>
+      <div class="rpKachiCombined"><span>BIG・REG 合算</span><strong>${combinedRate}</strong></div>
       <div class="rpKachiOwn">着席 ${fmt(s.seat.total)}G ・ 自分 ${calc.unknown?'未確定':fmt(calc.knownG)+'G'}</div>
     </section>
     <section class="rpKachiPane rpKachiBonuses"><div class="rpKachiPaneTitle">ボーナスを登録</div>
-      <button type="button" class="rpKachiBig" data-rp-action="big">BIG 登録</button>
-      <button type="button" class="rpKachiReg" data-rp-action="reg">REG 登録</button>
+      <button type="button" class="rpKachiBig rpKachiBonusButton" data-rp-action="big" aria-label="BIG登録・累計 ${countLabel(wholeBig)}・確率 ${rateLabel(wholeBig)}"><span class="rpKachiBonusInfo"><span>累計 ${countLabel(wholeBig)}</span><span>${rateLabel(wholeBig)}</span></span><span class="rpKachiActionLabel">BIG登録</span></button>
+      <button type="button" class="rpKachiReg rpKachiBonusButton" data-rp-action="reg" aria-label="REG登録・累計 ${countLabel(wholeReg)}・確率 ${rateLabel(wholeReg)}"><span class="rpKachiBonusInfo"><span>累計 ${countLabel(wholeReg)}</span><span>${rateLabel(wholeReg)}</span></span><span class="rpKachiActionLabel">REG登録</span></button>
     </section>
    </div>
    <div class="rpKachiFoot">${t.pending||t.missing||calc.unknown?'⚠ 計測区間またはG数が未確定です。通常画面の詳細操作で確認してください。':'ブドウ確率は着席後の計測区間だけを使用します。'}</div>
@@ -4876,6 +5002,23 @@ html.rpKachiActive #jugpokeQAStatus{display:none!important}
  #rpKachiScreen .rpKachiTotalTouch{min-height:42px}
  #rpKachiScreen .rpKachiTotalTouch strong{font-size:clamp(25px,7vh,46px)}
  #rpKachiScreen .rpKachiPane{gap:2px}
+}
+</style>
+
+
+<style id="jp-pm020-kachikachi-bonus-metrics">
+/* PM-020: compact auxiliary metrics are overlaid inside the original large buttons;
+   no button height or tap area is sacrificed on the smallest iPhone landscape. */
+#rpKachiScreen .rpKachiBonusButton{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px 4px 4px;box-shadow:0 2px 0 rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.16);transition:filter .08s,transform .08s;cursor:pointer}
+#rpKachiScreen .rpKachiBonusButton:active{filter:brightness(1.12);transform:translateY(1px)}
+#rpKachiScreen .rpKachiActionLabel{display:block;width:100%;text-align:center;line-height:1.05}
+#rpKachiScreen .rpKachiBonusInfo{position:absolute;left:7px;right:7px;top:6px;display:flex;align-items:center;justify-content:space-between;gap:3px;font-size:clamp(9px,1.35vw,12px);line-height:1.12;font-weight:700;color:#fff;white-space:nowrap;text-align:left}
+#rpKachiScreen .rpKachiBonusInfo span:last-child{font-variant-numeric:tabular-nums;text-align:right}
+#rpKachiScreen .rpKachiCombined{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:3px 6px;border:1px solid #425e78;border-radius:8px;background:#1b3249;color:#d6eaff;font-size:clamp(10px,1.4vw,12px);line-height:1.15;white-space:nowrap}
+#rpKachiScreen .rpKachiCombined strong{font-size:clamp(12px,1.85vw,16px);color:#fff;font-variant-numeric:tabular-nums}
+@media(orientation:landscape) and (max-height:340px){
+ #rpKachiScreen .rpKachiBonusInfo{font-size:9px;top:4px;left:5px;right:5px}
+ #rpKachiScreen .rpKachiCombined{padding:2px 4px}
 }
 </style>
 
